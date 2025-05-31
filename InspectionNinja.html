@@ -17,6 +17,7 @@
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
+      position: relative; /* Added to support absolute positioning of the icon */
     }
     #console {
       flex: 1;
@@ -269,10 +270,42 @@
       color: #636366;
       font-style: italic;
     }
+.header-container {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    .header-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 12px;
+    }
+    .header-text {
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      margin-left: 10px;
+      color: #1d1d1f;
+      letter-spacing: 0.03em;
+    }
+    .header-text .metanynja {
+      font-family: 'Nothing You Could Do', cursive; /* Google Fonts cursive font */
+      font-size: 22px;
+      margin-left:10px;
+      
+    }
   </style>
+  <!-- Add Google Fonts for cursive MetaNynja -->
+  <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1 class="main-header">Inspection Ninja</h1>
+  <div class="header-container">
+    <img src="https://i.ibb.co/23KNG1cL/saving-PNG.png" alt="Inspection Ninja Icon" class="header-icon">
+    <div class="header-text">Inspection Ninja by<span class="metanynja">MetaNynja</span></div>
+  </div>
   <div id="console">
     <div id="output"></div>
     <div id="input-line" class="line">
