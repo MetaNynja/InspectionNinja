@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XRPL Token & Trade Info</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background: linear-gradient(180deg, #e6f0ff 0%, #f2f2f7 100%);
+      color: #1d1d1f;
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+    #console {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      border-radius: 16px;
+      margin: 0;
+      overflow: hidden;
+      box-sizing: border-box;
+      min-height: 0;
+    }
+    #output {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      min-height: 0;
+    }
+    .line {
+      margin: 0 0 10px 0;
+      color: #1d1d1f;
+    }
+    .header {
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: #1d1d1f;
+      text-align: center;
+      margin: 28px 0;
+      letter-spacing: 0.03em;
+    }
+    .main-header {
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 600;
+      font-size: 28px;
+      color: #1d1d1f;
+      text-align: center;
+      margin: 20px 0;
+      letter-spacing: 0.05em;
+    }
+    .separator {
+      border-top: 1px solid #e8e8ed;
+      margin: 16px 0;
+    }
+    #input-line {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      padding: 12px 20px;
+      border-top: 1px solid #e8e8ed;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 0 0 16px 16px;
+    }
+    #cmd-input {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #d2d2d7;
+      border-radius: 12px;
+      outline: none;
+      color: #1d1d1f;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 12px 16px;
+      flex: 1;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    #cmd-input:focus {
+      border-color: #007aff;
+      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2);
+    }
+    #cmd-input::placeholder {
+      color: #8e8e93;
+      transition: transform 0.3s ease;
+    }
+    #cmd-input:focus::placeholder {
+      transform: translateX(4px);
+    }
+    a {
+      color: #007aff;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    a:hover {
+      color: #005bb5;
+      transform: scale(1.05);
+      display: inline-block;
+    }
+    .expandable {
+      cursor: pointer;
+      color: #007aff;
+      text-decoration: underline;
+      transition: all 0.2s ease;
+    }
+    .expandable:hover {
+      color: #005bb5;
+      transform: scale(1.05);
+      display: inline-block;
+    }
+    .hidden {
+      display: none;
+    }
+    .blinking {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .expanded {
+      border: 1px solid #e8e8ed;
+      padding: 16px;
+      margin: 12px 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .expanded .line {
+      margin-bottom: 14px;
+    }
+    #loadingLine {
+      margin: 24px 0;
+      padding: 12px;
+      color: #636366;
+      font-style: italic;
+    }
+    .error {
+      color: #ff3b30;
+      font-weight: 500;
+    }
+    .custom-dropdown {
+      position: relative;
+      display: inline-block;
+      margin-right: 16px;
+    }
+    .dropdown-toggle {
+      background: rgba(255, 255, 255, 0.95);
+      color: #1d1d1f;
+      font-size: 14px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 1px solid #d2d2d7;
+      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .dropdown-toggle:hover {
+      background: #f2f2f7;
+      transform: translateY(-1px);
+    }
+    .dropdown-toggle::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(0, 122, 255, 0.1);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s, height 0.3s;
+    }
+    .dropdown-toggle:active::after {
+      width: 200px;
+      height: 200px;
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid #e8e8ed;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+      z-index: 4;
+      width: 220px;
+      transform: scale(0.95);
+      transform-origin: bottom left;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .dropdown-menu.show {
+      display: block;
+      transform: scale(1);
+    }
+    .dropdown-option {
+      padding: 12px 16px;
+      color: #1d1d1f;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .dropdown-option:hover {
+      background: #e6f0ff;
+      color: #007aff;
+      transform: translateX(4px);
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 16px 0;
+      font-size: 13px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #e8e8ed;
+      padding: 12px 16px;
+      text-align: left;
+      word-break: break-all;
+    }
+    th {
+      background: #f2f2f7;
+      color: #1d1d1f;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background: #fafafa;
+    }
+    tr:hover {
+      background: #e6f0ff;
+      transition: background 0.2s ease;
+    }
+    tr {
+      cursor: pointer;
+    }
+    .details-row {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      border-top: none;
+    }
+    .details-row td {
+      padding: 16px;
+      border-top: none;
+    }
+    .details-content {
+      padding: 12px;
+      background: rgba(245, 245, 245, 0.9);
+      border-radius: 8px;
+    }
+    .loading-details {
+      color: #636366;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="main-header">Inspection Ninja</h1>
+  <div id="console">
+    <div id="output"></div>
+    <div id="input-line" class="line">
+      <div class="custom-dropdown">
+        <div class="dropdown-toggle" id="scope-toggle">Scope Level: Token Metrics</div>
+        <div class="dropdown-menu" id="scope-menu">
+          <div class="dropdown-option" data-value="overview" data-name="Token Metrics">
+            Token Metrics
+          </div>
+          <div class="dropdown-option" data-value="dev" data-name="DEV Inspect">
+            + DEV Inspect
+          </div>
+          <div class="dropdown-option" data-value="tier1" data-name="Tier 1 Transfers">
+            + Tier 1 Transfers
+          </div>
+          <div class="dropdown-option" data-value="tier2" data-name="Tier 2 Transfers">
+           + Tier 2 Transfers
+          </div>
+          <div class="dropdown-option" data-value="snipers" data-name="Snipers">
+            Snipers
+          </div>
+        </div>
+      </div>
+      <span class="prompt"></span>
+      <input type="text" id="cmd-input" placeholder="Enter Issuer Address" autofocus />
+    </div>
+  </div>
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/xrpl@2.6.0/build/xrpl-latest-min.js"></script>
+
+  <script>
+    /* ---------- Global State ---------- */
+    let enrichedPayments = [];
+    let lastIssuer = null;
+    const purchaserDetailsCache = new Map(); // Cache for purchaser details
+
+    /* ---------- Helper Functions ---------- */
+    function hexToAscii(hex) {
+      let str = '';
+      for (let i = 0; i < hex.length; i += 2) {
+        const charCode = parseInt(hex.substr(i, 2), 16);
+        if (charCode >= 32 && charCode <= 126) {
+          str += String.fromCharCode(charCode);
+        }
+      }
+      return str;
+    }
+
+    function getCurrencyDisplay(currency) {
+      return currency.length === 3 ? currency : hexToAscii(currency);
+    }
+
+    function formatAmount(amount) {
+      if (amount === 'N/A' || isNaN(amount)) return amount;
+      return Number(amount).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    }
+
+    function updateLoadingMessage(message) {
+      document.getElementById("output").innerHTML = `<div class="line" id="loadingLine">${message} <span class="blinking">...</span></div>`;
+    }
+
+    function displayError(message) {
+      document.getElementById("output").innerHTML = `<div class="line error">Error: ${message}</div>`;
+      addNewPrompt();
+    }
+
+    function validateIssuerAddress(address) {
+      try {
+        return xrpl.isValidAddress(address);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function toggleSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.toggle('hidden');
+      }
+    }
+
+    /* ---------- Data Fetching Functions ---------- */
+    async function connectClient() {
+      const primaryNode = 'wss://xrplcluster.com';
+      const fallbackNode = 'wss://s1.ripple.com';
+      const client = new xrpl.Client(primaryNode);
+      try {
+        await Promise.race([
+          client.connect(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('XRPL client connection timed out')), 7000))
+        ]);
+        return client;
+      } catch (error) {
+        console.warn(`Failed to connect to ${primaryNode}, trying ${fallbackNode}:`, error);
+        client.url = fallbackNode;
+        try {
+          await Promise.race([
+            client.connect(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('XRPL client connection timed out')), 7000))
+          ]);
+          return client;
+        } catch (fallbackError) {
+          throw new Error(`Failed to connect to XRPL nodes: ${fallbackError.message}`);
+        }
+      }
+    }
+
+    async function fetchWithRetry(client, request, retries = 3, delay = 1000) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          return await Promise.race([
+            client.request(request),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Request timed out')), 10000))
+          ]);
+        } catch (error) {
+          if (i < retries - 1) {
+            console.warn(`Retry ${i + 1}/${retries} for ${request.command} after error: ${error.message}`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          } else {
+            throw error;
+          }
+        }
+      }
+    }
+
+    async function getActivatorAddress(issuer) {
+      updateLoadingMessage("Fetching activator address");
+      const client = await connectClient();
+      try {
+        const issuerTxResponse = await fetchWithRetry(client, {
+          command: "account_tx",
+          account: issuer,
+          ledger_index_min: -1,
+          ledger_index_max: -1,
+          forward: true,
+          limit: 1
+        });
+
+        if (!issuerTxResponse.result.transactions?.length) {
+          throw new Error('No transaction history for this issuer.');
+        }
+
+        const activationTx = issuerTxResponse.result.transactions[0].tx;
+        if (activationTx.TransactionType !== 'Payment' ||
+            activationTx.Destination !== issuer ||
+            typeof activationTx.Amount !== 'string') {
+          throw new Error('Initial activation transaction is not valid.');
+        }
+
+        let activator = activationTx.Account;
+        let creationDate = activationTx.date || 0;
+        let isAntiSniper = false;
+
+        const antiSniperAddress = 'rMFMJsQa1xDCcEV78ePWdpVhUoatbZmzPt';
+        if (activator === antiSniperAddress) {
+          isAntiSniper = true;
+          updateLoadingMessage("Detected anti-sniper token, searching for true activator");
+
+          let marker;
+          let ammAddress = null;
+          let txCount = 0;
+          const maxTxCount = 10000;
+          do {
+            const paymentTxResponse = await fetchWithRetry(client, {
+              command: "account_tx",
+              account: issuer,
+              ledger_index_min: -1,
+              ledger_index_max: -1,
+              forward: true,
+              limit: 200,
+              ...(marker ? { marker } : {})
+            });
+
+            const txs = paymentTxResponse.result.transactions || [];
+            txCount += txs.length;
+            console.log(`Fetched ${txs.length} transactions for issuer, total: ${txCount}`);
+
+            for (const txObj of txs) {
+              const tx = txObj.tx;
+              if (tx.TransactionType === 'Payment' && tx.Account === issuer && tx.Destination !== issuer) {
+                ammAddress = tx.Destination;
+                console.log(`Found first Payment transaction, AMM address: ${ammAddress}`);
+                break;
+              }
+            }
+            marker = paymentTxResponse.result.marker;
+            if (ammAddress || !marker || !txs.length || txCount >= maxTxCount) break;
+          } while (marker);
+
+          if (!ammAddress) {
+            throw new Error(`Could not find a Payment transaction from the issuer after checking ${txCount} transactions.`);
+          }
+
+          updateLoadingMessage(`Searching AMM (${ammAddress}) for CheckCreate transaction`);
+          let checkMarker;
+          let trueActivator = null;
+          let checkTxCount = 0;
+          do {
+            const ammTxResponse = await fetchWithRetry(client, {
+              command: "account_tx",
+              account: ammAddress,
+              ledger_index_min: -1,
+              ledger_index_max: -1,
+              forward: true,
+              limit: 200,
+              ...(checkMarker ? { marker: checkMarker } : {})
+            });
+
+            const ammTxs = ammTxResponse.result.transactions || [];
+            checkTxCount += ammTxs.length;
+            console.log(`Fetched ${ammTxs.length} transactions for AMM, total: ${checkTxCount}`);
+
+            for (const txObj of ammTxs) {
+              const tx = txObj.tx;
+              if (tx.TransactionType === 'CheckCreate') {
+                trueActivator = tx.Destination;
+                creationDate = tx.date || 0;
+                console.log(`Found CheckCreate transaction, true activator: ${trueActivator}`);
+                break;
+              }
+            }
+            checkMarker = ammTxResponse.result.marker;
+            if (trueActivator || !checkMarker || !ammTxs.length || checkTxCount >= maxTxCount) break;
+          } while (checkMarker);
+
+          if (!trueActivator) {
+            throw new Error(`Could not find a CheckCreate transaction for the AMM address (${ammAddress}) after checking ${checkTxCount} transactions.`);
+          }
+
+          activator = trueActivator;
+        }
+
+        return { activator, creationDate, isAntiSniper };
+      } finally {
+        await client.disconnect();
+      }
+    }
+
+    async function getCurrencyCode(issuer) {
+      updateLoadingMessage("Fetching currency code");
+      const client = await connectClient();
+      try {
+        const txResponse = await fetchWithRetry(client, {
+          command: "account_tx",
+          account: issuer,
+          ledger_index_min: -1,
+          ledger_index_max: -1,
+          forward: false,
+          limit: 200
+        });
+        if (txResponse.result.transactions && txResponse.result.transactions.length > 0) {
+          for (const txObj of txResponse.result.transactions) {
+            const tx = txObj.tx;
+            if (tx.Amount && typeof tx.Amount === 'object' && tx.Amount.currency && tx.Amount.issuer === issuer) {
+              return tx.Amount.currency;
+            }
+            if (tx.DeliveredAmount && typeof tx.DeliveredAmount === 'object' && tx.DeliveredAmount.currency && tx.DeliveredAmount.issuer === issuer) {
+              return tx.DeliveredAmount.currency;
+            }
+          }
+        }
+        const gbResponse = await fetchWithRetry(client, {
+          command: "gateway_balances",
+          account: issuer,
+          ledger_index: "validated"
+        });
+        if (gbResponse.result && gbResponse.result.assets) {
+          const assets = gbResponse.result.assets;
+          const currencies = Object.keys(assets);
+          if (currencies.length > 0) {
+            return currencies[0];
+          }
+        }
+        throw new Error("Currency code not found using account_tx or gateway_balances");
+      } finally {
+        await client.disconnect();
+      }
+    }
+
+    async function getTokenMetrics(issuer, currencyCode, activator) {
+      updateLoadingMessage("Fetching token metrics");
+      const client = await connectClient();
+      try {
+        const accountLinesResponse = await fetchWithRetry(client, {
+          command: "account_lines",
+          account: activator,
+          ledger_index: "validated",
+          peer: issuer
+        });
+        const lines = accountLinesResponse.result.lines || [];
+        const tokenLine = lines.find(line => 
+          line.currency === currencyCode && line.account === issuer
+        );
+        const currentBalance = tokenLine ? parseFloat(tokenLine.balance) : 0;
+
+        let marker;
+        const transactions = [];
+        let markerIssuer;
+        const issuerTxs = [];
+        const seenTxs = new Set();
+        let txCount = 0;
+        const maxTxCount = 10000;
+
+        do {
+          const params = {
+            command: "account_tx",
+            account: activator,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            limit: 200,
+            ...(marker ? { marker } : {})
+          };
+          const txResponse = await fetchWithRetry(client, params);
+          if (txResponse.result.transactions) {
+            transactions.push(...txResponse.result.transactions);
+            txCount += txResponse.result.transactions.length;
+            console.log(`Fetched ${txResponse.result.transactions.length} activator transactions, total: ${txCount}`);
+          }
+          marker = txResponse.result.marker;
+          if (!marker || !txResponse.result.transactions.length || txCount >= maxTxCount) break;
+        } while (marker);
+
+        txCount = 0;
+        do {
+          const paramsIssuer = {
+            command: "account_tx",
+            account: issuer,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            limit: 200,
+            ...(markerIssuer ? { marker: markerIssuer } : {})
+          };
+          const issuerTxResponse = await fetchWithRetry(client, paramsIssuer);
+          if (issuerTxResponse.result.transactions) {
+            issuerTxs.push(...issuerTxResponse.result.transactions);
+            txCount += issuerTxResponse.result.transactions.length;
+            console.log(`Fetched ${issuerTxResponse.result.transactions.length} issuer transactions, total: ${txCount}`);
+          }
+          markerIssuer = issuerTxResponse.result.marker;
+          if (!markerIssuer || !issuerTxResponse.result.transactions.length || txCount >= maxTxCount) break;
+        } while (markerIssuer);
+
+        let initialBalance = 0;
+        let devBurned = 0;
+        let devBurnedTxs = [];
+        let issuerBurned = 0;
+        let issuerBurnedTxs = [];
+
+        transactions.forEach(txObj => {
+          const tx = txObj.tx;
+          const meta = txObj.meta;
+          if (tx.TransactionType === 'CheckCash' &&
+              tx.Amount && typeof tx.Amount === 'object' &&
+              tx.Amount.currency === currencyCode && tx.Amount.issuer === issuer) {
+            initialBalance += parseFloat(tx.Amount.value);
+          } else if (tx.TransactionType === 'Payment' &&
+                     tx.Destination === issuer &&
+                     tx.Amount && typeof tx.Amount === 'object' &&
+                     tx.Amount.currency === currencyCode && tx.Amount.issuer === issuer &&
+                     meta.TransactionResult === 'tesSUCCESS' &&
+                     !meta.AffectedNodes.some(node => node.ModifiedNode?.LedgerEntryType === 'AMM')) {
+            const amt = parseFloat(tx.Amount.value);
+            devBurned += amt;
+            let txHash = tx.hash || txObj.tx.hash || 'N/A';
+            if (!seenTxs.has(txHash)) {
+              seenTxs.add(txHash);
+              devBurnedTxs.push({ txHash, amount: amt, source: 'DEV' });
+            }
+          }
+        });
+
+        issuerTxs.forEach(txObj => {
+          const tx = txObj.tx;
+          const meta = txObj.meta;
+          if (tx.TransactionType === 'Payment' &&
+              tx.Destination === issuer &&
+              tx.Amount && typeof tx.Amount === 'object' &&
+              tx.Amount.currency === currencyCode && tx.Amount.issuer === issuer &&
+              meta.TransactionResult === 'tesSUCCESS' &&
+              !meta.AffectedNodes.some(node => node.ModifiedNode?.LedgerEntryType === 'AMM')) {
+            const amt = parseFloat(tx.Amount.value);
+            issuerBurned += amt;
+            let txHash = tx.hash || txObj.tx.hash || 'N/A';
+            if (!seenTxs.has(txHash)) {
+              seenTxs.add(txHash);
+              issuerBurnedTxs.push({ txHash, amount: amt, source: 'ISSUER' });
+            }
+          }
+        });
+
+        const combinedBurnedTxs = devBurnedTxs.concat(issuerBurnedTxs);
+        const totalBurned = devBurned + issuerBurned;
+        const sold = Math.max(initialBalance - (currentBalance + totalBurned), 0);
+
+        return {
+          initialBalance,
+          currentBalance,
+          devBurned,
+          totalBurned,
+          sold,
+          devBurnedTxs,
+          totalBurnedTxs: combinedBurnedTxs
+        };
+      } catch (error) {
+        console.error('Error in getTokenMetrics:', error);
+        return { 
+          initialBalance: 'N/A', 
+          currentBalance: 'N/A', 
+          devBurned: 'N/A', 
+          totalBurned: 'N/A',
+          sold: 'N/A', 
+          devBurnedTxs: [], 
+          totalBurnedTxs: []
+        };
+      } finally {
+        await client.disconnect();
+      }
+    }
+
+    async function fetchDexscreenerData(issuer) {
+      updateLoadingMessage("Fetching market data");
+      try {
+        const response = await Promise.race([
+          axios.get(`https://api.dexscreener.com/latest/dex/search?q=${issuer}`),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('DexScreener request timed out')), 5000))
+        ]);
+        if (response.data.pairs && response.data.pairs.length > 0) {
+          const pair = response.data.pairs[0];
+          const fdv = pair.stats && pair.stats.fdv ? pair.stats.fdv : pair.fdv;
+          const priceNative = pair.priceNative || (pair.token0 && pair.token0.priceNative ? pair.token0.priceNative : null);
+          const marketCap = fdv ? `$${Number(fdv).toLocaleString()}` : 'N/A';
+          const liquidity = (pair.liquidity && pair.liquidity.usd)
+            ? `$${Number(pair.liquidity.usd).toLocaleString()}`
+            : 'N/A';
+
+          let supply;
+          if (pair.token0) {
+            if (pair.token0.supply) {
+              supply = Number(pair.token0.supply);
+            } else if (pair.token0.totalSupply) {
+              supply = Number(pair.token0.totalSupply);
+            }
+          }
+          if (!supply && fdv && priceNative && Number(priceNative) !== 0) {
+            supply = Number(fdv) / Number(priceNative);
+          }
+          return { marketCap, supply, priceNative, liquidity };
+        }
+        return { marketCap: 'N/A', supply: 'N/A', priceNative: 'N/A', liquidity: 'N/A' };
+      } catch (error) {
+        console.error('Error fetching market data:', error);
+        return { marketCap: 'N/A', supply: 'N/A', priceNative: 'N/A', liquidity: 'N/A' };
+      }
+    }
+
+    async function getTokenInfoFromXrplTo(issuer, currency) {
+      updateLoadingMessage("Fetching additional token information");
+      try {
+        const response = await Promise.race([
+          axios.get(`https://api.xrpl.to/api/token/${issuer}_${currency}`),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('xrpl.to API request timed out')), 5000))
+        ]);
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching additional token information:', error);
+        return null;
+      }
+    }
+
+    async function fetchAllTrustLines(issuer, currency) {
+      updateLoadingMessage("Fetching top holders");
+      const client = await connectClient();
+      try {
+        let trustLines = [];
+        let marker;
+        let txCount = 0;
+        const maxTxCount = 10000;
+        do {
+          const response = await fetchWithRetry(client, {
+            command: "account_lines",
+            account: issuer,
+            ledger_index: "validated",
+            limit: 200,
+            ...(marker ? { marker } : {})
+          });
+          const lines = response.result.lines.filter(line => line.currency === currency);
+          trustLines = trustLines.concat(lines);
+          marker = response.result.marker;
+          txCount += lines.length;
+          console.log(`Fetched ${lines.length} trust lines, total: ${txCount}`);
+          if (!marker || !response.result.lines.length || txCount >= maxTxCount) break;
+        } while (marker);
+
+        const holders = trustLines
+          .map(line => ({
+            account: line.account,
+            balance: Math.abs(parseFloat(line.balance))
+          }))
+          .filter(holder => holder.balance > 0)
+          .sort((a, b) => b.balance - a.balance)
+          .slice(0, 10);
+        return holders;
+      } catch (error) {
+        console.error('Error fetching top holders:', error);
+        return [];
+      } finally {
+        await client.disconnect();
+      }
+    }
+
+    async function getPaymentTransactions(issuer, currencyCode) {
+      updateLoadingMessage("Fetching payment transactions");
+      const client = await connectClient();
+      try {
+        let payments = [];
+        let marker;
+        let txCount = 0;
+        const maxTxCount = 10000;
+        do {
+          const response = await fetchWithRetry(client, {
+            command: "account_tx",
+            account: issuer,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            forward: true,
+            limit: 200,
+            ...(marker ? { marker } : {})
+          });
+          const txs = response.result.transactions || [];
+          txCount += txs.length;
+          console.log(`Fetched ${txs.length} payment transactions, total: ${txCount}`);
+          for (const txObj of txs) {
+            const tx = txObj.tx;
+            const meta = txObj.meta;
+            if (
+              tx.TransactionType === 'Payment' &&
+              meta?.DeliveredAmount &&
+              typeof meta.DeliveredAmount === 'object' &&
+              meta.DeliveredAmount.currency === currencyCode &&
+              meta.DeliveredAmount.issuer === issuer &&
+              tx.Destination !== issuer &&
+              meta.TransactionResult === 'tesSUCCESS'
+            ) {
+              let xrpSpent = 'N/A';
+              if (typeof tx.SendMax === 'string') {
+                xrpSpent = parseFloat(tx.SendMax) / 1000000;
+              }
+              payments.push({
+                txHash: tx.hash,
+                purchaser: tx.Account,
+                destination: tx.Destination,
+                amount: parseFloat(meta.DeliveredAmount.value),
+                xrpSpent: xrpSpent,
+                time: tx.date,
+                ledger_index: tx.ledger_index
+              });
+            }
+            if (payments.length >= 10) break;
+          }
+          marker = response.result.marker;
+          if (!marker || !txs.length || txCount >= maxTxCount || payments.length >= 10) break;
+        } while (marker);
+        return payments.sort((a, b) => a.time - b.time).slice(0, 10);
+      } finally {
+        await client.disconnect();
+      }
+    }
+
+    async function fetchPurchaserDetails(purchaser, issuer, currencyCode) {
+      const cacheKey = `${purchaser}_${issuer}_${currencyCode}`;
+      if (purchaserDetailsCache.has(cacheKey)) {
+        return purchaserDetailsCache.get(cacheKey);
+      }
+
+      const client = await connectClient();
+      let details = {
+        currentBalance: 'N/A',
+        tokensSold: 0,
+        xrpReceived: 0,
+        tokensBought: 0,
+        xrpSpent: 0
+      };
+
+      try {
+        // Fetch current balance
+        const accountLinesResponse = await fetchWithRetry(client, {
+          command: "account_lines",
+          account: purchaser,
+          ledger_index: "validated",
+          peer: issuer
+        });
+        const lines = accountLinesResponse.result.lines || [];
+        const tokenLine = lines.find(line => 
+          line.currency === currencyCode && line.account === issuer
+        );
+        details.currentBalance = tokenLine ? parseFloat(tokenLine.balance) : 0;
+        console.log(`Current balance for ${purchaser}: ${details.currentBalance}`);
+
+        // Fetch transactions in both directions
+        const forwardTxs = [];
+        const reverseTxs = [];
+        let forwardMarker, reverseMarker;
+        let txCount = 0;
+        const maxTxCount = 10000;
+
+        // Fetch forward
+        do {
+          console.log(`Fetching forward transactions for ${purchaser}, marker: ${JSON.stringify(forwardMarker)}`);
+          const txResponse = await fetchWithRetry(client, {
+            command: "account_tx",
+            account: purchaser,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            forward: true,
+            limit: 200,
+            ...(forwardMarker ? { marker: forwardMarker } : {})
+          });
+          const txs = txResponse.result.transactions || [];
+          forwardTxs.push(...txs);
+          txCount += txs.length;
+          console.log(`Fetched ${txs.length} forward transactions for ${purchaser}, total: ${txCount}`);
+          forwardMarker = txResponse.result.marker;
+          if (!forwardMarker || txCount >= maxTxCount) break;
+        } while (forwardMarker);
+
+        // Fetch reverse
+        txCount = 0;
+        do {
+          console.log(`Fetching reverse transactions for ${purchaser}, marker: ${JSON.stringify(reverseMarker)}`);
+          const txResponse = await fetchWithRetry(client, {
+            command: "account_tx",
+            account: purchaser,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            forward: false,
+            limit: 200,
+            ...(reverseMarker ? { marker: reverseMarker } : {})
+          });
+          const txs = txResponse.result.transactions || [];
+          reverseTxs.push(...txs);
+          txCount += txs.length;
+          console.log(`Fetched ${txs.length} reverse transactions for ${purchaser}, total: ${txCount}`);
+          reverseMarker = txResponse.result.marker;
+          if (!reverseMarker || txCount >= maxTxCount) break;
+        } while (reverseMarker);
+
+        // Combine and deduplicate transactions
+        const allTxs = [...new Set([...forwardTxs, ...reverseTxs].map(tx => tx.tx.hash))].map(hash => 
+          forwardTxs.find(tx => tx.tx.hash === hash) || reverseTxs.find(tx => tx.tx.hash === hash)
+        );
+        console.log(`Total unique transactions for ${purchaser}: ${allTxs.length}`);
+
+        for (const txEntry of allTxs) {
+          const tx = txEntry.tx;
+          const meta = txEntry.meta;
+          if (
+            (tx.TransactionType === 'Payment' || 
+             tx.TransactionType === 'OfferCreate' || 
+             tx.TransactionType === 'CheckCash' || 
+             tx.TransactionType === 'AMMBid' || 
+             tx.TransactionType === 'AMMVote') &&
+            tx.Account === purchaser &&
+            meta?.TransactionResult === 'tesSUCCESS'
+          ) {
+            console.log(`Processing tx: ${tx.hash}, Type: ${tx.TransactionType}`);
+
+            // Use getBalanceChanges to determine token and XRP movements
+            const balanceChanges = xrpl.getBalanceChanges(meta);
+            const purchaserChanges = balanceChanges.find(change => change.account === purchaser);
+
+            if (purchaserChanges) {
+              const tokenChange = purchaserChanges.balances.find(
+                b => b.currency === currencyCode && b.issuer === issuer
+              );
+              const xrpChange = purchaserChanges.balances.find(b => b.currency === 'XRP');
+
+              if (tokenChange && xrpChange) {
+                const tokenValue = parseFloat(tokenChange.value);
+                const xrpValue = parseFloat(xrpChange.value);
+                console.log(`Token change: ${tokenValue}, XRP change: ${xrpValue}`);
+
+                // Sale: tokens decrease, XRP increases
+                if (tokenValue < 0 && xrpValue > 0) {
+                  const tokensSold = Math.abs(tokenValue);
+                  const xrpReceived = xrpValue;
+                  details.tokensSold += tokensSold;
+                  details.xrpReceived += xrpReceived;
+                  console.log(`Sale detected: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
+                }
+                // Purchase: tokens increase, XRP decreases
+                else if (tokenValue > 0 && xrpValue < 0) {
+                  const tokensBought = tokenValue;
+                  const xrpSpent = Math.abs(xrpValue);
+                  details.tokensBought += tokensBought;
+                  details.xrpSpent += xrpSpent;
+                  console.log(`Purchase detected: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
+                }
+              } else if (meta?.DeliveredAmount && typeof meta.DeliveredAmount === 'object' &&
+                         meta.DeliveredAmount.currency === currencyCode && 
+                         meta.DeliveredAmount.issuer === issuer) {
+                const tokenValue = parseFloat(meta.DeliveredAmount.value);
+                if (tokenValue < 0) {
+                  const tokensSold = Math.abs(tokenValue);
+                  let xrpReceived = 0;
+                  if (tx.SendMax && typeof tx.SendMax === 'string') {
+                    xrpReceived = parseFloat(tx.SendMax) / 1000000;
+                  }
+                  details.tokensSold += tokensSold;
+                  details.xrpReceived += xrpReceived;
+                  console.log(`Sale detected via DeliveredAmount: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
+                } else if (tokenValue > 0) {
+                  const tokensBought = tokenValue;
+                  let xrpSpent = 0;
+                  if (tx.SendMax && typeof tx.SendMax === 'string') {
+                    xrpSpent = parseFloat(tx.SendMax) / 1000000;
+                  }
+                  details.tokensBought += tokensBought;
+                  details.xrpSpent += xrpSpent;
+                  console.log(`Purchase detected via DeliveredAmount: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
+                }
+              }
+            }
+          }
+        }
+
+        console.log(`Final details for ${purchaser}:`, details);
+        purchaserDetailsCache.set(cacheKey, details);
+        return details;
+      } catch (error) {
+        console.error(`Error fetching purchaser details for ${purchaser}:`, error);
+        return details;
+      } finally {
+        await client.disconnect();
+      }
+    }
+
+    async function fetchTradeData(devWallet, issuer, currencyCode, creationDate) {
+      updateLoadingMessage("Fetching developer trade data");
+      const client = await connectClient();
+      try {
+        let allDevTxs = [];
+        let marker;
+        let txCount = 0;
+        const maxTxCount = 10000;
+        do {
+          const req = {
+            command: "account_tx",
+            account: devWallet,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            forward: true,
+            limit: 200,
+            ...(marker ? { marker } : {})
+          };
+          const devTxResponse = await fetchWithRetry(client, req);
+          const txs = devTxResponse.result.transactions || [];
+          allDevTxs = allDevTxs.concat(txs);
+          txCount += txs.length;
+          console.log(`Fetched ${txs.length} DEV transactions, total: ${txCount}`);
+          marker = devTxResponse.result.marker;
+          if (!marker || !txs.length || txCount >= maxTxCount) break;
+        } while (marker);
+
+        let sales = [];
+        let purchases = [];
+        let transfers = [];
+        for (const txEntry of allDevTxs) {
+          const tx = txEntry.tx;
+          const meta = txEntry.meta;
+          if (tx.date && tx.date < creationDate) continue;
+          if (tx.TransactionType !== 'Payment' || !meta || meta.TransactionResult !== 'tesSUCCESS') continue;
+
+          const balanceChanges = xrpl.getBalanceChanges(meta);
+          const devChanges = balanceChanges.find(change => change.account === devWallet);
+          if (!devChanges) continue;
+
+          const tokenChange = devChanges.balances.find(
+            b => b.currency === currencyCode && b.issuer === issuer
+          );
+          const xrpChange = devChanges.balances.find(b => b.currency === 'XRP');
+
+          if (tokenChange && xrpChange) {
+            if (parseFloat(tokenChange.value) < 0 && parseFloat(xrpChange.value) > 0) {
+              const tokensSold = -parseFloat(tokenChange.value);
+              const xrpReceived = parseFloat(xrpChange.value);
+              sales.push({ txHash: tx.hash, tokensSold, xrpReceived });
+              console.log(`DEV sale detected: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
+            } else if (parseFloat(tokenChange.value) > 0 && parseFloat(xrpChange.value) < 0) {
+              const tokensBought = parseFloat(tokenChange.value);
+              const xrpSpent = -parseFloat(xrpChange.value);
+              purchases.push({ txHash: tx.hash, tokensBought, xrpSpent });
+              console.log(`DEV purchase detected: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
+            }
+          }
+
+          // Detect transfers
+          if (meta.delivered_amount && typeof meta.delivered_amount === 'object' &&
+              meta.delivered_amount.currency === currencyCode &&
+              meta.delivered_amount.issuer === issuer &&
+              tx.Destination !== devWallet &&
+              tx.Destination !== issuer) {
+            const tokensTransferred = parseFloat(meta.delivered_amount.value);
+            transfers.push({ txHash: tx.hash, tokensTransferred, destination: tx.Destination });
+            console.log(`DEV transfer detected: ${tx.hash}, Tokens transferred: ${tokensTransferred}, Destination: ${tx.Destination}`);
+          } else {
+            const recipientChanges = balanceChanges.find(change => change.account === tx.Destination && change.account !== issuer && change.account !== devWallet);
+            if (recipientChanges) {
+              const tokenReceived = recipientChanges.balances.find(
+                b => b.currency === currencyCode && b.issuer === issuer
+              );
+              if (tokenReceived && parseFloat(tokenReceived.value) > 0) {
+                const tokensTransferred = parseFloat(tokenReceived.value);
+                transfers.push({ txHash: tx.hash, tokensTransferred, destination: tx.Destination });
+                console.log(`DEV transfer detected via balance changes: ${tx.hash}, Tokens transferred: ${tokensTransferred}, Destination: ${tx.Destination}`);
+              }
+            }
+          }
+        }
+        const totalTokensSold = sales.reduce((sum, s) => sum + s.tokensSold, 0);
+        const totalTokensBought = purchases.reduce((sum, p) => sum + p.tokensBought, 0);
+        const totalTokensTransferred = transfers.reduce((sum, t) => sum + t.tokensTransferred, 0);
+        const totalXrpReceived = sales.reduce((sum, s) => sum + s.xrpReceived, 0);
+        const totalXrpSpent = purchases.reduce((sum, p) => sum + p.xrpSpent, 0);
+        const uniqueTransferAddresses = new Set(transfers.map(t => t.destination)).size;
+        return { 
+          sales, 
+          purchases, 
+          transfers, 
+          totalTokensSold, 
+          totalTokensBought, 
+          totalTokensTransferred, 
+          totalXrpReceived, 
+          totalXrpSpent, 
+          uniqueTransferAddresses 
+        };
+      } catch (error) {
+        console.error('Error fetching trade data:', error);
+        return { 
+          sales: [], 
+          purchases: [], 
+          transfers: [], 
+          totalTokensSold: 0, 
+          totalTokensBought: 0, 
+          totalTokensTransferred: 0,
+          totalXrpReceived: 0,
+          totalXrpSpent: 0,
+          uniqueTransferAddresses: 0
+        };
+      } finally {
+        await client.disconnect();
+      }
+    }
+
+    async function fetchWalletTransactions(wallet, currencyCode, issuer, creationDate) {
+      updateLoadingMessage(`Fetching wallet transactions for ${wallet}`);
+      const client = await connectClient();
+      try {
+        let allTxs = [];
+        let marker;
+        let txCount = 0;
+        const maxTxCount = 10000;
+        do {
+          const req = {
+            command: "account_tx",
+            account: wallet,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            forward: true,
+            limit: 200,
+            ...(marker ? { marker } : {})
+          };
+          const resp = await fetchWithRetry(client, req);
+          const txs = resp.result.transactions || [];
+          allTxs = allTxs.concat(txs);
+          txCount += txs.length;
+          console.log(`Fetched ${txs.length} transactions for ${wallet}, total: ${txCount}`);
+          marker = resp.result.marker;
+          if (!marker || !txs.length || txCount >= maxTxCount) break;
+        } while (marker);
+        
+        let transfers = [];
+        for (const txEntry of allTxs) {
+          const tx = txEntry.tx;
+          const meta = txEntry.meta;
+          if (tx.date && tx.date < creationDate) continue;
+          if (tx.TransactionType !== 'Payment' || !meta || meta.TransactionResult !== 'tesSUCCESS') continue;
+
+          if (meta.delivered_amount && typeof meta.delivered_amount === 'object' &&
+              meta.delivered_amount.currency === currencyCode &&
+              meta.delivered_amount.issuer === issuer &&
+              tx.Destination !== wallet && 
+              tx.Destination !== issuer) {
+            const tokensTransferred = parseFloat(meta.delivered_amount.value);
+            transfers.push({ txHash: tx.hash, tokensTransferred, destination: tx.Destination });
+            console.log(`Transfer detected: ${tx.hash}, Tokens transferred: ${tokensTransferred}, Destination: ${tx.Destination}`);
+          } else {
+            const balanceChanges = xrpl.getBalanceChanges(meta);
+            const recipientChanges = balanceChanges.find(change => change.account === tx.Destination && change.account !== issuer && change.account !== wallet);
+            if (recipientChanges) {
+              const tokenReceived = recipientChanges.balances.find(
+                b => b.currency === currencyCode && b.issuer === issuer
+              );
+              if (tokenReceived && parseFloat(tokenReceived.value) > 0) {
+                const tokensTransferred = parseFloat(tokenReceived.value);
+                transfers.push({ txHash: tx.hash, tokensTransferred, destination: tx.Destination });
+                console.log(`Transfer detected via balance changes: ${tx.hash}, Tokens transferred: ${tokensTransferred}, Destination: ${tx.Destination}`);
+              }
+            }
+          }
+        }
+        return { transfers };
+      } catch (error) {
+        console.error(`Error fetching transactions for ${wallet}:`, error);
+        return { transfers: [] };
+      } finally {
+        await client.disconnect();
+      }
+    }
+
+    async function fetchTradeActivity(address, currencyCode, issuer, creationDate) {
+      updateLoadingMessage(`Fetching trade activity for address ${address}`);
+      const client = await connectClient();
+      let totalTokensSold = 0;
+      let totalXrpReceived = 0;
+      let totalTokensBought = 0;
+      let totalXrpSpent = 0;
+      let saleTxs = [];
+      let purchaseTxs = [];
+      try {
+        let marker;
+        let txCount = 0;
+        const maxTxCount = 10000;
+        do {
+          const req = {
+            command: "account_tx",
+            account: address,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            forward: true,
+            limit: 200,
+            ...(marker ? { marker } : {})
+          };
+          const response = await fetchWithRetry(client, req);
+          const txs = response.result.transactions || [];
+          txCount += txs.length;
+          console.log(`Fetched ${txs.length} trade activity transactions for ${address}, total: ${txCount}`);
+
+          for (const txEntry of txs) {
+            const tx = txEntry.tx;
+            if (tx.date && tx.date < creationDate) continue;
+            if (!txEntry.meta || txEntry.meta.TransactionResult !== 'tesSUCCESS') continue;
+
+            const balanceChanges = xrpl.getBalanceChanges(txEntry.meta);
+            const addressChanges = balanceChanges.find(change => change.account === address);
+            if (addressChanges) {
+              const tokenChange = addressChanges.balances.find(
+                b => b.currency === currencyCode && b.issuer === issuer
+              );
+              const xrpChange = addressChanges.balances.find(b => b.currency === 'XRP');
+              
+              if (tokenChange && xrpChange) {
+                const tokenValue = parseFloat(tokenChange.value);
+                const xrpValue = parseFloat(xrpChange.value);
+                if (tokenValue < 0 && xrpValue > 0) {
+                  const tokensSold = Math.abs(tokenValue);
+                  const xrpReceived = xrpValue;
+                  totalTokensSold += tokensSold;
+                  totalXrpReceived += xrpReceived;
+                  saleTxs.push({ txHash: tx.hash, tokensSold, xrpReceived });
+                  console.log(`Sale detected for ${address}: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
+                } else if (tokenValue > 0 && xrpValue < 0) {
+                  const tokensBought = tokenValue;
+                  const xrpSpent = Math.abs(xrpValue);
+                  totalTokensBought += tokensBought;
+                  totalXrpSpent += xrpSpent;
+                  purchaseTxs.push({ txHash: tx.hash, tokensBought, xrpSpent });
+                  console.log(`Purchase detected for ${address}: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
+                }
+              }
+            }
+          }
+          marker = response.result.marker;
+          if (!marker || !txs.length || txCount >= maxTxCount) break;
+        } while (marker);
+      } catch (e) {
+        console.error(`Error fetching trade activity for ${address}:`, e);
+      } finally {
+        await client.disconnect();
+      }
+      return { totalTokensSold, totalXrpReceived, totalTokensBought, totalXrpSpent, saleTxs, purchaseTxs };
+    }
+
+    function buildTableHTML(arr, type, tokenName) {
+      if (arr.length === 0) return `<div class="line">No ${type} transactions found.</div>`;
+      let html = `<div class="expanded">`;
+      if (type === 'transfer') {
+        for (const item of arr) {
+          html += `<div class="line"><a href="https://xrpscan.com/tx/${item.txHash}" target="_blank">view</a> | ${formatAmount(item.tokensTransferred)} ${tokenName} was transferred to <a href="https://xrpscan.com/account/${item.destination}" target="_blank">${item.destination}</a></div>`;
+        }
+      } else if (type === 'burned') {
+        for (const item of arr) {
+          html += `<div class="line"><a href="https://xrpscan.com/tx/${item.txHash}" target="_blank">view</a> | ${formatAmount(item.amount)} ${tokenName}${item.source === 'DEV' ? ' (DEV)' : ''}</div>`;
+        }
+      } else if (type === 'sale') {
+        for (const item of arr) {
+          html += `<div class="line"><a href="https://xrpscan.com/tx/${item.txHash}" target="_blank">view</a> | ${formatAmount(item.tokensSold)} ${tokenName} was sold for ${formatAmount(item.xrpReceived)} XRP</div>`;
+        }
+      } else if (type === 'purchase') {
+        for (const item of arr) {
+          html += `<div class="line"><a href="https://xrpscan.com/tx/${item.txHash}" target="_blank">view</a> | ${formatAmount(item.tokensBought)} ${tokenName} was bought for ${formatAmount(item.xrpSpent)} XRP</div>`;
+        }
+      } else {
+        html += `<div class="line">Unknown transaction type.</div>`;
+      }
+      html += `</div>`;
+      return html;
+    }
+
+    async function togglePurchaserDetails(txHash, purchaser, issuer, currencyCode) {
+      const detailsRow = document.getElementById(`details_${txHash}`);
+      if (!detailsRow.classList.contains('hidden')) {
+        detailsRow.classList.add('hidden');
+        return;
+      }
+
+      const detailsContent = document.getElementById(`details_content_${txHash}`);
+      if (!detailsContent.innerHTML) {
+        detailsContent.innerHTML = `
+          <div class="details-content">
+            <div class="line loading-details">Loading purchaser details <span class="blinking">...</span></div>
+          </div>
+        `;
+        detailsRow.classList.remove('hidden');
+
+        try {
+          const details = await fetchPurchaserDetails(purchaser, issuer, currencyCode);
+          const profit = details.xrpReceived - details.xrpSpent;
+          const profitLabel = profit >= 0 ? 'Profit' : 'Loss';
+          detailsContent.innerHTML = `
+            <div class="details-content">
+              <div class="line">Current Balance: ${formatAmount(details.currentBalance)} ${getCurrencyDisplay(currencyCode)}</div>
+              <div class="line">Tokens Purchased: ${formatAmount(details.tokensBought)} ${getCurrencyDisplay(currencyCode)}</div>
+              <div class="line">XRP Spent on Purchases: ${formatAmount(details.xrpSpent)} XRP</div>
+              <div class="line">Tokens Sold: ${formatAmount(details.tokensSold)} ${getCurrencyDisplay(currencyCode)}</div>
+              <div class="line">XRP Received from Sales: ${formatAmount(details.xrpReceived)} XRP</div>
+              <div class="line">${profitLabel}: ${formatAmount(Math.abs(profit))} XRP</div>
+            </div>
+          `;
+        } catch (error) {
+          detailsContent.innerHTML = `
+            <div class="details-content">
+              <div class="line error">Error loading purchaser details: ${error.message}</div>
+            </div>
+          `;
+        }
+      } else {
+        detailsRow.classList.remove('hidden');
+      }
+    }
+
+    function renderSnipersTable(currencyCode, issuer, payments) {
+      let html = `<div class="header">Snipers</div>`;
+      html += `<div class="separator"></div>`;
+      html += `<div class="line">Currency: ${getCurrencyDisplay(currencyCode)}</div>`;
+      html += `<div class="line">Issuer: <a href="https://xrpscan.com/account/${issuer}" target="_blank">${issuer}</a></div>`;
+
+      if (payments.length === 0) {
+        html += `<div class="line">No sniper transactions found.</div>`;
+      } else {
+        html += `<table>`;
+        html += `<tr><th>#</th><th>Transaction</th><th>Purchaser</th><th>XRP Spent</th><th>Token Received</th></tr>`;
+        payments.forEach((payment, index) => {
+          const txHash = payment.txHash;
+          html += `<tr onclick="togglePurchaserDetails('${txHash}', '${payment.purchaser}', '${issuer}', '${currencyCode}')">`;
+          html += `<td>${index + 1}</td>`;
+          html += `<td><a href="https://xrpscan.com/tx/${txHash}" target="_blank">view</a></td>`;
+          html += `<td><a href="https://xrpscan.com/account/${payment.purchaser}" target="_blank">${payment.purchaser}</a></td>`;
+          html += `<td>${formatAmount(payment.xrpSpent)} XRP</td>`;
+          html += `<td>${formatAmount(payment.amount)} ${getCurrencyDisplay(currencyCode)}</td>`;
+          html += `</tr>`;
+          html += `<tr id="details_${txHash}" class="details-row hidden"><td colspan="5"><div id="details_content_${txHash}"></div></td></tr>`;
+        });
+        html += `</table>`;
+      }
+      return html;
+    }
+
+    async function fetchTokenInfo(issuer, scope) {
+      console.log(`Fetching token info for issuer: ${issuer}, scope: ${scope}`);
+      if (!validateIssuerAddress(issuer)) {
+        displayError("Invalid issuer address format");
+        return;
+      }
+
+      updateLoadingMessage("Conducting deep dive...");
+      const output = document.getElementById("output");
+      try {
+        const currencyCode = await getCurrencyCode(issuer);
+        if (scope === 'snipers') {
+          enrichedPayments = await getPaymentTransactions(issuer, currencyCode);
+          enrichedPayments.currencyCode = currencyCode;
+          enrichedPayments.issuer = issuer;
+          output.innerHTML = renderSnipersTable(currencyCode, issuer, enrichedPayments);
+          addNewPrompt();
+          return;
+        }
+
+        const activatorData = await getActivatorAddress(issuer);
+        const activator = activatorData.activator;
+        const creationDate = activatorData.creationDate;
+        const isAntiSniper = activatorData.isAntiSniper;
+        const metrics = await getTokenMetrics(issuer, currencyCode, activator);
+        const marketData = await fetchDexscreenerData(issuer);
+        const xrplToData = await getTokenInfoFromXrplTo(issuer, currencyCode);
+        const topHolders = await fetchAllTrustLines(issuer, currencyCode);
+
+        let supply;
+        if (xrplToData) {
+          if (xrplToData.supply != null) {
+            supply = Number(xrplToData.supply);
+          } else if (xrplToData.token && xrplToData.token.supply != null) {
+            supply = Number(xrplToData.token.supply);
+          }
+        }
+        if (supply == null) { supply = marketData.supply; }
+        const token = {
+          issuer,
+          currency: currencyCode,
+          supply: (supply !== 'N/A') ? supply : 'N/A',
+          marketCap: marketData.marketCap,
+          liquidity: marketData.liquidity
+        };
+
+        if (isAntiSniper) {
+          token.classification = "Anti-Sniper Token";
+        }
+
+        let currentTokenSupply = token.supply;
+        let currentDevPercentage = 'N/A';
+        if (
+          currentTokenSupply !== 'N/A' && 
+          !isNaN(currentTokenSupply) && 
+          metrics.currentBalance !== 'N/A' && 
+          !isNaN(metrics.currentBalance) && 
+          Number(currentTokenSupply) > 0
+        ) {
+          currentDevPercentage = ((metrics.currentBalance / Number(currentTokenSupply)) * 100).toFixed(2) + '%';
+        }
+
+        let html = `<div class="header">Token Overview</div>`;
+        html += `<div class="separator"></div>`;
+        html += `<div class="line">Currency: ${getCurrencyDisplay(token.currency)}</div>`;
+        if (token.classification) {
+          html += `<div class="line">Classification: ${token.classification}</div>`;
+        }
+        html += `<div class="line">Market Cap: ${token.marketCap} | Liquidity: ${token.liquidity}</div>`;
+        html += `<div class="line">Current Token Supply: ${(currentTokenSupply !== 'N/A') ? formatAmount(currentTokenSupply) : currentTokenSupply}</div>`;
+        html += `<div class="line">Total Supply Burned: ${(metrics.totalBurned !== 'N/A') ? formatAmount(metrics.totalBurned) : metrics.totalBurned} <span class="expandable" onclick="toggleSection('burned_${issuer}')">[expand]</span></div>`;
+        html += `<div id="burned_${issuer}" class="hidden">${buildTableHTML(metrics.totalBurnedTxs, 'burned', getCurrencyDisplay(token.currency))}</div>`;
+        
+        html += `<div class="line">Top 10 Holders: <span class="expandable" onclick="toggleSection('topHolders_${issuer}')">[expand]</span></div>`;
+        html += `<div id="topHolders_${issuer}" class="hidden">`;
+        if (topHolders.length > 0) {
+          const totalSupply = Number(currentTokenSupply);
+          topHolders.forEach((holder, index) => {
+            const percentage = !isNaN(totalSupply) && totalSupply > 0 ? 
+              (holder.balance / totalSupply * 100).toFixed(2) + '%' : 'N/A';
+            const xrpEquivalent = marketData.priceNative !== 'N/A' && !isNaN(marketData.priceNative) ? 
+              (holder.balance * Number(marketData.priceNative)).toFixed(2) : 'N/A';
+            const isDev = holder.account === activator ? ' (DEV)' : '';
+            html += `<div class="line">${index + 1}. <a href="https://xrpscan.com/account/${holder.account}" target="_blank">${holder.account}</a>${isDev}: ${formatAmount(holder.balance)} (${percentage}) - ${xrpEquivalent} XRP</div>`;
+          });
+        } else {
+          html += `<div class="line">No holder data available.</div>`;
+        }
+        html += `</div>`;
+
+        if (scope === 'dev' || scope === 'tier1' || scope === 'tier2') {
+          const tradeData = await fetchTradeData(activator, issuer, currencyCode, creationDate);
+          html += `<div class="header">Developer Inspection</div>`;
+          html += `<div class="separator"></div>`;
+          html += `<div class="line">Dev Wallet: <a href="https://xrpscan.com/account/${activator}" target="_blank">${activator}</a></div>`;
+          html += `<div class="line">Initial Dev Supply: ${formatAmount(metrics.initialBalance)}</div>`;
+          html += `<div class="line">Current Balance: ${(metrics.currentBalance !== 'N/A') ? formatAmount(metrics.currentBalance) : metrics.currentBalance} (${currentDevPercentage})</div>`;
+          html += `<div class="line">Sold: ${formatAmount(tradeData.totalTokensSold)} (XRP Received: ${formatAmount(tradeData.totalXrpReceived)}) <span class="expandable" onclick="toggleSection('sales_${issuer}')">[expand]</span></div>`;
+          html += `<div id="sales_${issuer}" class="hidden">${buildTableHTML(tradeData.sales, 'sale', getCurrencyDisplay(token.currency))}</div>`;
+          html += `<div class="line">Bought: ${formatAmount(tradeData.totalTokensBought)} (XRP Paid: ${formatAmount(tradeData.totalXrpSpent)}) <span class="expandable" onclick="toggleSection('purchases_${issuer}')">[expand]</span></div>`;
+          html += `<div id="purchases_${issuer}" class="hidden">${buildTableHTML(tradeData.purchases, 'purchase', getCurrencyDisplay(token.currency))}</div>`;
+          html += `<div class="line">Transfers: ${formatAmount(tradeData.totalTokensTransferred)} (to ${tradeData.uniqueTransferAddresses} unique addresses) <span class="expandable" onclick="toggleSection('transfers_${issuer}')">[expand]</span></div>`;
+          html += `<div id="transfers_${issuer}" class="hidden">${buildTableHTML(tradeData.transfers, 'transfer', getCurrencyDisplay(token.currency))}</div>`;
+        }
+
+        if (scope === 'tier1' || scope === 'tier2') {
+          updateLoadingMessage("Analyzing Tier 1 transfers");
+          const tradeData = await fetchTradeData(activator, issuer, currencyCode, creationDate);
+          let tier1TotalTransferred = 0, tier1TotalSold = 0, tier1TotalXrpReceived = 0, tier1TotalBought = 0, tier1TotalXrpSpent = 0;
+          let tier1Wallets = {};
+          tradeData.transfers.forEach(tx => {
+            if (!tier1Wallets[tx.destination]) {
+              tier1Wallets[tx.destination] = { tokensTransferred: 0, txs: [] };
+            }
+            tier1Wallets[tx.destination].tokensTransferred += tx.tokensTransferred;
+            tier1Wallets[tx.destination].txs.push(tx);
+          });
+          let tier1Count = Object.keys(tier1Wallets).length;
+          let tier1DetailsHTML = "";
+          for (let wallet of Object.keys(tier1Wallets)) {
+            let tradeResult = await fetchTradeActivity(wallet, currencyCode, issuer, creationDate);
+            tier1TotalTransferred += tier1Wallets[wallet].tokensTransferred;
+            tier1TotalSold += tradeResult.totalTokensSold;
+            tier1TotalXrpReceived += tradeResult.totalXrpReceived;
+            tier1TotalBought += tradeResult.totalTokensBought;
+            tier1TotalXrpSpent += tradeResult.totalXrpSpent;
+            tier1DetailsHTML += `<div class="line">Address <a href="https://xrpscan.com/account/${wallet}" target="_blank">${wallet}</a> received ${formatAmount(tier1Wallets[wallet].tokensTransferred)} ${getCurrencyDisplay(token.currency)}, sold ${formatAmount(tradeResult.totalTokensSold)} for ${formatAmount(tradeResult.totalXrpReceived)} XRP, bought ${formatAmount(tradeResult.totalTokensBought)} for ${formatAmount(tradeResult.totalXrpSpent)} XRP. <span class="expandable" onclick="toggleSection('tier1_transfers_${wallet}_${issuer}')">[view transfers]</span> <span class="expandable" onclick="toggleSection('tier1_sales_${wallet}_${issuer}')">[view sales]</span> <span class="expandable" onclick="toggleSection('tier1_purchases_${wallet}_${issuer}')">[view purchases]</span></div>`;
+            tier1DetailsHTML += `<div id="tier1_transfers_${wallet}_${issuer}" class="hidden">${buildTableHTML(tier1Wallets[wallet].txs, 'transfer', getCurrencyDisplay(token.currency))}</div>`;
+            tier1DetailsHTML += `<div id="tier1_sales_${wallet}_${issuer}" class="hidden">${buildTableHTML(tradeResult.saleTxs, 'sale', getCurrencyDisplay(token.currency))}</div>`;
+            tier1DetailsHTML += `<div id="tier1_purchases_${wallet}_${issuer}" class="hidden">${buildTableHTML(tradeResult.purchaseTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>`;
+          }
+          let tier1SummaryHTML = `<div class="expanded">
+              <div class="line">DEV transferred a total of ${formatAmount(tier1TotalTransferred)} ${getCurrencyDisplay(token.currency)} to ${tier1Count} addresses, which sold ${formatAmount(tier1TotalSold)} for ${formatAmount(tier1TotalXrpReceived)} XRP and bought ${formatAmount(tier1TotalBought)} for ${formatAmount(tier1TotalXrpSpent)} XRP.</div>
+              <div class="line"><span class="expandable" onclick="toggleSection('tier1Details_${issuer}')">[view Tier 1 details]</span></div>
+              <div id="tier1Details_${issuer}" class="hidden">${tier1DetailsHTML}</div>
+            </div>`;
+
+          html += `<div class="header">Token Outflow - Tier 1</div>`;
+          html += `<div class="separator"></div>`;
+          html += tier1SummaryHTML;
+
+          if (scope === 'tier2') {
+            updateLoadingMessage("Analyzing Tier 2 transfers");
+            let tier2Data = {};
+            for (let wallet of Object.keys(tier1Wallets)) {
+              let tier1Tx = await fetchWalletTransactions(wallet, currencyCode, issuer, creationDate);
+              tier1Tx.transfers.forEach(tx => {
+                if (!tier2Data[tx.destination]) {
+                  tier2Data[tx.destination] = { tokensTransferred: 0, txs: [] };
+                }
+                tier2Data[tx.destination].tokensTransferred += tx.tokensTransferred;
+                tier2Data[tx.destination].txs.push(tx);
+              });
+            }
+            let tier2Wallets = Object.keys(tier2Data);
+            let tier2TotalTransferred = 0, tier2TotalSold = 0, tier2TotalXrpReceived = 0, tier2TotalBought = 0, tier2TotalXrpSpent = 0;
+            let tier2DetailsHTML = "";
+            for (let wallet of tier2Wallets) {
+              let tradeResult = await fetchTradeActivity(wallet, currencyCode, issuer, creationDate);
+              tier2TotalTransferred += tier2Data[wallet].tokensTransferred;
+              tier2TotalSold += tradeResult.totalTokensSold;
+              tier2TotalXrpReceived += tradeResult.totalXrpReceived;
+              tier2TotalBought += tradeResult.totalTokensBought;
+              tier2TotalXrpSpent += tradeResult.totalXrpSpent;
+              tier2DetailsHTML += `<div class="line">Address <a href="https://xrpscan.com/account/${wallet}" target="_blank">${wallet}</a> received ${formatAmount(tier2Data[wallet].tokensTransferred)} ${getCurrencyDisplay(token.currency)}, sold ${formatAmount(tradeResult.totalTokensSold)} for ${formatAmount(tradeResult.totalXrpReceived)} XRP, bought ${formatAmount(tradeResult.totalTokensBought)} for ${formatAmount(tradeResult.totalXrpSpent)} XRP. <span class="expandable" onclick="toggleSection('tier2_transfers_${wallet}_${issuer}')">[view transfers]</span> <span class="expandable" onclick="toggleSection('tier2_sales_${wallet}_${issuer}')">[view sales]</span> <span class="expandable" onclick="toggleSection('tier2_purchases_${wallet}_${issuer}')">[view purchases]</span></div>`;
+              tier2DetailsHTML += `<div id="tier2_transfers_${wallet}_${issuer}" class="hidden">${buildTableHTML(tier2Data[wallet].txs, 'transfer', getCurrencyDisplay(token.currency))}</div>`;
+              tier2DetailsHTML += `<div id="tier2_sales_${wallet}_${issuer}" class="hidden">${buildTableHTML(tradeResult.saleTxs, 'sale', getCurrencyDisplay(token.currency))}</div>`;
+              tier2DetailsHTML += `<div id="tier2_purchases_${wallet}_${issuer}" class="hidden">${buildTableHTML(tradeResult.purchaseTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>`;
+            }
+            let tier2SummaryHTML = `<div class="expanded">
+                <div class="line">Tier 1 addresses transferred a total of ${formatAmount(tier2TotalTransferred)} ${getCurrencyDisplay(token.currency)} to ${tier2Wallets.length} addresses, which sold ${formatAmount(tier2TotalSold)} for ${formatAmount(tier2TotalXrpReceived)} XRP and bought ${formatAmount(tier2TotalBought)} for ${formatAmount(tier2TotalXrpSpent)} XRP.</div>
+                <div class="line"><span class="expandable" onclick="toggleSection('tier2Details_${issuer}')">[view Tier 2 details]</span></div>
+                <div id="tier2Details_${issuer}" class="hidden">${tier2DetailsHTML}</div>
+              </div>`;
+
+            html += `<div class="header">Token Outflow - Tier 2</div>`;
+            html += `<div class="separator"></div>`;
+            html += tier2SummaryHTML;
+          }
+        }
+
+        output.innerHTML = html;
+        addNewPrompt();
+      } catch (error) {
+        console.error('Error in fetchTokenInfo:', error);
+        displayError(error.message ||
+                     "Failed to fetch data. Please try again.");
+      }
+    }
+
+function addNewPrompt() {
+  const cmdInput = document.getElementById("cmd-input");
+  cmdInput.value = lastIssuer || '';
+  cmdInput.focus();
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+/* Custom Dropdown Logic */
+let selectedScope = 'overview';
+const toggle = document.getElementById('scope-toggle');
+const menu = document.getElementById('scope-menu');
+const options = document.querySelectorAll('.dropdown-option');
+
+toggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  console.log('Dropdown toggle clicked');
+  menu.classList.toggle('show');
+});
+
+options.forEach(option => {
+  option.addEventListener('click', (e) => {
+    e.stopPropagation();
+    console.log(`Dropdown option clicked: ${option.getAttribute('data-value')}`);
+    selectedScope = option.getAttribute('data-value');
+    const optionName = option.getAttribute('data-name');
+    toggle.textContent = `Scope Level: ${optionName}`;
+    menu.classList.remove('show');
+
+    const cmdInput = document.getElementById("cmd-input");
+    const inputIssuer = cmdInput.value.trim();
+
+    if (inputIssuer) {
+      if (!validateIssuerAddress(inputIssuer)) {
+        displayError("Invalid issuer address format in input field.");
+        return;
+      }
+      lastIssuer = inputIssuer;
+      document.getElementById("output").innerHTML = "";
+      fetchTokenInfo(lastIssuer, selectedScope);
+    } else if (lastIssuer) {
+      document.getElementById("output").innerHTML = "";
+      fetchTokenInfo(lastIssuer, selectedScope);
+    } else {
+      displayError("Please enter an issuer address first.");
+    }
+  });
+});
+
+document.addEventListener('click', (e) => {
+  if (!toggle.contains(e.target) && !menu.contains(e.target)) {
+    console.log('Clicked outside dropdown, hiding menu');
+    menu.classList.remove('show');
+  }
+});
+
+document.getElementById("cmd-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    console.log('Enter key pressed on cmd-input');
+    const issuer = e.target.value.trim();
+    if (!issuer) {
+      displayError("Please enter an issuer address");
+      return;
+    }
+    if (!validateIssuerAddress(issuer)) {
+      displayError("Invalid issuer address format");
+      return;
+    }
+    lastIssuer = issuer;
+    document.getElementById("output").innerHTML = "";
+    fetchTokenInfo(issuer, selectedScope);
+    e.preventDefault();
+  }
+});
+     </script>
+</body>
+</html>
