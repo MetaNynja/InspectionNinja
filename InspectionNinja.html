@@ -434,77 +434,78 @@
     }
 
     async function getActivatorAddress(issuer) {
-      updateLoadingMessage("Fetching activator address");
-      const client = await connectClient();
-      try {
-        const issuerTxResponse = await fetchWithRetry(client, {
-          command: "account_tx",
-          account: issuer,
-          ledger_index_min: -1,
-          ledger_index_max: -1,
-          forward: true,
-          limit: 1
-        });
+    updateLoadingMessage("Fetching activator address");
+    const client = await connectClient();
+    try {
+      const issuerTxResponse = await fetchWithRetry(client, {
+        command: "account_tx",
+        account: issuer,
+        ledger_index_min: -1,
+        ledger_index_max: -1,
+        forward: true,
+        limit: 1
+      });
 
-        if (!issuerTxResponse.result.transactions?.length) {
-          throw new Error('No transaction history for this issuer.');
-        }
+      if (!issuerTxResponse.result.transactions?.length) {
+        throw new Error('No transaction history for this issuer.');
+      }
 
-        const activationTx = issuerTxResponse.result.transactions[0].tx;
-        if (activationTx.TransactionType !== 'Payment' ||
-            activationTx.Destination !== issuer ||
-            typeof activationTx.Amount !== 'string') {
-          throw new Error('Initial activation transaction is not valid.');
-        }
+      const activationTx = issuerTxResponse.result.transactions[0].tx;
+      if (activationTx.TransactionType !== 'Payment' ||
+          activationTx.Destination !== issuer ||
+          typeof activationTx.Amount !== 'string') {
+        throw new Error('Initial activation transaction is not valid.');
+      }
 
-        let activator = activationTx.Account;
-        let creationDate = activationTx.date || 0;
-        let isAntiSniper = false;
+      let activator = activationTx.Account;
+      let creationDate = activationTx.date || 0;
+      let isAntiSniper = false;
 
-        const antiSniperAddress = 'rMFMJsQa1xDCcEV78ePWdpVhUoatbZmzPt';
-        if (activator === antiSniperAddress) {
-          isAntiSniper = true;
-          updateLoadingMessage("Detected anti-sniper token, searching for true activator");
+      const antiSniperAddress = 'rMFMJsQa1xDCcEV78ePWdpVhUoatbZmzPt';
+      if (activator === antiSniperAddress) {
+        isAntiSniper = true;
+        updateLoadingMessage("Detected anti-sniper token, searching for true activator");
 
-          let marker;
-          let ammAddress = null;
-          let txCount = 0;
-          const maxTxCount = 10000;
-          do {
-            const paymentTxResponse = await fetchWithRetry(client, {
-              command: "account_tx",
-              account: issuer,
-              ledger_index_min: -1,
-              ledger_index_max: -1,
-              forward: true,
-              limit: 200,
-              ...(marker ? { marker } : {})
-            });
+        let marker;
+        let ammAddress = null;
+        let txCount = 0;
+        const maxTxCount = 10000;
+        do {
+          const paymentTxResponse = await fetchWithRetry(client, {
+            command: "account_tx",
+            account: issuer,
+            ledger_index_min: -1,
+            ledger_index_max: -1,
+            forward: true,
+            limit: 200,
+            ...(marker ? { marker } : {})
+          });
 
-            const txs = paymentTxResponse.result.transactions || [];
-            txCount += txs.length;
-            console.log(`Fetched ${txs.length} transactions for issuer, total: ${txCount}`);
+          const txs = paymentTxResponse.result.transactions || [];
+          txCount += txs.length;
+          console.log(`Fetched ${txs.length} transactions for issuer, total: ${txCount}`);
 
-            for (const txObj of txs) {
-              const tx = txObj.tx;
-              if (tx.TransactionType === 'Payment' && tx.Account === issuer && tx.Destination !== issuer) {
-                ammAddress = tx.Destination;
-                console.log(`Found first Payment transaction, AMM address: ${ammAddress}`);
-                break;
-              }
+          for (const txObj of txs) {
+            const tx = txObj.tx;
+            if (tx.TransactionType === 'Payment' && tx.Account === issuer && tx.Destination !== issuer) {
+              ammAddress = tx.Destination;
+              console.log(`Found first Payment transaction, AMM address: ${ammAddress}`);
+              break;
             }
-            marker = paymentTxResponse.result.marker;
-            if (ammAddress || !marker || !txs.length || txCount >= maxTxCount) break;
-          } while (marker);
-
-          if (!ammAddress) {
-            throw new Error(`Could not find a Payment transaction from the issuer after checking ${txCount} transactions.`);
           }
+          marker = paymentTxResponse.result.marker;
+          if (ammAddress || !marker || !txs.length || txCount >= maxTxCount) break;
+        } while (marker);
 
-          updateLoadingMessage(`Searching AMM (${ammAddress}) for CheckCreate transaction`);
-          let checkMarker;
-          let trueActivator = null;
-          let checkTxCount = 0;
+        if (!ammAddress) {
+          throw new Error(`Could not find a Payment transaction from the issuer after checking ${txCount} transactions.`);
+        }
+
+        updateLoadingMessage(`Searching AMM (${ammAddress}) for CheckCreate transaction`);
+        let checkMarker;
+        let trueActivator = null;
+        let checkTxCount = 0;
+        try {
           do {
             const ammTxResponse = await fetchWithRetry(client, {
               command: "account_tx",
@@ -536,56 +537,54 @@
           if (!trueActivator) {
             throw new Error(`Could not find a CheckCreate transaction for the AMM address (${ammAddress}) after checking ${checkTxCount} transactions.`);
           }
+        } catch (checkError) {
+          // New logic for updated anti-sniper protocol: search issuer for first Payment with SourceTag
+          console.warn(`CheckCreate not found: ${checkError.message}. Falling back to search for Payment with SourceTag on issuer account.`);
+          updateLoadingMessage(`Searching issuer (${issuer}) for Payment with SourceTag`);
 
-          activator = trueActivator;
-        }
+          let paymentMarker;
+          let paymentTxCount = 0;
+          do {
+            const issuerPaymentTxResponse = await fetchWithRetry(client, {
+              command: "account_tx",
+              account: issuer,
+              ledger_index_min: -1,
+              ledger_index_max: -1,
+              forward: true,
+              limit: 200,
+              ...(paymentMarker ? { marker: paymentMarker } : {})
+            });
 
-        return { activator, creationDate, isAntiSniper };
-      } finally {
-        await client.disconnect();
-      }
-    }
+            const issuerTxs = issuerPaymentTxResponse.result.transactions || [];
+            paymentTxCount += issuerTxs.length;
+            console.log(`Fetched ${issuerTxs.length} transactions for issuer, total: ${paymentTxCount}`);
 
-    async function getCurrencyCode(issuer) {
-      updateLoadingMessage("Fetching currency code");
-      const client = await connectClient();
-      try {
-        const txResponse = await fetchWithRetry(client, {
-          command: "account_tx",
-          account: issuer,
-          ledger_index_min: -1,
-          ledger_index_max: -1,
-          forward: false,
-          limit: 200
-        });
-        if (txResponse.result.transactions && txResponse.result.transactions.length > 0) {
-          for (const txObj of txResponse.result.transactions) {
-            const tx = txObj.tx;
-            if (tx.Amount && typeof tx.Amount === 'object' && tx.Amount.currency && tx.Amount.issuer === issuer) {
-              return tx.Amount.currency;
+            for (const txObj of issuerTxs) {
+              const tx = txObj.tx;
+              if (tx.TransactionType === 'Payment' && typeof tx.SourceTag === 'number') {
+                trueActivator = tx.Account;
+                creationDate = tx.date || 0;
+                console.log(`Found Payment with SourceTag, true activator: ${trueActivator}`);
+                break;
+              }
             }
-            if (tx.DeliveredAmount && typeof tx.DeliveredAmount === 'object' && tx.DeliveredAmount.currency && tx.DeliveredAmount.issuer === issuer) {
-              return tx.DeliveredAmount.currency;
-            }
+            paymentMarker = issuerPaymentTxResponse.result.marker;
+            if (trueActivator || !paymentMarker || !issuerTxs.length || paymentTxCount >= maxTxCount) break;
+          } while (paymentMarker);
+
+          if (!trueActivator) {
+            throw new Error(`Could not find a Payment transaction with SourceTag for the issuer (${issuer}) after checking ${paymentTxCount} transactions.`);
           }
         }
-        const gbResponse = await fetchWithRetry(client, {
-          command: "gateway_balances",
-          account: issuer,
-          ledger_index: "validated"
-        });
-        if (gbResponse.result && gbResponse.result.assets) {
-          const assets = gbResponse.result.assets;
-          const currencies = Object.keys(assets);
-          if (currencies.length > 0) {
-            return currencies[0];
-          }
-        }
-        throw new Error("Currency code not found using account_tx or gateway_balances");
-      } finally {
-        await client.disconnect();
+
+        activator = trueActivator;
       }
+
+      return { activator, creationDate, isAntiSniper };
+    } finally {
+      await client.disconnect();
     }
+  }
 
     async function getTokenMetrics(issuer, currencyCode, activator) {
       updateLoadingMessage("Fetching token metrics");
