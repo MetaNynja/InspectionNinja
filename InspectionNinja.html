@@ -626,144 +626,143 @@
   }
 
   async function getTokenMetrics(issuer, currencyCode, activator) {
-    updateLoadingMessage("Fetching token metrics");
-    const client = await connectClient();
-    try {
-      const accountLinesResponse = await fetchWithRetry(client, {
-        command: "account_lines",
+  updateLoadingMessage("Fetching token metrics");
+  const client = await connectClient();
+  try {
+    // Fetch current balance of the activator
+    const accountLinesResponse = await fetchWithRetry(client, {
+      command: "account_lines",
+      account: activator,
+      ledger_index: "validated",
+      peer: issuer
+    });
+    const lines = accountLinesResponse.result.lines || [];
+    const tokenLine = lines.find(line => 
+      line.currency === currencyCode && line.account === issuer
+    );
+    const currentBalance = tokenLine ? parseFloat(tokenLine.balance) : 0;
+
+    // Fetch activator and issuer transactions
+    let marker;
+    const transactions = [];
+    let markerIssuer;
+    const issuerTxs = [];
+    const seenTxs = new Set();
+    let txCount = 0;
+    const maxTxCount = 10000;
+
+    do {
+      const params = {
+        command: "account_tx",
         account: activator,
-        ledger_index: "validated",
-        peer: issuer
-      });
-      const lines = accountLinesResponse.result.lines || [];
-      const tokenLine = lines.find(line => 
-        line.currency === currencyCode && line.account === issuer
-      );
-      const currentBalance = tokenLine ? parseFloat(tokenLine.balance) : 0;
-
-      let marker;
-      const transactions = [];
-      let markerIssuer;
-      const issuerTxs = [];
-      const seenTxs = new Set();
-      let txCount = 0;
-      const maxTxCount = 10000;
-
-      do {
-        const params = {
-          command: "account_tx",
-          account: activator,
-          ledger_index_min: -1,
-          ledger_index_max: -1,
-          limit: 200,
-          ...(marker ? { marker } : {})
-        };
-        const txResponse = await fetchWithRetry(client, params);
-        if (txResponse.result.transactions) {
-          transactions.push(...txResponse.result.transactions);
-          txCount += txResponse.result.transactions.length;
-          console.log(`Fetched ${txResponse.result.transactions.length} activator transactions, total: ${txCount}`);
-        }
-        marker = txResponse.result.marker;
-        if (!marker || !txResponse.result.transactions.length || txCount >= maxTxCount) break;
-      } while (marker);
-
-      txCount = 0;
-      do {
-        const paramsIssuer = {
-          command: "account_tx",
-          account: issuer,
-          ledger_index_min: -1,
-          ledger_index_max: -1,
-          limit: 200,
-          ...(markerIssuer ? { marker: markerIssuer } : {})
-        };
-        const issuerTxResponse = await fetchWithRetry(client, paramsIssuer);
-        if (issuerTxResponse.result.transactions) {
-          issuerTxs.push(...issuerTxResponse.result.transactions);
-          txCount += issuerTxResponse.result.transactions.length;
-          console.log(`Fetched ${issuerTxResponse.result.transactions.length} issuer transactions, total: ${txCount}`);
-        }
-        markerIssuer = issuerTxResponse.result.marker;
-        if (!markerIssuer || !issuerTxResponse.result.transactions.length || txCount >= maxTxCount) break;
-      } while (markerIssuer);
-
-      let initialBalance = 0;
-      let devBurned = 0;
-      let devBurnedTxs = [];
-      let issuerBurned = 0;
-      let issuerBurnedTxs = [];
-
-      transactions.forEach(txObj => {
-        const tx = txObj.tx;
-        const meta = txObj.meta;
-        if (tx.TransactionType === 'CheckCash' &&
-            tx.Amount && typeof tx.Amount === 'object' &&
-            tx.Amount.currency === currencyCode && tx.Amount.issuer === issuer) {
-          initialBalance += parseFloat(tx.Amount.value);
-        } else if (tx.TransactionType === 'Payment' &&
-                   tx.Destination === issuer &&
-                   tx.Amount && typeof tx.Amount === 'object' &&
-                   tx.Amount.currency === currencyCode && tx.Amount.issuer === issuer &&
-                   meta.TransactionResult === 'tesSUCCESS' &&
-                   !meta.AffectedNodes.some(node => node.ModifiedNode?.LedgerEntryType === 'AMM')) {
-          const amt = parseFloat(tx.Amount.value);
-          devBurned += amt;
-          let txHash = tx.hash || txObj.tx.hash || 'N/A';
-          if (!seenTxs.has(txHash)) {
-            seenTxs.add(txHash);
-            devBurnedTxs.push({ txHash, amount: amt, source: 'DEV' });
-          }
-        }
-      });
-
-      issuerTxs.forEach(txObj => {
-        const tx = txObj.tx;
-        const meta = txObj.meta;
-        if (tx.TransactionType === 'Payment' &&
-            tx.Destination === issuer &&
-            tx.Amount && typeof tx.Amount === 'object' &&
-            tx.Amount.currency === currencyCode && tx.Amount.issuer === issuer &&
-            meta.TransactionResult === 'tesSUCCESS' &&
-            !meta.AffectedNodes.some(node => node.ModifiedNode?.LedgerEntryType === 'AMM')) {
-          const amt = parseFloat(tx.Amount.value);
-          issuerBurned += amt;
-          let txHash = tx.hash || txObj.tx.hash || 'N/A';
-          if (!seenTxs.has(txHash)) {
-            seenTxs.add(txHash);
-            issuerBurnedTxs.push({ txHash, amount: amt, source: 'ISSUER' });
-          }
-        }
-      });
-
-      const combinedBurnedTxs = devBurnedTxs.concat(issuerBurnedTxs);
-      const totalBurned = devBurned + issuerBurned;
-      const sold = Math.max(initialBalance - (currentBalance + totalBurned), 0);
-
-      return {
-        initialBalance,
-        currentBalance,
-        devBurned,
-        totalBurned,
-        sold,
-        devBurnedTxs,
-        totalBurnedTxs: combinedBurnedTxs
+        ledger_index_min: -1,
+        ledger_index_max: -1,
+        forward: true,
+        limit: 200,
+        ...(marker ? { marker } : {})
       };
-    } catch (error) {
-      console.error('Error in getTokenMetrics:', error);
-      return { 
-        initialBalance: 'N/A', 
-        currentBalance: 'N/A', 
-        devBurned: 'N/A', 
-        totalBurned: 'N/A',
-        sold: 'N/A', 
-        devBurnedTxs: [], 
-        totalBurnedTxs: []
+      const txResponse = await fetchWithRetry(client, params);
+      if (txResponse.result.transactions) {
+        transactions.push(...txResponse.result.transactions);
+        txCount += txResponse.result.transactions.length;
+        console.log(`Fetched ${txResponse.result.transactions.length} activator transactions, total: ${txCount}`);
+      }
+      marker = txResponse.result.marker;
+      if (!marker || !txResponse.result.transactions.length || txCount >= maxTxCount) break;
+    } while (marker);
+
+    txCount = 0;
+    do {
+      const paramsIssuer = {
+        command: "account_tx",
+        account: issuer,
+        ledger_index_min: -1,
+        ledger_index_max: -1,
+        forward: true,
+        limit: 200,
+        ...(markerIssuer ? { marker: markerIssuer } : {})
       };
-    } finally {
-      await client.disconnect();
+      const issuerTxResponse = await fetchWithRetry(client, paramsIssuer);
+      if (issuerTxResponse.result.transactions) {
+        issuerTxs.push(...issuerTxResponse.result.transactions);
+        txCount += issuerTxResponse.result.transactions.length;
+        console.log(`Fetched ${issuerTxResponse.result.transactions.length} issuer transactions, total: ${txCount}`);
+      }
+      markerIssuer = issuerTxResponse.result.marker;
+      if (!markerIssuer || !issuerTxResponse.result.transactions.length || txCount >= maxTxCount) break;
+    } while (markerIssuer);
+
+    // Calculate initial balance from the first CheckCash transaction
+    let initialBalance = 0;
+    for (const txObj of transactions) {
+      const tx = txObj.tx;
+      if (
+        tx.TransactionType === 'CheckCash' &&
+        tx.Amount &&
+        typeof tx.Amount === 'object' &&
+        tx.Amount.currency === currencyCode &&
+        tx.Amount.issuer === issuer
+      ) {
+        initialBalance = parseFloat(tx.Amount.value);
+        console.log(`Found first CheckCash transaction for initial balance: ${initialBalance}`);
+        break; // Stop after the first matching CheckCash
+      }
     }
+
+    // Calculate total burned tokens (sent to issuer address)
+    let totalBurned = 0;
+    let totalBurnedTxs = [];
+
+    issuerTxs.forEach(txObj => {
+      const tx = txObj.tx;
+      const meta = txObj.meta;
+      if (
+        tx.TransactionType === 'Payment' &&
+        tx.Destination === issuer &&
+        tx.Amount &&
+        typeof tx.Amount === 'object' &&
+        tx.Amount.currency === currencyCode &&
+        tx.Amount.issuer === issuer &&
+        meta.TransactionResult === 'tesSUCCESS' &&
+        !meta.AffectedNodes.some(node => node.ModifiedNode?.LedgerEntryType === 'AMM')
+      ) {
+        const amt = parseFloat(tx.Amount.value);
+        totalBurned += amt;
+        let txHash = tx.hash || txObj.tx.hash || 'N/A';
+        if (!seenTxs.has(txHash)) {
+          seenTxs.add(txHash);
+          totalBurnedTxs.push({
+            txHash,
+            amount: amt,
+            source: tx.Account === activator ? 'DEV' : 'OTHER'
+          });
+        }
+      }
+    });
+
+    // Calculate sold amount
+    const sold = initialBalance > 0 ? Math.max(initialBalance - (currentBalance + totalBurned), 0) : 0;
+
+    return {
+      initialBalance,
+      currentBalance,
+      totalBurned,
+      sold,
+      totalBurnedTxs
+    };
+  } catch (error) {
+    console.error('Error in getTokenMetrics:', error);
+    return { 
+      initialBalance: 'N/A', 
+      currentBalance: 'N/A', 
+      totalBurned: 'N/A',
+      sold: 'N/A', 
+      totalBurnedTxs: []
+    };
+  } finally {
+    await client.disconnect();
   }
+}
 
   async function fetchDexscreenerData(issuer) {
     updateLoadingMessage("Fetching market data");
