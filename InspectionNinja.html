@@ -914,20 +914,24 @@
   }
 
   async function fetchPurchaserDetails(purchaser, issuer, currencyCode) {
-    const cacheKey = `${purchaser}_${issuer}_${currencyCode}`;
-    if (purchaserDetailsCache.has(cacheKey)) {
-      return purchaserDetailsCache.get(cacheKey);
-    }
+  const cacheKey = `${purchaser}_${issuer}_${currencyCode}`;
+  if (purchaserDetailsCache.has(cacheKey)) {
+    return purchaserDetailsCache.get(cacheKey);
+  }
 
-    const client = await connectClient();
-    let details = {
-      currentBalance: 'N/A',
-      tokensSold: 0,
-      xrpReceived: 0,
-      tokensBought: 0,
-      xrpSpent: 0
-    };
+  const client = await connectClient();
+  let details = {
+    currentBalance: 'N/A',
+    tokensSold: 0,
+    xrpReceived: 0,
+    tokensBought: 0,
+    xrpSpent: 0,
+    transfers: [],
+    isDeleted: false
+  };
 
+  try {
+    // Check if account exists with account_lines
     try {
       const accountLinesResponse = await fetchWithRetry(client, {
         command: "account_lines",
@@ -941,13 +945,32 @@
       );
       details.currentBalance = tokenLine ? parseFloat(tokenLine.balance) : 0;
       console.log(`Current balance for ${purchaser}: ${details.currentBalance}`);
+    } catch (error) {
+      if (error.data?.error === 'actNotFound' || error.message.includes('account not found')) {
+        console.warn(`Account ${purchaser} not found, marking as deleted.`);
+        details.isDeleted = true;
+        details.currentBalance = 'N/A';
+        details.tokensBought = 0;
+        details.xrpSpent = 0;
+        details.tokensSold = 0;
+        details.xrpReceived = 0;
+        purchaserDetailsCache.set(cacheKey, details);
+        await client.disconnect();
+        return details; // Exit early for deleted accounts
+      } else {
+        console.error(`Error fetching account_lines for ${purchaser}:`, error);
+        throw error; // Rethrow other errors
+      }
+    }
 
-      const forwardTxs = [];
-      const reverseTxs = [];
-      let forwardMarker, reverseMarker;
-      let txCount = 0;
-      const maxTxCount = 10000;
+    // Fetch transactions for non-deleted accounts
+    const forwardTxs = [];
+    const reverseTxs = [];
+    let forwardMarker, reverseMarker;
+    let txCount = 0;
+    const maxTxCount = 10000;
 
+    try {
       do {
         console.log(`Fetching forward transactions for ${purchaser}, marker: ${JSON.stringify(forwardMarker)}`);
         const txResponse = await fetchWithRetry(client, {
@@ -986,91 +1009,134 @@
         reverseMarker = txResponse.result.marker;
         if (!reverseMarker || txCount >= maxTxCount) break;
       } while (reverseMarker);
+    } catch (error) {
+      if (error.data?.error === 'actNotFound' || error.message.includes('account not found')) {
+        console.warn(`Account ${purchaser} transaction fetch failed, confirming deleted status.`);
+        details.isDeleted = true;
+        details.currentBalance = 'N/A';
+        details.tokensBought = 0;
+        details.xrpSpent = 0;
+        details.tokensSold = 0;
+        details.xrpReceived = 0;
+        purchaserDetailsCache.set(cacheKey, details);
+        await client.disconnect();
+        return details;
+      } else {
+        console.error(`Error fetching transactions for ${purchaser}:`, error);
+        throw error;
+      }
+    }
 
-      const allTxs = [...new Set([...forwardTxs, ...reverseTxs].map(tx => tx.tx.hash))].map(hash => 
-        forwardTxs.find(tx => tx.tx.hash === hash) || reverseTxs.find(tx => tx.tx.hash === hash)
-      );
-      console.log(`Total unique transactions for ${purchaser}: ${allTxs.length}`);
+    const allTxs = [...new Set([...forwardTxs, ...reverseTxs].map(tx => tx.tx.hash))].map(hash => 
+      forwardTxs.find(tx => tx.tx.hash === hash) || reverseTxs.find(tx => tx.tx.hash === hash)
+    );
+    console.log(`Total unique transactions for ${purchaser}: ${allTxs.length}`);
 
-      for (const txEntry of allTxs) {
-        const tx = txEntry.tx;
-        const meta = txEntry.meta;
+    for (const txEntry of allTxs) {
+      const tx = txEntry.tx;
+      const meta = txEntry.meta;
+      if (
+        (tx.TransactionType === 'Payment' || 
+         tx.TransactionType === 'OfferCreate' || 
+         tx.TransactionType === 'CheckCash' || 
+         tx.TransactionType === 'AMMBid' || 
+         tx.TransactionType === 'AMMVote') &&
+        tx.Account === purchaser &&
+        meta?.TransactionResult === 'tesSUCCESS'
+      ) {
+        console.log(`Processing tx: ${tx.hash}, Type: ${tx.TransactionType}`);
+
+        const balanceChanges = xrpl.getBalanceChanges(meta);
+        const purchaserChanges = balanceChanges.find(change => change.account === purchaser);
+
+        if (purchaserChanges) {
+          const tokenChange = purchaserChanges.balances.find(
+            b => b.currency === currencyCode && b.issuer === issuer
+          );
+          const xrpChange = purchaserChanges.balances.find(b => b.currency === 'XRP');
+
+          if (tokenChange && xrpChange) {
+            const tokenValue = parseFloat(tokenChange.value);
+            const xrpValue = parseFloat(xrpChange.value);
+            console.log(`Token change: ${tokenValue}, XRP change: ${xrpValue}`);
+
+            if (tokenValue < 0 && xrpValue > 0) {
+              const tokensSold = Math.abs(tokenValue);
+              const xrpReceived = xrpValue;
+              details.tokensSold += tokensSold;
+              details.xrpReceived += xrpReceived;
+              console.log(`Sale detected: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
+            } else if (tokenValue > 0 && xrpValue < 0) {
+              const tokensBought = tokenValue;
+              const xrpSpent = Math.abs(xrpValue);
+              details.tokensBought += tokensBought;
+              details.xrpSpent += xrpSpent;
+              console.log(`Purchase detected: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
+            }
+          }
+        }
+
+        // Check for transfers
         if (
-          (tx.TransactionType === 'Payment' || 
-           tx.TransactionType === 'OfferCreate' || 
-           tx.TransactionType === 'CheckCash' || 
-           tx.TransactionType === 'AMMBid' || 
-           tx.TransactionType === 'AMMVote') &&
-          tx.Account === purchaser &&
-          meta?.TransactionResult === 'tesSUCCESS'
+          tx.TransactionType === 'Payment' &&
+          meta?.delivered_amount &&
+          typeof meta.delivered_amount === 'object' &&
+          meta.delivered_amount.currency === currencyCode &&
+          meta.delivered_amount.issuer === issuer &&
+          tx.Destination !== purchaser &&
+          tx.Destination !== issuer
         ) {
-          console.log(`Processing tx: ${tx.hash}, Type: ${tx.TransactionType}`);
-
+          const tokensTransferred = parseFloat(meta.delivered_amount.value);
+          details.transfers.push({
+            txHash: tx.hash,
+            tokensTransferred,
+            destination: tx.Destination
+          });
+          console.log(`Transfer detected: ${tx.hash}, Tokens transferred: ${tokensTransferred}, Destination: ${tx.Destination}`);
+        } else if (meta) {
           const balanceChanges = xrpl.getBalanceChanges(meta);
-          const purchaserChanges = balanceChanges.find(change => change.account === purchaser);
-
-          if (purchaserChanges) {
-            const tokenChange = purchaserChanges.balances.find(
+          const recipientChanges = balanceChanges.find(
+            change => change.account === tx.Destination && change.account !== issuer && change.account !== purchaser
+          );
+          if (recipientChanges) {
+            const tokenReceived = recipientChanges.balances.find(
               b => b.currency === currencyCode && b.issuer === issuer
             );
-            const xrpChange = purchaserChanges.balances.find(b => b.currency === 'XRP');
-
-            if (tokenChange && xrpChange) {
-              const tokenValue = parseFloat(tokenChange.value);
-              const xrpValue = parseFloat(xrpChange.value);
-              console.log(`Token change: ${tokenValue}, XRP change: ${xrpValue}`);
-
-              if (tokenValue < 0 && xrpValue > 0) {
-                const tokensSold = Math.abs(tokenValue);
-                const xrpReceived = xrpValue;
-                details.tokensSold += tokensSold;
-                details.xrpReceived += xrpReceived;
-                console.log(`Sale detected: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
-              } else if (tokenValue > 0 && xrpValue < 0) {
-                const tokensBought = tokenValue;
-                const xrpSpent = Math.abs(xrpValue);
-                details.tokensBought += tokensBought;
-                details.xrpSpent += xrpSpent;
-                console.log(`Purchase detected: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
-              }
-            } else if (meta?.DeliveredAmount && typeof meta.DeliveredAmount === 'object' &&
-                       meta.DeliveredAmount.currency === currencyCode && 
-                       meta.DeliveredAmount.issuer === issuer) {
-              const tokenValue = parseFloat(meta.DeliveredAmount.value);
-              if (tokenValue < 0) {
-                const tokensSold = Math.abs(tokenValue);
-                let xrpReceived = 0;
-                if (tx.SendMax && typeof tx.SendMax === 'string') {
-                  xrpReceived = parseFloat(tx.SendMax) / 1000000;
-                }
-                details.tokensSold += tokensSold;
-                details.xrpReceived += xrpReceived;
-                console.log(`Sale detected via DeliveredAmount: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
-              } else if (tokenValue > 0) {
-                const tokensBought = tokenValue;
-                let xrpSpent = 0;
-                if (tx.SendMax && typeof tx.SendMax === 'string') {
-                  xrpSpent = parseFloat(tx.SendMax) / 1000000;
-                }
-                details.tokensBought += tokensBought;
-                details.xrpSpent += xrpSpent;
-                console.log(`Purchase detected via DeliveredAmount: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
-              }
+            if (tokenReceived && parseFloat(tokenReceived.value) > 0) {
+              const tokensTransferred = parseFloat(tokenReceived.value);
+              details.transfers.push({
+                txHash: tx.hash,
+                tokensTransferred,
+                destination: tx.Destination
+              });
+              console.log(`Transfer detected via balance changes: ${tx.hash}, Tokens transferred: ${tokensTransferred}, Destination: ${tx.Destination}`);
             }
           }
         }
       }
-
-      console.log(`Final details for ${purchaser}:`, details);
-      purchaserDetailsCache.set(cacheKey, details);
-      return details;
-    } catch (error) {
-      console.error(`Error fetching purchaser details for ${purchaser}:`, error);
-      return details;
-    } finally {
-      await client.disconnect();
     }
+
+    console.log(`Final details for ${purchaser}:`, details);
+    purchaserDetailsCache.set(cacheKey, details);
+    return details;
+  } catch (error) {
+    console.error(`Error fetching purchaser details for ${purchaser}:`, error);
+    if (error.data?.error === 'actNotFound' || error.message.includes('account not found')) {
+      details.isDeleted = true;
+      details.currentBalance = 'N/A';
+      details.tokensBought = 0;
+      details.xrpSpent = 0;
+      details.tokensSold = 0;
+      details.xrpReceived = 0;
+      purchaserDetailsCache.set(cacheKey, details);
+    } else {
+      throw error; // Rethrow unexpected errors
+    }
+    return details;
+  } finally {
+    await client.disconnect();
   }
+}
 
   async function fetchTradeData(devWallet, issuer, currencyCode, creationDate) {
     updateLoadingMessage("Fetching developer trade data");
@@ -1354,46 +1420,67 @@
   }
 
   async function togglePurchaserDetails(txHash, purchaser, issuer, currencyCode) {
-    const detailsRow = document.getElementById(`details_${txHash}`);
-    if (!detailsRow.classList.contains('hidden')) {
-      detailsRow.classList.add('hidden');
-      return;
-    }
+  const detailsRow = document.getElementById(`details_${txHash}`);
+  if (!detailsRow.classList.contains('hidden')) {
+    detailsRow.classList.add('hidden');
+    return;
+  }
 
-    const detailsContent = document.getElementById(`details_content_${txHash}`);
-    if (!detailsContent.innerHTML) {
-      detailsContent.innerHTML = `
-        <div class="details-content">
-          <div class="line loading-details">Loading purchaser details <span class="blinking">...</span></div>
-        </div>
-      `;
-      detailsRow.classList.remove('hidden');
+  const detailsContent = document.getElementById(`details_content_${txHash}`);
+  if (!detailsContent.innerHTML) {
+    detailsContent.innerHTML = `
+      <div class="details-content">
+        <div class="line loading-details">Loading purchaser details <span class="blinking">...</span></div>
+      </div>
+    `;
+    detailsRow.classList.remove('hidden');
 
-      try {
-        const details = await fetchPurchaserDetails(purchaser, issuer, currencyCode);
+    try {
+      const details = await fetchPurchaserDetails(purchaser, issuer, currencyCode);
+      let detailsHTML = '';
+
+      if (details.isDeleted) {
+        detailsHTML += `
+          <div class="line error">Purchaser wallet appears to be deleted. Transaction history may still be available on <a href="https://xrpscan.com/account/${purchaser}" target="_blank">XRPSCAN</a>.</div>
+        `;
+      } else {
         const profit = details.xrpReceived - details.xrpSpent;
         const profitLabel = profit >= 0 ? 'Profit' : 'Loss';
-        detailsContent.innerHTML = `
-          <div class="details-content">
-            <div class="line">Current Balance: ${formatAmount(details.currentBalance)} ${getCurrencyDisplay(currencyCode)}</div>
-            <div class="line">Tokens Purchased: ${formatAmount(details.tokensBought)} ${getCurrencyDisplay(currencyCode)}</div>
-            <div class="line">XRP Spent on Purchases: ${formatAmount(details.xrpSpent)} XRP</div>
-            <div class="line">Tokens Sold: ${formatAmount(details.tokensSold)} ${getCurrencyDisplay(currencyCode)}</div>
-            <div class="line">XRP Received from Sales: ${formatAmount(details.xrpReceived)} XRP</div>
-            <div class="line">${profitLabel}: ${formatAmount(Math.abs(profit))} XRP</div>
-          </div>
+        detailsHTML += `
+          <div class="line">Current Balance: ${formatAmount(details.currentBalance)} ${getCurrencyDisplay(currencyCode)}</div>
+          <div class="line">Tokens Purchased: ${formatAmount(details.tokensBought)} ${getCurrencyDisplay(currencyCode)}</div>
+          <div class="line">XRP Spent on Purchases: ${formatAmount(details.xrpSpent)} XRP</div>
+          <div class="line">Tokens Sold: ${formatAmount(details.tokensSold)} ${getCurrencyDisplay(currencyCode)}</div>
+          <div class="line">XRP Received from Sales: ${formatAmount(details.xrpReceived)} XRP</div>
+          <div class="line">${profitLabel}: ${formatAmount(Math.abs(profit))} XRP</div>
         `;
-      } catch (error) {
-        detailsContent.innerHTML = `
-          <div class="details-content">
-            <div class="line error">Error loading purchaser details: ${error.message}</div>
-          </div>
-        `;
+        if (details.transfers.length > 0) {
+          detailsHTML += `
+            <div class="line">Transfers: ${formatAmount(details.transfers.reduce((sum, t) => sum + t.tokensTransferred, 0))} ${getCurrencyDisplay(currencyCode)} to ${new Set(details.transfers.map(t => t.destination)).size} unique addresses <span class="expandable" onclick="toggleSection('transfers_${txHash}_${purchaser}')">[view transfers]</span></div>
+            <div id="transfers_${txHash}_${purchaser}" class="hidden">${buildTableHTML(details.transfers, 'transfer', getCurrencyDisplay(currencyCode))}</div>
+          `;
+        } else {
+          detailsHTML += `<div class="line">Transfers: None</div>`;
+        }
       }
-    } else {
-      detailsRow.classList.remove('hidden');
+
+      detailsContent.innerHTML = `
+        <div class="details-content">
+          ${detailsHTML}
+        </div>
+      `;
+    } catch (error) {
+      console.error(`Error in togglePurchaserDetails for ${purchaser}:`, error);
+      detailsContent.innerHTML = `
+        <div class="details-content">
+          <div class="line error">Error loading purchaser details: ${error.message}. View transaction history on <a href="https://xrpscan.com/account/${purchaser}" target="_blank">XRPSCAN</a>.</div>
+        </div>
+      `;
     }
+  } else {
+    detailsRow.classList.remove('hidden');
   }
+}
 
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
@@ -1643,40 +1730,40 @@
       }
     },
     snipers: {
-      async fetchData(issuer, currencyCode) {
-        enrichedPayments = await getPaymentTransactions(issuer, currencyCode);
-        enrichedPayments.currencyCode = currencyCode;
-        enrichedPayments.issuer = issuer;
-        return { payments: enrichedPayments, currencyCode, issuer };
-      },
-      renderData(data) {
-        const { payments, currencyCode, issuer } = data;
-        let html = `<div class="header">Snipers</div>`;
-        html += `<div class="separator"></div>`;
-        html += `<div class="line">Currency: ${getCurrencyDisplay(currencyCode)}</div>`;
-        html += `<div class="line">Issuer: <a href="https://xrpscan.com/account/${issuer}" target="_blank">${issuer}</a></div>`;
+  async fetchData(issuer, currencyCode) {
+    enrichedPayments = await getPaymentTransactions(issuer, currencyCode);
+    enrichedPayments.currencyCode = currencyCode;
+    enrichedPayments.issuer = issuer;
+    return { payments: enrichedPayments, currencyCode, issuer };
+  },
+  renderData(data) {
+    const { payments, currencyCode, issuer } = data;
+    let html = `<div class="header">Snipers</div>`;
+    html += `<div class="separator"></div>`;
+    html += `<div class="line">Currency: ${getCurrencyDisplay(currencyCode)}</div>`;
+    html += `<div class="line">Issuer: <a href="https://xrpscan.com/account/${issuer}" target="_blank">${issuer}</a></div>`;
 
-        if (payments.length === 0) {
-          html += `<div class="line">No sniper transactions found.</div>`;
-        } else {
-          html += `<table>`;
-          html += `<tr><th>#</th><th>Transaction</th><th>Purchaser</th><th>XRP Spent</th><th>Token Received</th></tr>`;
-          payments.forEach((payment, index) => {
-            const txHash = payment.txHash;
-            html += `<tr onclick="togglePurchaserDetails('${txHash}', '${payment.purchaser}', '${issuer}', '${currencyCode}')">`;
-            html += `<td>${index + 1}</td>`;
-            html += `<td><a href="https://xrpscan.com/tx/${txHash}" target="_blank">view</a></td>`;
-            html += `<td><a href="https://xrpscan.com/account/${payment.purchaser}" target="_blank">${payment.purchaser}</a></td>`;
-            html += `<td>${formatAmount(payment.xrpSpent)} XRP</td>`;
-            html += `<td>${formatAmount(payment.amount)} ${getCurrencyDisplay(currencyCode)}</td>`;
-            html += `</tr>`;
-            html += `<tr id="details_${txHash}" class="details-row hidden"><td colspan="5"><div id="details_content_${txHash}"></div></td></tr>`;
-          });
-          html += `</table>`;
-        }
-        return html;
-      }
+    if (payments.length === 0) {
+      html += `<div class="line">No sniper transactions found.</div>`;
+    } else {
+      html += `<table>`;
+      html += `<tr><th>#</th><th>Transaction</th><th>Purchaser</th><th>XRP Spent</th><th>Token Received</th></tr>`;
+      payments.forEach((payment, index) => {
+        const txHash = payment.txHash;
+        html += `<tr onclick="togglePurchaserDetails('${txHash}', '${payment.purchaser}', '${issuer}', '${currencyCode}')">`;
+        html += `<td>${index + 1}</td>`;
+        html += `<td><a href="https://xrpscan.com/tx/${txHash}" target="_blank">view</a></td>`;
+        html += `<td><a href="https://xrpscan.com/account/${payment.purchaser}" target="_blank">${payment.purchaser}</a></td>`;
+        html += `<td>${formatAmount(payment.xrpSpent)} XRP</td>`;
+        html += `<td>${formatAmount(payment.amount)} ${getCurrencyDisplay(currencyCode)}</td>`;
+        html += `</tr>`;
+        html += `<tr id="details_${txHash}" class="details-row hidden"><td colspan="5"><div id="details_content_${txHash}"></div></td></tr>`;
+      });
+      html += `</table>`;
     }
+    return html;
+  }
+}
   };
 
   /* ---------- Main Fetch and Render Logic ---------- */
