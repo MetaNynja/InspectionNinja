@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,337 +5,417 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inspection Ninja</title>
   <style>
-    body {
-      margin: 0;
-      padding: 24px;
-      background: linear-gradient(180deg, #e6f0ff 0%, #f2f2f7 100%);
-      color: #1d1d1f;
-      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1.6;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-      position: relative; /* Added to support absolute positioning of the icon */
-    }
-    #console {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-      border-radius: 16px;
-      margin: 0;
-      overflow: hidden;
-      box-sizing: border-box;
-      min-height: 0;
-    }
-    #output {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      min-height: 0;
-    }
-    .line {
-      margin: 0 0 10px 0;
-      color: #1d1d1f;
-    }
-    .header {
-      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-      font-weight: 600;
-      font-size: 20px;
-      color: #1d1d1f;
-      text-align: center;
-      margin: 28px 0;
-      letter-spacing: 0.03em;
-    }
-    .main-header {
-      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-      font-weight: 600;
-      font-size: 28px;
-      color: #1d1d1f;
-      text-align: center;
-      margin: 20px 0;
-      letter-spacing: 0.05em;
-    }
-    .separator {
-      border-top: 1px solid #e8e8ed;
-      margin: 16px 0;
-    }
-    #input-line {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(12px);
-      padding: 12px 20px;
-      border-top: 1px solid #e8e8ed;
-      display: flex;
-      align-items: center;
-      width: 100%;
-      box-sizing: border-box;
-      border-radius: 0 0 16px 16px;
-    }
-    #cmd-input {
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid #d2d2d7;
-      border-radius: 12px;
-      outline: none;
-      color: #1d1d1f;
-      font-family: inherit;
-      font-size: 14px;
-      padding: 12px 16px;
-      flex: 1;
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    #cmd-input:focus {
-      border-color: #007aff;
-      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2);
-    }
-    #cmd-input::placeholder {
-      color: #8e8e93;
-      transition: transform 0.3s ease;
-    }
-    #cmd-input:focus::placeholder {
-      transform: translateX(4px);
-    }
-    a {
-      color: #007aff;
-      text-decoration: none;
-      transition: all 0.2s ease;
-    }
-    a:hover {
-      color: #005bb5;
-      transform: scale(1.05);
-      display: inline-block;
-    }
-    .expandable {
-      cursor: pointer;
-      color: #007aff;
-      text-decoration: underline;
-      transition: all 0.2s ease;
-    }
-    .expandable:hover {
-      color: #005bb5;
-      transform: scale(1.05);
-      display: inline-block;
-    }
-    .hidden {
-      display: none;
-    }
-    .blinking {
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-    .expanded {
-      border: 1px solid #e8e8ed;
-      padding: 16px;
-      margin: 12px 0;
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .expanded .line {
-      margin-bottom: 14px;
-    }
-    #loadingLine {
-      margin: 24px 0;
-      padding: 12px;
-      color: #636366;
-      font-style: italic;
-    }
-    .error {
-      color: #ff3b30;
-      font-weight: 500;
-    }
-    .custom-dropdown {
-      position: relative;
-      display: inline-block;
-      margin-right: 16px;
-    }
-    .dropdown-toggle {
-      background: rgba(255, 255, 255, 0.95);
-      color: #1d1d1f;
-      font-size: 14px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      border: 1px solid #d2d2d7;
-      transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-      position: relative;
-      overflow: hidden;
-    }
-    .dropdown-toggle:hover {
-      background: #f2f2f7;
-      transform: translateY(-1px);
-    }
-    .dropdown-toggle::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(0, 122, 255, 0.1);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: width 0.3s, height 0.3s;
-    }
-    .dropdown-toggle:active::after {
-      width: 200px;
-      height: 200px;
-    }
-    .dropdown-menu {
-      display: none;
-      position: absolute;
-      bottom: calc(100% + 10px);
-      left: 0;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      border: 1px solid #e8e8ed;
-      border-radius: 12px;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-      z-index: 4;
-      width: 220px;
-      transform: scale(0.95);
-      transform-origin: bottom left;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .dropdown-menu.show {
-      display: block;
-      transform: scale(1);
-    }
-    .dropdown-option {
-      padding: 12px 16px;
-      color: #1d1d1f;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .dropdown-option:hover {
-      background: #e6f0ff;
-      color: #007aff;
-      transform: translateX(4px);
-    }
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      margin: 16px 0;
-      font-size: 13px;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    th, td {
-      border: 1px solid #e8e8ed;
-      padding: 12px 16px;
-      text-align: left;
-      word-break: break-all;
-    }
-    th {
-      background: #f2f2f7;
-      color: #1d1d1f;
-      font-weight: 600;
-    }
-    tr:nth-child(even) {
-      background: #fafafa;
-    }
-    tr:hover {
-      background: #e6f0ff;
-      transition: background 0.2s ease;
-    }
-    tr {
-      cursor: pointer;
-    }
-    .details-row {
-      background: rgba(255, 255, 255, 0.98);
-      backdrop-filter: blur(10px);
-      border-top: none;
-    }
-    .details-row td {
-      padding: 16px;
-      border-top: none;
-    }
-    .details-content {
-      padding: 12px;
-      background: rgba(245, 245, 245, 0.9);
-      border-radius: 8px;
-    }
-    .loading-details {
-      color: #636366;
-      font-style: italic;
-    }
+body {
+  margin: 0;
+  padding: 24px;
+  background: linear-gradient(180deg, #1a1a1e 0%, #2c2c34 100%);
+  color: #e5e5e7;
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  position: relative;
+}
+
+#console {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 20px;
+  background: rgba(34, 34, 40, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+#output {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto; /* Enable horizontal scrolling for wide tables */
+  padding: 16px;
+  min-height: 0;
+}
+
+.line {
+  margin: 0 0 10px 0;
+  color: #e5e5e7;
+}
+
+.header {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: #ffffff;
+  text-align: center;
+  margin: 28px 0;
+  letter-spacing: 0.03em;
+}
+
+.main-header {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: #ffffff;
+  text-align: center;
+  margin: 20px 0;
+  letter-spacing: 0.05em;
+}
+
+.separator {
+  border-top: 1px solid #3a3a42;
+  margin: 16px 0;
+}
+
+#input-line {
+  background: rgba(34, 34, 40, 0.9);
+  backdrop-filter: blur(12px);
+  padding: 12px 20px;
+  border-top: 1px solid #3a3a42;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 0 0 16px 16px;
+}
+
+#cmd-input {
+  background: rgba(44, 44, 50, 0.95);
+  border: 1px solid #4a4a52;
+  border-radius: 12px;
+  outline: none;
+  color: #e5e5e7;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 12px 16px;
+  flex: 1;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+#cmd-input:focus {
+  border-color: #1e90ff;
+  box-shadow: 0 0 0 4px rgba(30, 144, 255, 0.3);
+}
+
+#cmd-input::placeholder {
+  color: #8e8e93;
+  transition: transform 0.3s ease;
+}
+
+#cmd-input:focus::placeholder {
+  transform: translateX(4px);
+}
+
+a {
+  color: #1e90ff;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  color: #40c4ff;
+  transform: scale(1.05);
+  display: inline-block;
+}
+
+.expandable {
+  cursor: pointer;
+  color: #1e90ff;
+  text-decoration: underline;
+  transition: all 0.2s ease;
+}
+
+.expandable:hover {
+  color: #40c4ff;
+  transform: scale(1.05);
+  display: inline-block;
+}
+
+.hidden {
+  display: none;
+}
+
+.blinking {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.expanded {
+  border: 1px solid #3a3a42;
+  padding: 16px;
+  margin: 12px 0;
+  background: rgba(44, 44, 50, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expanded .line {
+  margin-bottom: 14px;
+}
+
+#loadingLine {
+  margin: 24px 0;
+  padding: 12px;
+  color: #a1a1a6;
+  font-style: italic;
+}
+
+.error {
+  color: #ff5555;
+  font-weight: 500;
+}
+
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  margin-right: 16px;
+}
+
+.dropdown-toggle {
+  background: rgba(44, 44, 50, 0.95);
+  color: #e5e5e7;
+  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid #4a4a52;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-toggle:hover {
+  background: #3a3a42;
+  transform: translateY(-1px);
+}
+
+.dropdown-toggle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(30, 144, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.dropdown-toggle:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  background: rgba(44, 44, 50, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid #4a4a52;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  z-index: 4;
+  width: 220px;
+  transform: scale(0.95);
+  transform-origin: bottom left;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdown-menu.show {
+  display: block;
+  transform: scale(1);
+}
+
+.dropdown-option {
+  padding: 12px 16px;
+  color: #e5e5e7;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdown-option:hover {
+  background: #3a3a42;
+  color: #1e90ff;
+  transform: translateX(4px);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse; /* Changed to collapse for cleaner separators */
+  margin: 16px 0;
+  font-size: 13px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #222228; /* Solid color matching #console */
+}
+
+th, td {
+  border: none;
+  padding: 12px 16px;
+  text-align: left;
+  white-space: nowrap; /* Prevent wrapping for all cells */
+  min-height: 48px;
+  vertical-align: middle;
+  font-size: 13px; /* Ensure consistent character sizing */
+}
+
+th {
+  background: #222228; /* Match table background */
+  color: #ffffff;
+  font-weight: 600;
+}
+
+tr {
+  min-height: 48px;
+  cursor: pointer;
+  background: #222228; /* Solid color for rows */
+}
+
+tr:not(:last-child) {
+  border-bottom: 1px solid #3a3a42; /* Horizontal separators */
+}
+
+tr:nth-child(even) {
+  background: #222228; /* Remove gradient, match solid color */
+}
+
+tr:hover {
+  background: #3a3a42;
+  transition: background 0.2s ease;
+}
+
+.xrp-icon {
+  max-height: 20px;
+  width: auto;
+  vertical-align: middle;
+}
+
+.xrp-cell {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.xrp-cell .value {
+  flex-grow: 1;
+}
+
+.xrp-cell .icon {
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.details-row {
+  background: rgba(44, 44, 50, 0.98); /* Retain distinct background for details */
+  backdrop-filter: blur(10px);
+  border-top: none;
+}
+
+.details-row td {
+  padding: 16px;
+  border-top: none;
+  min-height: 48px;
+  white-space: normal; /* Allow wrapping in details for readability */
+}
+
+.details-content {
+  padding: 12px;
+  background: rgba(34, 34, 40, 0.9);
+  border-radius: 8px;
+}
+
+.loading-details {
+  color: #a1a1a6;
+  font-style: italic;
+}
+
 .header-container {
-      display: flex;
-      align-items: center;
-      padding: 16px 24px;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 12px;
-      margin-bottom: 20px;
-    }
-    .header-icon {
-      width: 32px;
-      height: 32px;
-      margin-right: 12px;
-    }
-    .header-text {
-      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-      font-weight: 600;
-      font-size: 20px;
-      margin-left: 10px;
-      color: #1d1d1f;
-      letter-spacing: 0.03em;
-    }
-    .header-text .metanynja {
-      font-family: 'Nothing You Could Do', cursive; /* Google Fonts cursive font */
-      font-size: 22px;
-      margin-left:10px;
-      
-    }
+  display: flex;
+  align-items: center;
+  padding: 24px 24px;
+  background: rgba(34, 34, 40, 0.95);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.header-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 12px;
+  margin-left: 12px:
+}
+
+.header-text {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  margin-left: 10px;
+  color: #ffffff;
+  letter-spacing: 0.03em;
+}
+
+.header-text .metanynja {
+  font-family: 'Nothing You Could Do', cursive;
+  font-size: 20px;
+  margin-left: 10px;
+  color: #1e90ff;
+}
   </style>
   <!-- Add Google Fonts for cursive MetaNynja -->
   <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="header-container">
-    <img src="https://i.ibb.co/tTFcgp9z/Magic-Eraser-250601-190000.png" alt="Inspection Ninja Icon" class="header-icon">
-    <div class="header-text">Inspection Ninja by<span class="metanynja">MetaNynja</span></div>
-  </div>
+  <img src="https://i.ibb.co/9HHNB8Tm/Magic-Eraser-250603-130317.png" alt="Inspection Ninja Icon" class="header-icon">
+  <div class="header-text">Inspection Ninja</div>
+</div>
   <div id="console">
-    <div id="output"></div>
-    <div id="input-line" class="line">
-      <div class="custom-dropdown">
-  <div class="dropdown-toggle" id="scope-toggle">Scope Level: Token Metrics</div>
-  <div class="dropdown-menu" id="scope-menu">
-    <div class="dropdown-option" data-value="overview" data-name="Token Metrics">
-      Token Metrics
+  <div id="output"></div>
+  <div id="input-line" class="line">
+    <div class="custom-dropdown">
+      <div class="dropdown-toggle" id="scope-toggle">Scope Level: Token Metrics</div>
+      <div class="dropdown-menu" id="scope-menu">
+        <div class="dropdown-option" data-value="overview" data-name="Token Metrics">
+          Token Metrics
+        </div>
+        <div class="dropdown-option" data-value="dev" data-name="DEV Inspect">
+          + DEV Inspect
+        </div>
+        <div class="dropdown-option" data-value="tier1" data-name="Tier 1 Transfers">
+          + Tier 1 Transfers
+        </div>
+        <div class="dropdown-option" data-value="tier2" data-name="Tier 2 Transfers">
+          + Tier 2 Transfers
+        </div>
+        <div class="dropdown-option" data-value="snipers" data-name="Snipers">
+          Snipers
+        </div>
+        <div class="dropdown-option" data-value="wallet" data-name="Trade History">
+          Trade History
+        </div>
+      </div>
     </div>
-    <div class="dropdown-option" data-value="dev" data-name="DEV Inspect">
-      + DEV Inspect
-    </div>
-    <div class="dropdown-option" data-value="tier1" data-name="Tier 1 Transfers">
-      + Tier 1 Transfers
-    </div>
-    <div class="dropdown-option" data-value="tier2" data-name="Tier 2 Transfers">
-      + Tier 2 Transfers
-    </div>
-    <div class="dropdown-option" data-value="snipers" data-name="Snipers">
-      Snipers
-    </div>
-    <div class="dropdown-option" data-value="wallet" data-name="Trade History">
-      Trade History
-    </div>
+    <span class="prompt"></span>
+    <input type="text" id="cmd-input" placeholder="Enter Issuer Address" autofocus />
   </div>
 </div>
-      <span class="prompt"></span>
-      <input type="text" id="cmd-input" placeholder="Enter Issuer Address" autofocus />
-    </div>
-  </div>
 
   <!-- External Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -1741,109 +1820,110 @@
     },
     wallet: {
   async fetchData(wallet) {
-  updateLoadingMessage("Fetching wallet transaction history");
-  const client = await connectClient();
-  try {
-    // Fetch all transactions for the wallet
-    let transactions = [];
-    let marker;
-    let txCount = 0;
-    const maxTxCount = 20000;
-    do {
-      const txResponse = await fetchWithRetry(client, {
-        command: "account_tx",
-        account: wallet,
-        ledger_index_min: -1,
-        ledger_index_max: -1,
-        forward: true,
-        limit: 200,
-        ...(marker ? { marker } : {})
-      });
-      if (!txResponse.result || !txResponse.result.transactions) {
-        console.error(`No transactions returned for ${wallet}, response:`, txResponse);
-        throw new Error("Failed to retrieve transactions. Please try again.");
-      }
-      const txs = txResponse.result.transactions || [];
-      transactions = transactions.concat(txs);
-      txCount += txs.length;
-      console.log(`Fetched ${txs.length} transactions for ${wallet}, total: ${txCount}`);
-      marker = txResponse.result.marker;
-      if (!marker || !txs.length || txCount >= maxTxCount) break;
-    } while (marker);
+    updateLoadingMessage("Fetching wallet transaction history");
+    const client = await connectClient();
+    try {
+      // Fetch all transactions for the wallet
+      let transactions = [];
+      let marker;
+      let txCount = 0;
+      const maxTxCount = 20000;
+      do {
+        const txResponse = await fetchWithRetry(client, {
+          command: "account_tx",
+          account: wallet,
+          ledger_index_min: -1,
+          ledger_index_max: -1,
+          forward: true,
+          limit: 200,
+          ...(marker ? { marker } : {})
+        });
+        if (!txResponse.result || !txResponse.result.transactions) {
+          console.error(`No transactions returned for ${wallet}, response:`, txResponse);
+          throw new Error("Failed to retrieve transactions. Please try again.");
+        }
+        const txs = txResponse.result.transactions || [];
+        transactions = transactions.concat(txs);
+        txCount += txs.length;
+        console.log(`Fetched ${txs.length} transactions for ${wallet}, total: ${txCount}`);
+        marker = txResponse.result.marker;
+        if (!marker || !txs.length || txCount >= maxTxCount) break;
+      } while (marker);
 
-    console.log(`Total transactions fetched for ${wallet}: ${transactions.length}`);
+      console.log(`Total transactions fetched for ${wallet}: ${transactions.length}`);
 
-    // Analyze transactions to identify tokens purchased or sold
-    const tokenDetails = {};
-    const tokenTimestamps = {}; // Track latest transaction date for each token
-    const seenTokens = new Set();
-    for (const txEntry of transactions) {
-      const tx = txEntry.tx;
-      const meta = txEntry.meta;
-      if (
-        (tx.TransactionType === 'Payment' ||
-         tx.TransactionType === 'OfferCreate' ||
-         tx.TransactionType === 'CheckCash' ||
-         tx.TransactionType === 'AMMBid' ||
-         tx.TransactionType === 'AMMVote') &&
-        meta?.TransactionResult === 'tesSUCCESS'
-      ) {
-        const balanceChanges = xrpl.getBalanceChanges(meta);
-        const walletChanges = balanceChanges.find(change => change.account === wallet);
-        if (walletChanges) {
-          for (const balance of walletChanges.balances) {
-            if (balance.currency !== 'XRP' && balance.issuer) {
-              const tokenKey = `${balance.issuer}_${balance.currency}`;
-              if (!seenTokens.has(tokenKey)) {
-                seenTokens.add(tokenKey);
-                tokenDetails[tokenKey] = {
-                  currency: balance.currency,
-                  issuer: balance.issuer,
-                  currentBalance: 0,
-                  tokensBought: 0,
-                  xrpSpent: 0,
-                  tokensSold: 0,
-                  xrpReceived: 0,
-                  buyTxs: [],
-                  sellTxs: [],
-                  profit: 0
-                };
-              }
-              const tokenValue = parseFloat(balance.value);
-              const xrpChange = walletChanges.balances.find(b => b.currency === 'XRP');
-              if (xrpChange) {
-                const xrpValue = parseFloat(xrpChange.value);
-                if (tokenValue > 0 && xrpValue < 0) {
-                  // Purchase
-                  const tokensBought = tokenValue;
-                  const xrpSpent = Math.abs(xrpValue);
-                  tokenDetails[tokenKey].tokensBought += tokensBought;
-                  tokenDetails[tokenKey].xrpSpent += xrpSpent;
-                  tokenDetails[tokenKey].buyTxs.push({
-                    txHash: tx.hash,
-                    tokensBought,
-                    xrpSpent
-                  });
-                  console.log(`Purchase detected for ${balance.currency}: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
-                  // Update latest transaction timestamp
-                  if (!tokenTimestamps[tokenKey] || tx.date > tokenTimestamps[tokenKey]) {
-                    tokenTimestamps[tokenKey] = tx.date;
-                  }
-                } else if (tokenValue < 0 && xrpValue > 0) {
-                  // Sale
-                  const tokensSold = Math.abs(tokenValue);
-                  const xrpReceived = xrpValue;
-                  tokenDetails[tokenKey].tokensSold += tokensSold;
-                  tokenDetails[tokenKey].xrpReceived += xrpReceived;
-                  tokenDetails[tokenKey].sellTxs.push({
-                    txHash: tx.hash,
-                    tokensSold,
-                    xrpReceived
-                  });
-                  console.log(`Sale detected for ${balance.currency}: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
-                  // Update latest transaction timestamp
-                  if (!tokenTimestamps[tokenKey] || tx.date > tokenTimestamps[tokenKey]) {
-                    tokenTimestamps[tokenKey] = tx.date;
+      // Analyze transactions to identify tokens purchased or sold
+      const tokenDetails = {};
+      const tokenTimestamps = {}; // Track latest transaction date for each token
+      const seenTokens = new Set();
+      for (const txEntry of transactions) {
+        const tx = txEntry.tx;
+        const meta = txEntry.meta;
+        if (
+          (tx.TransactionType === 'Payment' ||
+           tx.TransactionType === 'OfferCreate' ||
+           tx.TransactionType === 'CheckCash' ||
+           tx.TransactionType === 'AMMBid' ||
+           tx.TransactionType === 'AMMVote') &&
+          meta?.TransactionResult === 'tesSUCCESS'
+        ) {
+          const balanceChanges = xrpl.getBalanceChanges(meta);
+          const walletChanges = balanceChanges.find(change => change.account === wallet);
+          if (walletChanges) {
+            for (const balance of walletChanges.balances) {
+              if (balance.currency !== 'XRP' && balance.issuer) {
+                const tokenKey = `${balance.issuer}_${balance.currency}`;
+                if (!seenTokens.has(tokenKey)) {
+                  seenTokens.add(tokenKey);
+                  tokenDetails[tokenKey] = {
+                    currency: balance.currency,
+                    issuer: balance.issuer,
+                    currentBalance: 0,
+                    tokensBought: 0,
+                    xrpSpent: 0,
+                    tokensSold: 0,
+                    xrpReceived: 0,
+                    buyTxs: [],
+                    sellTxs: [],
+                    profit: 0
+                  };
+                }
+                const tokenValue = parseFloat(balance.value);
+                const xrpChange = walletChanges.balances.find(b => b.currency === 'XRP');
+                if (xrpChange) {
+                  const xrpValue = parseFloat(xrpChange.value);
+                  if (tokenValue > 0 && xrpValue < 0) {
+                    // Purchase
+                    const tokensBought = tokenValue;
+                    const xrpSpent = Math.abs(xrpValue);
+                    tokenDetails[tokenKey].tokensBought += tokensBought;
+                    tokenDetails[tokenKey].xrpSpent += xrpSpent;
+                    tokenDetails[tokenKey].buyTxs.push({
+                      txHash: tx.hash,
+                      tokensBought,
+                      xrpSpent
+                    });
+                    console.log(`Purchase detected for ${balance.currency}: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
+                    // Update latest transaction timestamp
+                    if (!tokenTimestamps[tokenKey] || tx.date > tokenTimestamps[tokenKey]) {
+                      tokenTimestamps[tokenKey] = tx.date;
+                    }
+                  } else if (tokenValue < 0 && xrpValue > 0) {
+                    // Sale
+                    const tokensSold = Math.abs(tokenValue);
+                    const xrpReceived = xrpValue;
+                    tokenDetails[tokenKey].tokensSold += tokensSold;
+                    tokenDetails[tokenKey].xrpReceived += xrpReceived;
+                    tokenDetails[tokenKey].sellTxs.push({
+                      txHash: tx.hash,
+                      tokensSold,
+                      xrpReceived
+                    });
+                    console.log(`Sale detected for ${balance.currency}: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
+                    // Update latest transaction timestamp
+                    if (!tokenTimestamps[tokenKey] || tx.date > tokenTimestamps[tokenKey]) {
+                      tokenTimestamps[tokenKey] = tx.date;
+                    }
                   }
                 }
               }
@@ -1851,169 +1931,167 @@
           }
         }
       }
+
+      // Fetch current trust lines to update current balances for purchased/sold tokens
+      let trustLines = [];
+      marker = undefined;
+      txCount = 0;
+      do {
+        const response = await fetchWithRetry(client, {
+          command: "account_lines",
+          account: wallet,
+          ledger_index: "validated",
+          limit: 2000,
+          ...(marker ? { marker } : {})
+        });
+        if (!response.result || !response.result.lines) {
+          console.error(`No trust lines returned for ${wallet}, response:`, response);
+          throw new Error("Failed to retrieve trust lines. Please try again.");
+        }
+        const lines = response.result.lines || [];
+        trustLines = trustLines.concat(lines);
+        marker = response.result.marker;
+        txCount += lines.length;
+        console.log(`Fetched ${lines.length} trust lines for ${wallet}, total: ${txCount}`);
+        if (!marker || !lines.length || txCount >= maxTxCount) break;
+      } while (marker);
+
+      console.log(`Total trust lines fetched for ${wallet}: ${trustLines.length}`);
+
+      // Update current balances only for tokens with purchase/sale activity
+      for (const line of trustLines) {
+        const key = `${line.account}_${line.currency}`;
+        if (tokenDetails[key]) {
+          tokenDetails[key].currentBalance = parseFloat(line.balance);
+        }
+      }
+
+      // Filter tokens to only those with purchases or sales and sort by latest transaction
+      const tokens = Array.from(seenTokens)
+        .filter(key => tokenDetails[key].tokensBought > 0 || tokenDetails[key].tokensSold > 0)
+        .map(key => {
+          const [issuer, currency] = key.split('_');
+          return {
+            issuer,
+            currency,
+            currentBalance: tokenDetails[key].currentBalance,
+            latestTxDate: tokenTimestamps[key] || 0
+          };
+        })
+        .sort((a, b) => b.latestTxDate - a.latestTxDate);
+
+      // Calculate profit/loss for each token
+      for (const key of Object.keys(tokenDetails)) {
+        tokenDetails[key].profit = tokenDetails[key].xrpReceived - tokenDetails[key].xrpSpent;
+      }
+
+      console.log(`Total tokens with purchase/sale activity for ${wallet}: ${tokens.length}`, tokens);
+
+      return { tokens, tokenDetails };
+    } catch (error) {
+      console.error('Error in wallet fetchData:', error);
+      throw error;
+    } finally {
+      await client.disconnect();
     }
-
-    // Fetch current trust lines to update current balances for purchased/sold tokens
-    let trustLines = [];
-    marker = undefined;
-    txCount = 0;
-    do {
-      const response = await fetchWithRetry(client, {
-        command: "account_lines",
-        account: wallet,
-        ledger_index: "validated",
-        limit: 2000,
-        ...(marker ? { marker } : {})
-      });
-      if (!response.result || !response.result.lines) {
-        console.error(`No trust lines returned for ${wallet}, response:`, response);
-        throw new Error("Failed to retrieve trust lines. Please try again.");
-      }
-      const lines = response.result.lines || [];
-      trustLines = trustLines.concat(lines);
-      marker = response.result.marker;
-      txCount += lines.length;
-      console.log(`Fetched ${lines.length} trust lines for ${wallet}, total: ${txCount}`);
-      if (!marker || !lines.length || txCount >= maxTxCount) break;
-    } while (marker);
-
-    console.log(`Total trust lines fetched for ${wallet}: ${trustLines.length}`);
-
-    // Update current balances only for tokens with purchase/sale activity
-    for (const line of trustLines) {
-      const key = `${line.account}_${line.currency}`;
-      if (tokenDetails[key]) {
-        tokenDetails[key].currentBalance = parseFloat(line.balance);
-      }
-    }
-
-    // Filter tokens to only those with purchases or sales and sort by latest transaction
-    const tokens = Array.from(seenTokens)
-      .filter(key => tokenDetails[key].tokensBought > 0 || tokenDetails[key].tokensSold > 0)
-      .map(key => {
-        const [issuer, currency] = key.split('_');
-        return {
-          issuer,
-          currency,
-          currentBalance: tokenDetails[key].currentBalance,
-          latestTxDate: tokenTimestamps[key] || 0 // Default to 0 if no timestamp
-        };
-      })
-      .sort((a, b) => b.latestTxDate - a.latestTxDate); // Sort newest to oldest
-
-    // Calculate profit/loss for each token
-    for (const key of Object.keys(tokenDetails)) {
-      tokenDetails[key].profit = tokenDetails[key].xrpReceived - tokenDetails[key].xrpSpent;
-    }
-
-    console.log(`Total tokens with purchase/sale activity for ${wallet}: ${tokens.length}`, tokens);
-
-    return { tokens, tokenDetails };
-  } catch (error) {
-    console.error('Error in wallet fetchData:', error);
-    throw error;
-  } finally {
-    await client.disconnect();
-  }
-},
-  renderData(data) {
-  const { tokens, tokenDetails } = data;
-  let html = `<div class="header">Trade History</div>`;
-  html += `<div class="separator"></div>`;
-  if (tokens.length === 0) {
-    html += `<div class="line">No token purchase or sale activity found for this wallet.</div>`;
-  } else {
-    html += `<table>`;
-    html += `<tr><th>Token</th><th>Balance</th><th>Bought</th><th>Spent</th><th>Sold</th><th>Received</th><th>P/L</th></tr>`;
-    tokens.forEach((token, index) => {
-      const key = `${token.issuer}_${token.currency}`;
-      const details = tokenDetails[key] || {
-        currentBalance: token.currentBalance,
-        tokensBought: 0,
-        xrpSpent: 0,
-        tokensSold: 0,
-        xrpReceived: 0,
-        profit: 0,
-        buyTxs: [],
-        sellTxs: []
-      };
-      let p_l_display, p_l_color;
-      if (details.tokensSold === 0) {
-        // No sales, show neutral
-        p_l_display = `0 XRP`;
-        p_l_color = 'black';
-      } else {
-        // Sales exist, show profit or loss
-        const isProfit = details.profit >= 0;
-        const symbol = isProfit ? '+' : '−';
-        p_l_display = `${symbol}${formatAmount(Math.abs(details.profit))} XRP`;
-        p_l_color = isProfit ? 'green' : 'red';
-      }
-      html += `<tr onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
-      html += `<td>${getCurrencyDisplay(token.currency)} (<a href="https://xrpscan.com/account/${token.issuer}" target="_blank">view</a>)</td>`;
-      html += `<td>${formatAmount(details.currentBalance)}</td>`;
-      html += `<td>${formatAmount(details.tokensBought)}</td>`;
-      html += `<td>${formatAmount(details.xrpSpent)} XRP</td>`;
-      html += `<td>${formatAmount(details.tokensSold)}</td>`;
-      html += `<td>${formatAmount(details.xrpReceived)} XRP</td>`;
-      html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
-      html += `</tr>`;
-      html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7"><div class="details-content">`;
-      if (details.buyTxs.length > 0) {
-        html += `<div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>`;
-        html += `<div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>`;
-      } else {
-        html += `<div class="line">Purchases: None</div>`;
-      }
-      if (details.sellTxs.length > 0) {
-        html += `<div class="line">Sales: <span class="expandable" onclick="event.stopPropagation(); toggleSection('sell_txs_${key}')">[view]</span></div>`;
-        html += `<div id="sell_txs_${key}" class="hidden">${buildTableHTML(details.sellTxs, 'sale', getCurrencyDisplay(token.currency))}</div>`;
-      } else {
-        html += `<div class="line">Sales: None</div>`;
-      }
-      html += `</div></td></tr>`;
-    });
-    html += `</table>`;
-  }
-  return html;
-}
-},
-    snipers: {
-  async fetchData(issuer, currencyCode) {
-    enrichedPayments = await getPaymentTransactions(issuer, currencyCode);
-    enrichedPayments.currencyCode = currencyCode;
-    enrichedPayments.issuer = issuer;
-    return { payments: enrichedPayments, currencyCode, issuer };
   },
   renderData(data) {
-    const { payments, currencyCode, issuer } = data;
-    let html = `<div class="header">Snipers</div>`;
+    const { tokens, tokenDetails } = data;
+    let html = `<div class="header">Trade History</div>`;
     html += `<div class="separator"></div>`;
-    html += `<div class="line">Currency: ${getCurrencyDisplay(currencyCode)}</div>`;
-    html += `<div class="line">Issuer: <a href="https://xrpscan.com/account/${issuer}" target="_blank">${issuer}</a></div>`;
-
-    if (payments.length === 0) {
-      html += `<div class="line">No sniper transactions found.</div>`;
+    if (tokens.length === 0) {
+      html += `<div class="line">No token purchase or sale activity found for this wallet.</div>`;
     } else {
       html += `<table>`;
-      html += `<tr><th>#</th><th>Transaction</th><th>Purchaser</th><th>XRP Spent</th><th>Token Received</th></tr>`;
-      payments.forEach((payment, index) => {
-        const txHash = payment.txHash;
-        html += `<tr onclick="togglePurchaserDetails('${txHash}', '${payment.purchaser}', '${issuer}', '${currencyCode}')">`;
-        html += `<td>${index + 1}</td>`;
-        html += `<td><a href="https://xrpscan.com/tx/${txHash}" target="_blank">view</a></td>`;
-        html += `<td><a href="https://xrpscan.com/account/${payment.purchaser}" target="_blank">${payment.purchaser}</a></td>`;
-        html += `<td>${formatAmount(payment.xrpSpent)} XRP</td>`;
-        html += `<td>${formatAmount(payment.amount)} ${getCurrencyDisplay(currencyCode)}</td>`;
+      html += `<tr><th>Token</th><th>Balance</th><th>Bought</th><th>Spent</th><th>Sold</th><th>Received</th><th>P/L</th></tr>`;
+      tokens.forEach((token, index) => {
+        const key = `${token.issuer}_${token.currency}`;
+        const details = tokenDetails[key] || {
+          currentBalance: token.currentBalance,
+          tokensBought: 0,
+          xrpSpent: 0,
+          tokensSold: 0,
+          xrpReceived: 0,
+          profit: 0,
+          buyTxs: [],
+          sellTxs: []
+        };
+        let p_l_display, p_l_color;
+        if (details.tokensSold === 0) {
+          p_l_display = `<span class="xrp-cell"><span class="value">0</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span>`;
+          p_l_color = 'black';
+        } else {
+          const isProfit = details.profit >= 0;
+          const symbol = isProfit ? '+' : '−';
+          p_l_display = `<span class="xrp-cell"><span class="value">${symbol}${formatAmount(Math.abs(details.profit))}</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span>`;
+          p_l_color = isProfit ? 'green' : 'red';
+        }
+        html += `<tr onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
+        html += `<td>${getCurrencyDisplay(token.currency)}</td>`; // Removed (view) link
+        html += `<td>${formatAmount(details.currentBalance)}</td>`;
+        html += `<td>${formatAmount(details.tokensBought)}</td>`;
+        html += `<td><span class="xrp-cell"><span class="value">${formatAmount(details.xrpSpent)}</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span></td>`;
+        html += `<td>${formatAmount(details.tokensSold)}</td>`;
+        html += `<td><span class="xrp-cell"><span class="value">${formatAmount(details.xrpReceived)}</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span></td>`;
+        html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
         html += `</tr>`;
-        html += `<tr id="details_${txHash}" class="details-row hidden"><td colspan="5"><div id="details_content_${txHash}"></div></td></tr>`;
+        html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7"><div class="details-content">`;
+        html += `<div class="line">Issuer: ${token.issuer} <a href="https://xrpscan.com/account/${token.issuer}" target="_blank">(view)</a></div>`; // Added issuer with (view) link
+        if (details.buyTxs.length > 0) {
+          html += `<div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>`;
+          html += `<div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>`;
+        } else {
+          html += `<div class="line">Purchases: None</div>`;
+        }
+        if (details.sellTxs.length > 0) {
+          html += `<div class="line">Sales: <span class="expandable" onclick="event.stopPropagation(); toggleSection('sell_txs_${key}')">[view]</span></div>`;
+          html += `<div id="sell_txs_${key}" class="hidden">${buildTableHTML(details.sellTxs, 'sale', getCurrencyDisplay(token.currency))}</div>`;
+        } else {
+          html += `<div class="line">Sales: None</div>`;
+        }
+        html += `</div></td></tr>`;
       });
       html += `</table>`;
     }
     return html;
   }
-}
-  };
+  },
+      snipers: {
+      async fetchData(issuer, currencyCode) {
+        enrichedPayments = await getPaymentTransactions(issuer, currencyCode);
+        enrichedPayments.currencyCode = currencyCode;
+        enrichedPayments.issuer = issuer;
+        return { payments: enrichedPayments, currencyCode, issuer };
+      },
+            renderData(data) {
+        const { payments, currencyCode, issuer } = data;
+        let html = `<div class="header">Snipers</div>`;
+        html += `<div class="separator"></div>`;
+        html += `<div class="line">Currency: ${getCurrencyDisplay(currencyCode)}</div>`;
+        html += `<div class="line">Issuer: <a href="https://xrpscan.com/account/${issuer}" target="_blank">${issuer}</a></div>`;
+
+        if (payments.length === 0) {
+          html += `<div class="line">No sniper transactions found.</div>`;
+        } else {
+          html += `<table>`;
+          html += `<tr><th>#</th><th>Transaction</th><th>Purchaser</th><th>Spent</th><th>Tokens Received</th></tr>`;
+          payments.forEach((payment, index) => {
+            const txHash = payment.txHash;
+            html += `<tr onclick="togglePurchaserDetails('${txHash}', '${payment.purchaser}', '${issuer}', '${currencyCode}')">`;
+            html += `<td>${index + 1}</td>`;
+            html += `<td><a href="https://xrpscan.com/tx/${txHash}" target="_blank">view</a></td>`;
+            html += `<td><a href="https://xrpscan.com/account/${payment.purchaser}" target="_blank">${payment.purchaser}</a></td>`;
+            html += `<td><span class="xrp-cell"><span class="value">${formatAmount(payment.xrpSpent)}</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span></td>`;
+            html += `<td>${formatAmount(payment.amount)} ${getCurrencyDisplay(currencyCode)}</td>`;
+            html += `</tr>`;
+            html += `<tr id="details_${txHash}" class="details-row hidden"><td colspan="5"><div id="details_content_${txHash}"></div></td></tr>`;
+          });
+          html += `</table>`;
+        }
+        return html;
+      }
+      }
+    };
 
   /* ---------- Main Fetch and Render Logic ---------- */
   async function fetchTokenInfo(address, scope) {
