@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1936,9 +1937,18 @@
         buyTxs: [],
         sellTxs: []
       };
-      const isProfit = details.profit >= 0;
-      const symbol = isProfit ? '+' : '−';
-      const color = isProfit ? 'green' : 'red';
+      let p_l_display, p_l_color;
+      if (details.tokensSold === 0) {
+        // No sales, show neutral
+        p_l_display = `0 XRP`;
+        p_l_color = 'black';
+      } else {
+        // Sales exist, show profit or loss
+        const isProfit = details.profit >= 0;
+        const symbol = isProfit ? '+' : '−';
+        p_l_display = `${symbol}${formatAmount(Math.abs(details.profit))} XRP`;
+        p_l_color = isProfit ? 'green' : 'red';
+      }
       html += `<tr onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
       html += `<td>${getCurrencyDisplay(token.currency)} (<a href="https://xrpscan.com/account/${token.issuer}" target="_blank">view</a>)</td>`;
       html += `<td>${formatAmount(details.currentBalance)}</td>`;
@@ -1946,7 +1956,7 @@
       html += `<td>${formatAmount(details.xrpSpent)} XRP</td>`;
       html += `<td>${formatAmount(details.tokensSold)}</td>`;
       html += `<td>${formatAmount(details.xrpReceived)} XRP</td>`;
-      html += `<td style="color: ${color}">${symbol}${formatAmount(Math.abs(details.profit))} XRP</td>`;
+      html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
       html += `</tr>`;
       html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7"><div class="details-content">`;
       if (details.buyTxs.length > 0) {
