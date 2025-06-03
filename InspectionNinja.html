@@ -310,25 +310,28 @@
     <div id="output"></div>
     <div id="input-line" class="line">
       <div class="custom-dropdown">
-        <div class="dropdown-toggle" id="scope-toggle">Scope Level: Token Metrics</div>
-        <div class="dropdown-menu" id="scope-menu">
-          <div class="dropdown-option" data-value="overview" data-name="Token Metrics">
-            Token Metrics
-          </div>
-          <div class="dropdown-option" data-value="dev" data-name="DEV Inspect">
-            + DEV Inspect
-          </div>
-          <div class="dropdown-option" data-value="tier1" data-name="Tier 1 Transfers">
-            + Tier 1 Transfers
-          </div>
-          <div class="dropdown-option" data-value="tier2" data-name="Tier 2 Transfers">
-           + Tier 2 Transfers
-          </div>
-          <div class="dropdown-option" data-value="snipers" data-name="Snipers">
-            Snipers
-          </div>
-        </div>
-      </div>
+  <div class="dropdown-toggle" id="scope-toggle">Scope Level: Token Metrics</div>
+  <div class="dropdown-menu" id="scope-menu">
+    <div class="dropdown-option" data-value="overview" data-name="Token Metrics">
+      Token Metrics
+    </div>
+    <div class="dropdown-option" data-value="dev" data-name="DEV Inspect">
+      + DEV Inspect
+    </div>
+    <div class="dropdown-option" data-value="tier1" data-name="Tier 1 Transfers">
+      + Tier 1 Transfers
+    </div>
+    <div class="dropdown-option" data-value="tier2" data-name="Tier 2 Transfers">
+      + Tier 2 Transfers
+    </div>
+    <div class="dropdown-option" data-value="snipers" data-name="Snipers">
+      Snipers
+    </div>
+    <div class="dropdown-option" data-value="wallet" data-name="Trade History">
+      Trade History
+    </div>
+  </div>
+</div>
       <span class="prompt"></span>
       <input type="text" id="cmd-input" placeholder="Enter Issuer Address" autofocus />
     </div>
@@ -386,6 +389,12 @@
       el.classList.toggle('hidden');
     }
   }
+  function addNewPrompt() {
+  const cmdInput = document.getElementById("cmd-input");
+  cmdInput.value = lastIssuer || '';
+  cmdInput.focus();
+  window.scrollTo(0, document.body.scrollHeight);
+}
 
   /* ---------- Data Fetching Functions ---------- */
   async function connectClient() {
@@ -1729,6 +1738,236 @@
         return html;
       }
     },
+    wallet: {
+  async fetchData(wallet) {
+  updateLoadingMessage("Fetching wallet transaction history");
+  const client = await connectClient();
+  try {
+    // Fetch all transactions for the wallet
+    let transactions = [];
+    let marker;
+    let txCount = 0;
+    const maxTxCount = 20000;
+    do {
+      const txResponse = await fetchWithRetry(client, {
+        command: "account_tx",
+        account: wallet,
+        ledger_index_min: -1,
+        ledger_index_max: -1,
+        forward: true,
+        limit: 200,
+        ...(marker ? { marker } : {})
+      });
+      if (!txResponse.result || !txResponse.result.transactions) {
+        console.error(`No transactions returned for ${wallet}, response:`, txResponse);
+        throw new Error("Failed to retrieve transactions. Please try again.");
+      }
+      const txs = txResponse.result.transactions || [];
+      transactions = transactions.concat(txs);
+      txCount += txs.length;
+      console.log(`Fetched ${txs.length} transactions for ${wallet}, total: ${txCount}`);
+      marker = txResponse.result.marker;
+      if (!marker || !txs.length || txCount >= maxTxCount) break;
+    } while (marker);
+
+    console.log(`Total transactions fetched for ${wallet}: ${transactions.length}`);
+
+    // Analyze transactions to identify tokens purchased or sold
+    const tokenDetails = {};
+    const tokenTimestamps = {}; // Track latest transaction date for each token
+    const seenTokens = new Set();
+    for (const txEntry of transactions) {
+      const tx = txEntry.tx;
+      const meta = txEntry.meta;
+      if (
+        (tx.TransactionType === 'Payment' ||
+         tx.TransactionType === 'OfferCreate' ||
+         tx.TransactionType === 'CheckCash' ||
+         tx.TransactionType === 'AMMBid' ||
+         tx.TransactionType === 'AMMVote') &&
+        meta?.TransactionResult === 'tesSUCCESS'
+      ) {
+        const balanceChanges = xrpl.getBalanceChanges(meta);
+        const walletChanges = balanceChanges.find(change => change.account === wallet);
+        if (walletChanges) {
+          for (const balance of walletChanges.balances) {
+            if (balance.currency !== 'XRP' && balance.issuer) {
+              const tokenKey = `${balance.issuer}_${balance.currency}`;
+              if (!seenTokens.has(tokenKey)) {
+                seenTokens.add(tokenKey);
+                tokenDetails[tokenKey] = {
+                  currency: balance.currency,
+                  issuer: balance.issuer,
+                  currentBalance: 0,
+                  tokensBought: 0,
+                  xrpSpent: 0,
+                  tokensSold: 0,
+                  xrpReceived: 0,
+                  buyTxs: [],
+                  sellTxs: [],
+                  profit: 0
+                };
+              }
+              const tokenValue = parseFloat(balance.value);
+              const xrpChange = walletChanges.balances.find(b => b.currency === 'XRP');
+              if (xrpChange) {
+                const xrpValue = parseFloat(xrpChange.value);
+                if (tokenValue > 0 && xrpValue < 0) {
+                  // Purchase
+                  const tokensBought = tokenValue;
+                  const xrpSpent = Math.abs(xrpValue);
+                  tokenDetails[tokenKey].tokensBought += tokensBought;
+                  tokenDetails[tokenKey].xrpSpent += xrpSpent;
+                  tokenDetails[tokenKey].buyTxs.push({
+                    txHash: tx.hash,
+                    tokensBought,
+                    xrpSpent
+                  });
+                  console.log(`Purchase detected for ${balance.currency}: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
+                  // Update latest transaction timestamp
+                  if (!tokenTimestamps[tokenKey] || tx.date > tokenTimestamps[tokenKey]) {
+                    tokenTimestamps[tokenKey] = tx.date;
+                  }
+                } else if (tokenValue < 0 && xrpValue > 0) {
+                  // Sale
+                  const tokensSold = Math.abs(tokenValue);
+                  const xrpReceived = xrpValue;
+                  tokenDetails[tokenKey].tokensSold += tokensSold;
+                  tokenDetails[tokenKey].xrpReceived += xrpReceived;
+                  tokenDetails[tokenKey].sellTxs.push({
+                    txHash: tx.hash,
+                    tokensSold,
+                    xrpReceived
+                  });
+                  console.log(`Sale detected for ${balance.currency}: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
+                  // Update latest transaction timestamp
+                  if (!tokenTimestamps[tokenKey] || tx.date > tokenTimestamps[tokenKey]) {
+                    tokenTimestamps[tokenKey] = tx.date;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Fetch current trust lines to update current balances for purchased/sold tokens
+    let trustLines = [];
+    marker = undefined;
+    txCount = 0;
+    do {
+      const response = await fetchWithRetry(client, {
+        command: "account_lines",
+        account: wallet,
+        ledger_index: "validated",
+        limit: 2000,
+        ...(marker ? { marker } : {})
+      });
+      if (!response.result || !response.result.lines) {
+        console.error(`No trust lines returned for ${wallet}, response:`, response);
+        throw new Error("Failed to retrieve trust lines. Please try again.");
+      }
+      const lines = response.result.lines || [];
+      trustLines = trustLines.concat(lines);
+      marker = response.result.marker;
+      txCount += lines.length;
+      console.log(`Fetched ${lines.length} trust lines for ${wallet}, total: ${txCount}`);
+      if (!marker || !lines.length || txCount >= maxTxCount) break;
+    } while (marker);
+
+    console.log(`Total trust lines fetched for ${wallet}: ${trustLines.length}`);
+
+    // Update current balances only for tokens with purchase/sale activity
+    for (const line of trustLines) {
+      const key = `${line.account}_${line.currency}`;
+      if (tokenDetails[key]) {
+        tokenDetails[key].currentBalance = parseFloat(line.balance);
+      }
+    }
+
+    // Filter tokens to only those with purchases or sales and sort by latest transaction
+    const tokens = Array.from(seenTokens)
+      .filter(key => tokenDetails[key].tokensBought > 0 || tokenDetails[key].tokensSold > 0)
+      .map(key => {
+        const [issuer, currency] = key.split('_');
+        return {
+          issuer,
+          currency,
+          currentBalance: tokenDetails[key].currentBalance,
+          latestTxDate: tokenTimestamps[key] || 0 // Default to 0 if no timestamp
+        };
+      })
+      .sort((a, b) => b.latestTxDate - a.latestTxDate); // Sort newest to oldest
+
+    // Calculate profit/loss for each token
+    for (const key of Object.keys(tokenDetails)) {
+      tokenDetails[key].profit = tokenDetails[key].xrpReceived - tokenDetails[key].xrpSpent;
+    }
+
+    console.log(`Total tokens with purchase/sale activity for ${wallet}: ${tokens.length}`, tokens);
+
+    return { tokens, tokenDetails };
+  } catch (error) {
+    console.error('Error in wallet fetchData:', error);
+    throw error;
+  } finally {
+    await client.disconnect();
+  }
+},
+  renderData(data) {
+  const { tokens, tokenDetails } = data;
+  let html = `<div class="header">Trade History</div>`;
+  html += `<div class="separator"></div>`;
+  if (tokens.length === 0) {
+    html += `<div class="line">No token purchase or sale activity found for this wallet.</div>`;
+  } else {
+    html += `<table>`;
+    html += `<tr><th>Token</th><th>Balance</th><th>Bought</th><th>Spent</th><th>Sold</th><th>Received</th><th>P/L</th></tr>`;
+    tokens.forEach((token, index) => {
+      const key = `${token.issuer}_${token.currency}`;
+      const details = tokenDetails[key] || {
+        currentBalance: token.currentBalance,
+        tokensBought: 0,
+        xrpSpent: 0,
+        tokensSold: 0,
+        xrpReceived: 0,
+        profit: 0,
+        buyTxs: [],
+        sellTxs: []
+      };
+      const isProfit = details.profit >= 0;
+      const symbol = isProfit ? '+' : '−';
+      const color = isProfit ? 'green' : 'red';
+      html += `<tr onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
+      html += `<td>${getCurrencyDisplay(token.currency)} (<a href="https://xrpscan.com/account/${token.issuer}" target="_blank">view</a>)</td>`;
+      html += `<td>${formatAmount(details.currentBalance)}</td>`;
+      html += `<td>${formatAmount(details.tokensBought)}</td>`;
+      html += `<td>${formatAmount(details.xrpSpent)} XRP</td>`;
+      html += `<td>${formatAmount(details.tokensSold)}</td>`;
+      html += `<td>${formatAmount(details.xrpReceived)} XRP</td>`;
+      html += `<td style="color: ${color}">${symbol}${formatAmount(Math.abs(details.profit))} XRP</td>`;
+      html += `</tr>`;
+      html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7"><div class="details-content">`;
+      if (details.buyTxs.length > 0) {
+        html += `<div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>`;
+        html += `<div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>`;
+      } else {
+        html += `<div class="line">Purchases: None</div>`;
+      }
+      if (details.sellTxs.length > 0) {
+        html += `<div class="line">Sales: <span class="expandable" onclick="event.stopPropagation(); toggleSection('sell_txs_${key}')">[view]</span></div>`;
+        html += `<div id="sell_txs_${key}" class="hidden">${buildTableHTML(details.sellTxs, 'sale', getCurrencyDisplay(token.currency))}</div>`;
+      } else {
+        html += `<div class="line">Sales: None</div>`;
+      }
+      html += `</div></td></tr>`;
+    });
+    html += `</table>`;
+  }
+  return html;
+}
+},
     snipers: {
   async fetchData(issuer, currencyCode) {
     enrichedPayments = await getPaymentTransactions(issuer, currencyCode);
@@ -1767,65 +2006,132 @@
   };
 
   /* ---------- Main Fetch and Render Logic ---------- */
-  async function fetchTokenInfo(issuer, scope) {
-    console.log(`Fetching token info for issuer: ${issuer}, scope: ${scope}`);
-    if (!validateIssuerAddress(issuer)) {
-      displayError("Invalid issuer address format");
-      return;
-    }
+  async function fetchTokenInfo(address, scope) {
+  console.log(`Fetching info for address: ${address}, scope: ${scope}`);
+  if (!validateIssuerAddress(address)) {
+    displayError("Invalid address format");
+    return;
+  }
 
-    updateLoadingMessage("Conducting deep dive...");
-    const output = document.getElementById("output");
-    try {
-      const currencyCode = await getCurrencyCode(issuer);
-      let html = '';
+  updateLoadingMessage("Conducting deep dive...");
+  const output = document.getElementById("output");
+  try {
+    if (scope === 'wallet') {
+      const data = await scopeModules.wallet.fetchData(address);
+      const html = scopeModules.wallet.renderData(data);
+      output.innerHTML = html;
+      addNewPrompt();
+    } else if (scope === 'snipers') {
+      const currencyCode = await getCurrencyCode(address);
+      const data = await scopeModules.snipers.fetchData(address, currencyCode);
+      const html = scopeModules.snipers.renderData(data);
+      output.innerHTML = html;
+      addNewPrompt();
+    } else {
+      const currencyCode = await getCurrencyCode(address);
+      const activatorData = await getActivatorAddress(address);
+      const commonData = {
+        activator: activatorData.activator,
+        creationDate: activatorData.creationDate,
+        isAntiSniper: activatorData.isAntiSniper
+      };
 
-      if (scope === 'snipers') {
-        const data = await scopeModules.snipers.fetchData(issuer, currencyCode);
-        html = scopeModules.snipers.renderData(data);
-      } else {
-        const activatorData = await getActivatorAddress(issuer);
-        const commonData = {
-          activator: activatorData.activator,
-          creationDate: activatorData.creationDate,
-          isAntiSniper: activatorData.isAntiSniper
-        };
+      // Always include overview
+      const overviewData = await scopeModules.overview.fetchData(address, currencyCode, activatorData, commonData);
+      let html = scopeModules.overview.renderData({ ...overviewData, activator: activatorData.activator });
 
-        // Always include overview
-        const overviewData = await scopeModules.overview.fetchData(issuer, currencyCode, activatorData, commonData);
-        html += scopeModules.overview.renderData({ ...overviewData, activator: activatorData.activator });
+      // Include additional scopes as needed
+      if (scope === 'dev' || scope === 'tier1' || scope === 'tier2') {
+        const devData = await scopeModules.dev.fetchData(address, currencyCode, activatorData, { token: overviewData.token, metrics: overviewData.metrics });
+        html += scopeModules.dev.renderData(devData);
+      }
 
-        // Include additional scopes as needed
-        if (scope === 'dev' || scope === 'tier1' || scope === 'tier2') {
-          const devData = await scopeModules.dev.fetchData(issuer, currencyCode, activatorData, { token: overviewData.token, metrics: overviewData.metrics });
-          html += scopeModules.dev.renderData(devData);
-        }
+      if (scope === 'tier1' || scope === 'tier2') {
+        const tier1Data = await scopeModules.tier1.fetchData(address, currencyCode, activatorData, { token: overviewData.token, metrics: overviewData.metrics });
+        html += scopeModules.tier1.renderData(tier1Data);
+      }
 
-        if (scope === 'tier1' || scope === 'tier2') {
-          const tier1Data = await scopeModules.tier1.fetchData(issuer, currencyCode, activatorData, { token: overviewData.token, metrics: overviewData.metrics });
-          html += scopeModules.tier1.renderData(tier1Data);
-        }
-
-        if (scope === 'tier2') {
-          const tier2Data = await scopeModules.tier2.fetchData(issuer, currencyCode, activatorData, { token: overviewData.token, metrics: overviewData.metrics });
-          html += scopeModules.tier2.renderData(tier2Data);
-        }
+      if (scope === 'tier2') {
+        const tier2Data = await scopeModules.tier2.fetchData(address, currencyCode, activatorData, { token: overviewData.token, metrics: overviewData.metrics });
+        html += scopeModules.tier2.renderData(tier2Data);
       }
 
       output.innerHTML = html;
       addNewPrompt();
-    } catch (error) {
-      console.error('Error in fetchTokenInfo:', error);
-      displayError(error.message || "Failed to fetch data. Please try again.");
     }
+  } catch (error) {
+    console.error('Error in fetchTokenInfo:', error);
+    displayError(error.message || "Failed to fetch data. Please try again.");
+  }
+}
+  /* ---------- Update Input Placeholder ---------- */
+async function fetchTokenInfo(address, scope) {
+  console.log(`Fetching info for address: ${address}, scope: ${scope}`);
+  if (scope !== 'wallet' && !validateIssuerAddress(address)) {
+    displayError("Invalid issuer address format");
+    return;
   }
 
-  function addNewPrompt() {
-    const cmdInput = document.getElementById("cmd-input");
-    cmdInput.value = lastIssuer || '';
-    cmdInput.focus();
-    window.scrollTo(0, document.body.scrollHeight);
+  updateLoadingMessage("Conducting deep dive...");
+  const output = document.getElementById("output");
+  try {
+    if (scope === 'wallet') {
+      const data = await scopeModules.wallet.fetchData(address);
+      const html = scopeModules.wallet.renderData(data);
+      output.innerHTML = html;
+      addNewPrompt();
+    } else if (scope === 'snipers') {
+      const currencyCode = await getCurrencyCode(address);
+      const data = await scopeModules.snipers.fetchData(address, currencyCode);
+      const html = scopeModules.snipers.renderData(data);
+      output.innerHTML = html;
+      addNewPrompt();
+    } else {
+      const currencyCode = await getCurrencyCode(address);
+      const activatorData = await getActivatorAddress(address);
+      const commonData = {
+        activator: activatorData.activator,
+        creationDate: activatorData.creationDate,
+        isAntiSniper: activatorData.isAntiSniper
+      };
+
+      // Always include overview
+      const overviewData = await scopeModules.overview.fetchData(address, currencyCode, activatorData, commonData);
+      let html = scopeModules.overview.renderData({ ...overviewData, activator: activatorData.activator });
+
+      // Include additional scopes as needed
+      if (scope === 'dev' || scope === 'tier1' || scope === 'tier2') {
+        const devData = await scopeModules.dev.fetchData(address, currencyCode, activatorData, { token: overviewData.token, metrics: overviewData.metrics });
+        html += scopeModules.dev.renderData(devData);
+      }
+
+      if (scope === 'tier1' || scope === 'tier2') {
+        const tier1Data = await scopeModules.tier1.fetchData(address, currencyCode, activatorData, { token: overviewData.token, metrics: overviewData.metrics });
+        html += scopeModules.tier1.renderData(tier1Data);
+      }
+
+      if (scope === 'tier2') {
+        const tier2Data = await scopeModules.tier2.fetchData(address, currencyCode, activatorData, { token: overviewData.token, metrics: overviewData.metrics });
+        html += scopeModules.tier2.renderData(tier2Data);
+      }
+
+      output.innerHTML = html;
+      addNewPrompt();
+    }
+  } catch (error) {
+    console.error('Error in fetchTokenInfo:', error);
+    displayError(error.message || "Failed to fetch data. Please try again.");
   }
+}
+/* ---------- Update Input Placeholder ---------- */
+function updateInputPlaceholder(scope) {
+  const cmdInput = document.getElementById("cmd-input");
+  if (scope === 'wallet') {
+    cmdInput.placeholder = "Enter Wallet Address";
+  } else {
+    cmdInput.placeholder = "Enter Issuer Address";
+  }
+}
 
   /* Custom Dropdown Logic */
   let selectedScope = 'overview';
@@ -1840,33 +2146,34 @@
   });
 
   options.forEach(option => {
-    option.addEventListener('click', (e) => {
-      e.stopPropagation();
-      console.log(`Dropdown option clicked: ${option.getAttribute('data-value')}`);
-      selectedScope = option.getAttribute('data-value');
-      const optionName = option.getAttribute('data-name');
-      toggle.textContent = `Scope Level: ${optionName}`;
-      menu.classList.remove('show');
+  option.addEventListener('click', (e) => {
+    e.stopPropagation();
+    console.log(`Dropdown option clicked: ${option.getAttribute('data-value')}`);
+    selectedScope = option.getAttribute('data-value');
+    const optionName = option.getAttribute('data-name');
+    toggle.textContent = `Scope Level: ${optionName}`;
+    menu.classList.remove('show');
+    updateInputPlaceholder(selectedScope); // Add this line to update placeholder
 
-      const cmdInput = document.getElementById("cmd-input");
-      const inputIssuer = cmdInput.value.trim();
+    const cmdInput = document.getElementById("cmd-input");
+    const inputIssuer = cmdInput.value.trim();
 
-      if (inputIssuer) {
-        if (!validateIssuerAddress(inputIssuer)) {
-          displayError("Invalid issuer address format in input field.");
-          return;
-        }
-        lastIssuer = inputIssuer;
-        document.getElementById("output").innerHTML = "";
-        fetchTokenInfo(lastIssuer, selectedScope);
-      } else if (lastIssuer) {
-        document.getElementById("output").innerHTML = "";
-        fetchTokenInfo(lastIssuer, selectedScope);
-      } else {
-        displayError("Please enter an issuer address first.");
+    if (inputIssuer) {
+      if (selectedScope !== 'wallet' && !validateIssuerAddress(inputIssuer)) {
+        displayError("Invalid issuer address format in input field.");
+        return;
       }
-    });
+      lastIssuer = inputIssuer;
+      document.getElementById("output").innerHTML = "";
+      fetchTokenInfo(lastIssuer, selectedScope);
+    } else if (lastIssuer) {
+      document.getElementById("output").innerHTML = "";
+      fetchTokenInfo(lastIssuer, selectedScope);
+    } else {
+      displayError("Please enter an address first.");
+    }
   });
+});
 
   document.addEventListener('click', (e) => {
     if (!toggle.contains(e.target) && !menu.contains(e.target)) {
