@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -259,48 +257,75 @@ a:hover {
 
 table {
   width: 100%;
-  border-collapse: collapse; /* Changed to collapse for cleaner separators */
+  max-width: 100%; /* Ensure table doesn't exceed container */
+  border-collapse: collapse;
   margin: 16px 0;
-  font-size: 13px;
+  font-size: 12px; /* Slightly smaller font for compactness */
   border-radius: 12px;
   overflow: hidden;
-  background: #222228; /* Solid color matching #console */
+  background: #222228;
+  table-layout: fixed; /* Force columns to respect assigned widths */
 }
 
 th, td {
   border: none;
-  padding: 12px 16px;
+  padding: 8px 12px; /* Reduced padding for tighter fit */
   text-align: left;
-  white-space: nowrap; /* Prevent wrapping for all cells */
-  min-height: 48px;
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis for long text */
+  min-height: 40px; /* Slightly smaller row height */
   vertical-align: middle;
-  font-size: 13px; /* Ensure consistent character sizing */
+  font-size: 12px; /* Consistent font size */
 }
 
 th {
-  background: #222228; /* Match table background */
+  background: #222228;
   color: #ffffff;
   font-weight: 600;
+  width: auto; /* Let table-layout manage widths */
+}
+
+td {
+  max-width: 0; /* Allow truncation for long content */
 }
 
 tr {
-  min-height: 48px;
+  min-height: 40px;
   cursor: pointer;
-  background: #222228; /* Solid color for rows */
+  background: #222228;
 }
 
 tr:not(:last-child) {
-  border-bottom: 1px solid #3a3a42; /* Horizontal separators */
+  border-bottom: 1px solid #3a3a42;
 }
 
 tr:nth-child(even) {
-  background: #222228; /* Remove gradient, match solid color */
+  background: #222228;
 }
 
 tr:hover {
   background: #3a3a42;
   transition: background 0.2s ease;
 }
+
+#output {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; /* Disable horizontal scrolling */
+  padding: 16px;
+  min-height: 0;
+  max-width: 100%; /* Ensure output container respects viewport */
+}
+
+/* Specific column widths to ensure fit */
+th:nth-child(1), td:nth-child(1) { width: 20%; } /* Token */
+th:nth-child(2), td:nth-child(2) { width: 15%; } /* Balance */
+th:nth-child(3), td:nth-child(3) { width: 15%; } /* Bought */
+th:nth-child(4), td:nth-child(4) { width: 15%; } /* Spent */
+th:nth-child(5), td:nth-child(5) { width: 15%; } /* Sold */
+th:nth-child(6), td:nth-child(6) { width: 15%; } /* Received */
+th:nth-child(7), td:nth-child(7) { width: 15%; } /* P/L */
 
 .xrp-icon {
   max-height: 20px;
@@ -1412,103 +1437,141 @@ tr:hover {
   }
 
   async function fetchTradeActivity(address, currencyCode, issuer, creationDate) {
-    updateLoadingMessage(`Fetching trade activity for address ${address}`);
-    const client = await connectClient();
-    let totalTokensSold = 0;
-    let totalXrpReceived = 0;
-    let totalTokensBought = 0;
-    let totalXrpSpent = 0;
-    let saleTxs = [];
-    let purchaseTxs = [];
-    try {
-      let marker;
-      let txCount = 0;
-      const maxTxCount = 10000;
-      do {
-        const req = {
-          command: "account_tx",
-          account: address,
-          ledger_index_min: -1,
-          ledger_index_max: -1,
-          forward: true,
-          limit: 200,
-          ...(marker ? { marker } : {})
-        };
-        const response = await fetchWithRetry(client, req);
-        const txs = response.result.transactions || [];
-        txCount += txs.length;
-        console.log(`Fetched ${txs.length} trade activity transactions for ${address}, total: ${txCount}`);
+  updateLoadingMessage(`Fetching trade activity for address ${address}`);
+  const client = await connectClient();
+  let totalTokensSold = 0;
+  let totalXrpReceived = 0;
+  let totalTokensBought = 0;
+  let totalXrpSpent = 0;
+  let saleTxs = [];
+  let purchaseTxs = [];
+  try {
+    let marker;
+    let txCount = 0;
+    const maxTxCount = 10000;
+    do {
+      const req = {
+        command: "account_tx",
+        account: address,
+        ledger_index_min: -1,
+        ledger_index_max: -1,
+        forward: true,
+        limit: 200,
+        ...(marker ? { marker } : {})
+      };
+      const response = await fetchWithRetry(client, req);
+      const txs = response.result.transactions || [];
+      txCount += txs.length;
+      console.log(`Fetched ${txs.length} trade activity transactions for ${address}, total: ${txCount}`);
 
-        for (const txEntry of txs) {
-          const tx = txEntry.tx;
-          if (tx.date && tx.date < creationDate) continue;
-          if (!txEntry.meta || txEntry.meta.TransactionResult !== 'tesSUCCESS') continue;
-
-          const balanceChanges = xrpl.getBalanceChanges(txEntry.meta);
-          const addressChanges = balanceChanges.find(change => change.account === address);
-          if (addressChanges) {
-            const tokenChange = addressChanges.balances.find(
-              b => b.currency === currencyCode && b.issuer === issuer
-            );
-            const xrpChange = addressChanges.balances.find(b => b.currency === 'XRP');
-            
-            if (tokenChange && xrpChange) {
-              const tokenValue = parseFloat(tokenChange.value);
-              const xrpValue = parseFloat(xrpChange.value);
-              if (tokenValue < 0 && xrpValue > 0) {
-                const tokensSold = Math.abs(tokenValue);
-                const xrpReceived = xrpValue;
-                totalTokensSold += tokensSold;
-                totalXrpReceived += xrpReceived;
-                saleTxs.push({ txHash: tx.hash, tokensSold, xrpReceived });
-                console.log(`Sale detected for ${address}: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
-              } else if (tokenValue > 0 && xrpValue < 0) {
-                const tokensBought = tokenValue;
-                const xrpSpent = Math.abs(xrpValue);
-                totalTokensBought += tokensBought;
-                totalXrpSpent += xrpSpent;
-                purchaseTxs.push({ txHash: tx.hash, tokensBought, xrpSpent });
-                console.log(`Purchase detected for ${address}: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
-              }
-            }
-          }
+      for (const txEntry of txs) {
+        const tx = txEntry.tx;
+        if (tx.date && tx.date < creationDate) continue;
+        if (!txEntry.meta || txEntry.meta.TransactionResult !== 'tesSUCCESS') continue;
+        if (tx.TransactionType === 'CheckCash') {
+          console.log(`Skipped CheckCash transaction for ${address}: ${tx.hash}`);
+          continue; // Skip CheckCash transactions
         }
-        marker = response.result.marker;
-        if (!marker || !txs.length || txCount >= maxTxCount) break;
-      } while (marker);
-    } catch (e) {
-      console.error(`Error fetching trade activity for ${address}:`, e);
-    } finally {
-      await client.disconnect();
-    }
-    return { totalTokensSold, totalXrpReceived, totalTokensBought, totalXrpSpent, saleTxs, purchaseTxs };
-  }
 
+        const balanceChanges = xrpl.getBalanceChanges(txEntry.meta);
+        const addressChanges = balanceChanges.find(change => change.account === address);
+        if (addressChanges) {
+          const tokenChange = addressChanges.balances.find(
+            b => b.currency === currencyCode && b.issuer === issuer
+          );
+          const xrpChange = addressChanges.balances.find(b => b.currency === 'XRP');
+          
+          if (tokenChange && xrpChange) {
+            const tokenValue = parseFloat(tokenChange.value);
+            const xrpValue = parseFloat(xrpChange.value);
+            if (tokenValue < 0 && xrpValue > 0) {
+              const tokensSold = Math.abs(tokenValue);
+              const xrpReceived = xrpValue;
+              totalTokensSold += tokensSold;
+              totalXrpReceived += xrpReceived;
+              saleTxs.push({ txHash: tx.hash, tokensSold, xrpReceived });
+              console.log(`Sale detected for ${address}: ${tx.hash}, Tokens sold: ${tokensSold}, XRP received: ${xrpReceived}`);
+            } else if (tokenValue > 0 && xrpValue < 0) {
+              const tokensBought = tokenValue;
+              const xrpSpent = Math.abs(xrpValue);
+              totalTokensBought += tokensBought;
+              totalXrpSpent += xrpSpent;
+              purchaseTxs.push({ txHash: tx.hash, tokensBought, xrpSpent });
+              console.log(`Purchase detected for ${address}: ${tx.hash}, Tokens bought: ${tokensBought}, XRP spent: ${xrpSpent}`);
+            }
+          } else {
+            console.log(`No relevant token/XRP balance changes for ${address} in tx: ${tx.hash}`);
+          }
+        } else {
+          console.log(`No balance changes for ${address} in tx: ${tx.hash}`);
+        }
+      }
+      marker = response.result.marker;
+      if (!marker || !txs.length || txCount >= maxTxCount) break;
+    } while (marker);
+  } catch (e) {
+    console.error(`Error fetching trade activity for ${address}:`, e);
+  } finally {
+    await client.disconnect();
+  }
+  console.log(`Trade activity for ${address}:`, { totalTokensSold, totalXrpReceived, totalTokensBought, totalXrpSpent, saleTxs, purchaseTxs });
+  return { totalTokensSold, totalXrpReceived, totalTokensBought, totalXrpSpent, saleTxs, purchaseTxs };
+}
+  
   function buildTableHTML(arr, type, tokenName) {
-    if (arr.length === 0) return `<div class="line">No ${type} transactions found.</div>`;
-    let html = `<div class="expanded">`;
+  if (!Array.isArray(arr) || arr.length === 0) {
+    console.log(`buildTableHTML: No ${type} transactions provided`, { arr, type, tokenName });
+    return `<div class="line">No ${type} transactions found.</div>`;
+  }
+  let html = `<div class="expanded">`;
+  try {
     if (type === 'transfer') {
       for (const item of arr) {
+        if (!item.txHash || !item.tokensTransferred || !item.destination) {
+          console.warn(`Invalid transfer item in buildTableHTML:`, item);
+          continue;
+        }
         html += `<div class="line"><a href="https://xrpscan.com/tx/${item.txHash}" target="_blank">view</a> | ${formatAmount(item.tokensTransferred)} ${tokenName} was transferred to <a href="https://xrpscan.com/account/${item.destination}" target="_blank">${item.destination}</a></div>`;
       }
     } else if (type === 'burned') {
       for (const item of arr) {
+        if (!item.txHash || !item.amount) {
+          console.warn(`Invalid burned item in buildTableHTML:`, item);
+          continue;
+        }
         html += `<div class="line"><a href="https://xrpscan.com/tx/${item.txHash}" target="_blank">view</a> | ${formatAmount(item.amount)} ${tokenName}${item.source === 'DEV' ? ' (DEV)' : ''}</div>`;
       }
     } else if (type === 'sale') {
       for (const item of arr) {
+        if (!item.txHash || !item.tokensSold || !item.xrpReceived) {
+          console.warn(`Invalid sale item in buildTableHTML:`, item);
+          continue;
+        }
         html += `<div class="line"><a href="https://xrpscan.com/tx/${item.txHash}" target="_blank">view</a> | ${formatAmount(item.tokensSold)} ${tokenName} was sold for ${formatAmount(item.xrpReceived)} XRP</div>`;
       }
     } else if (type === 'purchase') {
       for (const item of arr) {
+        if (!item.txHash || !item.tokensBought || !item.xrpSpent) {
+          console.warn(`Invalid purchase item in buildTableHTML:`, item);
+          continue;
+        }
         html += `<div class="line"><a href="https://xrpscan.com/tx/${item.txHash}" target="_blank">view</a> | ${formatAmount(item.tokensBought)} ${tokenName} was bought for ${formatAmount(item.xrpSpent)} XRP</div>`;
       }
     } else {
-      html += `<div class="line">Unknown transaction type.</div>`;
+      console.warn(`Unknown transaction type in buildTableHTML: ${type}`);
+      html += `<div class="line">Unknown transaction type: ${type}</div>`;
     }
-    html += `</div>`;
-    return html;
+    if (html === `<div class="expanded">`) {
+      console.log(`buildTableHTML: No valid ${type} transactions after filtering`, { arr });
+      html += `<div class="line">No valid ${type} transactions found.</div>`;
+    }
+  } catch (e) {
+    console.error(`Error in buildTableHTML for type ${type}:`, e, { arr, tokenName });
+    html += `<div class="line">Error rendering ${type} transactions.</div>`;
   }
+  html += `</div>`;
+  return html;
+}
 
   async function togglePurchaserDetails(txHash, purchaser, issuer, currencyCode) {
   const detailsRow = document.getElementById(`details_${txHash}`);
@@ -1573,6 +1636,39 @@ tr:hover {
   }
 }
 
+  function toggleXrpValuesOnly() {
+  const isXrpOnly = document.getElementById('xrp-values-toggle').checked;
+  const table = document.querySelector('#output table');
+  if (!table) return;
+
+  // Select columns for Balance (2), Bought (3), Sold (5)
+  const columnsToToggle = [2, 3, 5];
+  const rows = table.querySelectorAll('tr');
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('th, td');
+    columnsToToggle.forEach(colIndex => {
+      if (cells[colIndex - 1]) {
+        cells[colIndex - 1].style.display = isXrpOnly ? 'none' : '';
+      }
+    });
+  });
+}
+  function toggleZeroBalanceOnly() {
+  const isZeroBalanceOnly = document.getElementById('zero-balance-toggle').checked;
+  const table = document.querySelector('#output table');
+  if (!table) return;
+
+  const rows = table.querySelectorAll('tr');
+  rows.forEach((row, index) => {
+    // Skip header row and details rows
+    if (index === 0 || row.classList.contains('details-row')) return;
+    const balanceCell = row.querySelector('td:nth-child(2)');
+    if (!balanceCell) return;
+    const balance = parseFloat(balanceCell.textContent.replace(/,/g, '')) || 0;
+    row.style.display = isZeroBalanceOnly && balance !== 0 ? 'none' : '';
+  });
+}
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
     overview: {
@@ -2001,6 +2097,18 @@ tr:hover {
     const { tokens, tokenDetails } = data;
     let html = `<div class="header">Trade History</div>`;
     html += `<div class="separator"></div>`;
+    html += `
+      <div class="line">
+        <label style="cursor: pointer; margin-right: 20px;">
+          <input type="checkbox" id="xrp-values-toggle" onchange="toggleXrpValuesOnly()">
+          XRP Values Only
+        </label>
+        <label style="cursor: pointer;">
+          <input type="checkbox" id="zero-balance-toggle" onchange="toggleZeroBalanceOnly()">
+          Zero Balance Only
+        </label>
+      </div>
+    `;
     if (tokens.length === 0) {
       html += `<div class="line">No token purchase or sale activity found for this wallet.</div>`;
     } else {
@@ -2029,7 +2137,7 @@ tr:hover {
           p_l_color = isProfit ? 'green' : 'red';
         }
         html += `<tr onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
-        html += `<td>${getCurrencyDisplay(token.currency)}</td>`; // Removed (view) link
+        html += `<td style="overflow: hidden; text-overflow: ellipsis;" title="${getCurrencyDisplay(token.currency)}">${getCurrencyDisplay(token.currency)}</td>`;
         html += `<td>${formatAmount(details.currentBalance)}</td>`;
         html += `<td>${formatAmount(details.tokensBought)}</td>`;
         html += `<td><span class="xrp-cell"><span class="value">${formatAmount(details.xrpSpent)}</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span></td>`;
@@ -2038,7 +2146,7 @@ tr:hover {
         html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
         html += `</tr>`;
         html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7"><div class="details-content">`;
-        html += `<div class="line">Issuer: ${token.issuer} <a href="https://xrpscan.com/account/${token.issuer}" target="_blank">(view)</a></div>`; // Added issuer with (view) link
+        html += `<div class="line">Issuer: ${token.issuer} <a href="https://xrpscan.com/account/${token.issuer}" target="_blank">(view)</a></div>`;
         if (details.buyTxs.length > 0) {
           html += `<div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>`;
           html += `<div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>`;
@@ -2057,7 +2165,7 @@ tr:hover {
     }
     return html;
   }
-  },
+},
       snipers: {
       async fetchData(issuer, currencyCode) {
         enrichedPayments = await getPaymentTransactions(issuer, currencyCode);
