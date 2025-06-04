@@ -405,15 +405,18 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 /* PnL Card Styling */
 .pnl-card {
   background: 
-    repeating-linear-gradient(
+    linear-gradient(
       45deg,
-      rgba(255, 255, 255, 0.015), /* Soft white (1.5% opacity) for subtle lines */
-      rgba(255, 255, 255, 0.015) 2px,
-      transparent 2px,
-      transparent 8px
-    ),
-    rgba(34, 34, 40, 0.98); /* Regular background color */
-  backdrop-filter: blur(12px);
+      rgba(34, 34, 40, 0.98) 25%, /* Darker color for wider parts */
+      rgba(255, 255, 255, 0.05) 25%, /* Lighter color for narrower parts */
+      rgba(255, 255, 255, 0.05) 50%, /* Continue lighter */
+      rgba(34, 34, 40, 0.98) 50%, /* Back to darker */
+      rgba(34, 34, 40, 0.98) 75%, /* Darker continues */
+      rgba(255, 255, 255, 0.05) 75%, /* Lighter stripe */
+      rgba(255, 255, 255, 0.05) 100% /* Finish lighter */
+    );
+  background-size: 10px 10px; /* Wider stripes as you set */
+  background-color: rgba(34, 34, 40, 0.98); /* Base color for consistency */
   border-radius: 16px;
   padding: 24px;
   margin: 12px 0;
@@ -423,7 +426,7 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
   line-height: 1.6;
-  text-align: center; /* Center main content */
+  text-align: center;
 }
 
 .pnl-card-header {
@@ -526,15 +529,15 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   background: rgba(44, 44, 50, 0.95);
   color: #e5e5e7;
   font-size: 14px;
-  padding: 10px 16px;
+  padding: 10px 24px; 
   border-radius: 12px;
   border: 1px solid #4a4a52;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px; 
   transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  margin: 16px auto 0; /* Center button with top margin */
+  margin: 16px auto 0;
 }
 
 .download-btn:hover {
@@ -543,8 +546,8 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 }
 
 .download-btn img {
-  width: 16px;
-  height: 16px;
+  width: 18px; 
+  height: 18px;
   vertical-align: middle;
 }
 
@@ -2653,7 +2656,7 @@ table tr.details-row {
             </div>
           </div>
           <button class="download-btn" onclick="event.stopPropagation(); downloadPnLCard('pnl-card-${key}', '${getCurrencyDisplay(token.currency).replace(/'/g, "\\'")}')">
-            <img src="https://i.ibb.co/2K6W3zV/download-icon.png" alt="Download Icon">
+            <img src="https://i.ibb.co/3m0LddNz/IMG-7147.png">
             Download PnL Card
           </button>
         </div>`;
