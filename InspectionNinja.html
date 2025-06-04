@@ -2102,21 +2102,33 @@ table tr.details-row {
     return;
   }
 
-  // Temporarily show all expandable content to include in the screenshot
-  const expandableSections = cardElement.querySelectorAll('.hidden');
+  // Temporarily show all expandable content except transactions and download button
+  const expandableSections = cardElement.querySelectorAll('.hidden:not(.pnl-transactions .hidden)');
+  const transactionsSection = cardElement.querySelector('.pnl-transactions');
+  const downloadButton = cardElement.querySelector('.download-btn');
+  const originalTransactionsDisplay = transactionsSection ? transactionsSection.style.display : '';
+  const originalButtonDisplay = downloadButton ? downloadButton.style.display : '';
+
+  // Show expandable sections (excluding those inside transactions)
   expandableSections.forEach(section => {
     section.classList.remove('hidden');
   });
+
+  // Hide transactions and download button
+  if (transactionsSection) transactionsSection.style.display = 'none';
+  if (downloadButton) downloadButton.style.display = 'none';
 
   html2canvas(cardElement, {
     backgroundColor: null, // Preserve transparent background
     scale: 2, // Increase resolution for better quality
     useCORS: true // Enable CORS for external images
   }).then(canvas => {
-    // Restore hidden sections
+    // Restore original state
     expandableSections.forEach(section => {
       section.classList.add('hidden');
     });
+    if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
+    if (downloadButton) downloadButton.style.display = originalButtonDisplay;
 
     // Create download link
     const link = document.createElement('a');
@@ -2125,6 +2137,9 @@ table tr.details-row {
     link.click();
   }).catch(error => {
     console.error('Error generating PnL card image:', error);
+    // Restore original state on error
+    if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
+    if (downloadButton) downloadButton.style.display = originalButtonDisplay;
     alert('Failed to download PnL card. Please try again.');
   });
 }
