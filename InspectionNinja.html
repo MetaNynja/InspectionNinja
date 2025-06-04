@@ -25,7 +25,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 20px;
+  padding: 10px 20px 20px 20px; /* Reduced top padding from 20px to 10px */
   background: rgba(34, 34, 40, 0.95);
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
@@ -44,6 +44,10 @@ body {
   min-height: 0;
 }
 
+#output .header:first-child {
+  margin-top: 0; /* Remove top margin for the first header */
+}
+
 .line {
   margin: 0 0 10px 0;
   color: #e5e5e7;
@@ -51,12 +55,14 @@ body {
 
 .header {
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 600;
-  font-size: 20px;
-  color: #ffffff;
-  text-align: center;
-  margin: 28px 0;
-  letter-spacing: 0.03em;
+  font-weight: 500;
+  font-size: 16px;
+  color: #A7BEFF;
+  text-align: left;
+  margin: 20px 0 10px 0;
+  padding-bottom: 4px;
+  padding-top: 20px;
+  letter-spacing: 0.02em;
 }
 
 .main-header {
@@ -100,7 +106,7 @@ body {
 }
 
 #cmd-input:focus {
-  border-color: #1e90ff;
+  border-color: #4160BD;
   box-shadow: 0 0 0 4px rgba(30, 144, 255, 0.3);
 }
 
@@ -209,7 +215,7 @@ a:hover {
   left: 50%;
   width: 0;
   height: 0;
-  background: rgba(30, 144, 255, 0.2);
+  background: rgba(65, 96, 189, 0.2);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   transition: width 0.3s, height 0.3s;
@@ -301,7 +307,7 @@ tr:not(:last-child) {
 }
 
 tr:nth-child(even) {
-  background: #222228;
+  background: transparent; /* Consistent background */
 }
 
 tr:hover {
@@ -309,44 +315,64 @@ tr:hover {
   transition: background 0.2s ease;
 }
 
-#output {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden; /* Disable horizontal scrolling */
-  padding: 16px;
-  min-height: 0;
-  max-width: 100%; /* Ensure output container respects viewport */
+/* Specific column widths for Snipers table (default) */
+th:nth-child(1), td:nth-child(1) { width: 5%; } /* # (Snipers) or Token (Trade History) */
+th:nth-child(2), td:nth-child(2) { width: 15%; } /* Transaction (Snipers) or Balance (Trade History) */
+th:nth-child(3), td:nth-child(3) { width: 30%; } /* Purchaser (Snipers) or Bought (Trade History) */
+th:nth-child(4), td:nth-child(4) { width: 20%; } /* Spent (Snipers) or Spent (Trade History) */
+th:nth-child(5), td:nth-child(5) { width: 30%; } /* Tokens Received (Snipers) or Sold (Trade History) */
+th:nth-child(6), td:nth-child(6) { width: 15%; } /* Received (Trade History) */
+th:nth-child(7), td:nth-child(7) { width: 15%; } /* P/L (Trade History) */
+
+/* Override for Trade History table (identified by .xrp-values-only toggle or context) */
+table:has(#xrp-values-toggle) th:nth-child(1),
+table:has(#xrp-values-toggle) td:nth-child(1) { width: 20%; } /* Token (Trade History) */
+table:has(#xrp-values-toggle) th:nth-child(3),
+table:has(#xrp-values-toggle) td:nth-child(3) { width: 15%; } /* Bought (Trade History) */
+table:has(#xrp-values-toggle) th:nth-child(4),
+table:has(#xrp-values-toggle) td:nth-child(4) { width: 15%; } /* Spent (Trade History) */
+table:has(#xrp-values-toggle) th:nth-child(5),
+table:has(#xrp-values-toggle) td:nth-child(5) { width: 15%; } /* Sold (Trade History) */
+
+/* Truncate token names and adjust columns on smaller screens */
+@media screen and (max-width: 768px) {
+  th:nth-child(1), td:nth-child(1) {
+    max-width: 40px; /* Narrower for # (Snipers) */
+  }
+  table:has(#xrp-values-toggle) th:nth-child(1),
+  table:has(#xrp-values-toggle) td:nth-child(1) {
+    max-width: 100px; /* Token (Trade History) */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  th:nth-child(4), td:nth-child(4),
+  th:nth-child(6), td:nth-child(6),
+  th:nth-child(7), td:nth-child(7) {
+    min-width: 90px; /* Space for icon and number */
+  }
 }
 
-/* Specific column widths to ensure fit */
-th:nth-child(1), td:nth-child(1) { width: 20%; } /* Token */
-th:nth-child(2), td:nth-child(2) { width: 15%; } /* Balance */
-th:nth-child(3), td:nth-child(3) { width: 15%; } /* Bought */
-th:nth-child(4), td:nth-child(4) { width: 15%; } /* Spent */
-th:nth-child(5), td:nth-child(5) { width: 15%; } /* Sold */
-th:nth-child(6), td:nth-child(6) { width: 15%; } /* Received */
-th:nth-child(7), td:nth-child(7) { width: 15%; } /* P/L */
-
-.xrp-icon {
-  max-height: 20px;
-  width: auto;
-  vertical-align: middle;
-}
+/* Adjust column widths when XRP Values Only is toggled (Trade History only) */
+.xrp-values-only th:nth-child(1), .xrp-values-only td:nth-child(1) { width: 25%; } /* Token */
+.xrp-values-only th:nth-child(4), .xrp-values-only td:nth-child(4) { width: 25%; } /* Spent */
+.xrp-values-only th:nth-child(6), .xrp-values-only td:nth-child(6) { width: 25%; } /* Received */
+.xrp-values-only th:nth-child(7), .xrp-values-only td:nth-child(7) { width: 25%; } /* P/L */
 
 .xrp-cell {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  gap: 6px; /* Space between icon and number */
 }
 
-.xrp-cell .value {
-  flex-grow: 1;
+.xrp-value {
+  display: inline-block; /* Natural alignment under header */
 }
 
-.xrp-cell .icon {
-  flex-shrink: 0;
-  margin-left: 8px;
+.xrp-icon {
+  max-height: 20px; /* Compact size */
+  width: auto;
+  vertical-align: middle;
 }
 
 .details-row {
@@ -386,7 +412,7 @@ th:nth-child(7), td:nth-child(7) { width: 15%; } /* P/L */
   width: 40px;
   height: 40px;
   margin-right: 12px;
-  margin-left: 12px:
+  margin-left: 12px;
 }
 
 .header-text {
@@ -1645,6 +1671,13 @@ th:nth-child(7), td:nth-child(7) { width: 15%; } /* P/L */
   const columnsToToggle = [2, 3, 5];
   const rows = table.querySelectorAll('tr');
 
+  // Toggle xrp-values-only class on table
+  if (isXrpOnly) {
+    table.classList.add('xrp-values-only');
+  } else {
+    table.classList.remove('xrp-values-only');
+  }
+
   rows.forEach(row => {
     const cells = row.querySelectorAll('th, td');
     columnsToToggle.forEach(colIndex => {
@@ -2094,77 +2127,76 @@ th:nth-child(7), td:nth-child(7) { width: 15%; } /* P/L */
     }
   },
   renderData(data) {
-    const { tokens, tokenDetails } = data;
-    let html = `<div class="header">Trade History</div>`;
-    html += `<div class="separator"></div>`;
-    html += `
-      <div class="line">
-        <label style="cursor: pointer; margin-right: 20px;">
-          <input type="checkbox" id="xrp-values-toggle" onchange="toggleXrpValuesOnly()">
-          XRP Values Only
-        </label>
-        <label style="cursor: pointer;">
-          <input type="checkbox" id="zero-balance-toggle" onchange="toggleZeroBalanceOnly()">
-          Zero Balance Only
-        </label>
-      </div>
-    `;
-    if (tokens.length === 0) {
-      html += `<div class="line">No token purchase or sale activity found for this wallet.</div>`;
-    } else {
-      html += `<table>`;
-      html += `<tr><th>Token</th><th>Balance</th><th>Bought</th><th>Spent</th><th>Sold</th><th>Received</th><th>P/L</th></tr>`;
-      tokens.forEach((token, index) => {
-        const key = `${token.issuer}_${token.currency}`;
-        const details = tokenDetails[key] || {
-          currentBalance: token.currentBalance,
-          tokensBought: 0,
-          xrpSpent: 0,
-          tokensSold: 0,
-          xrpReceived: 0,
-          profit: 0,
-          buyTxs: [],
-          sellTxs: []
-        };
-        let p_l_display, p_l_color;
-        if (details.tokensSold === 0) {
-          p_l_display = `<span class="xrp-cell"><span class="value">0</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span>`;
-          p_l_color = 'white';
-        } else {
-          const isProfit = details.profit >= 0;
-          const symbol = isProfit ? '+' : '−';
-          p_l_display = `<span class="xrp-cell"><span class="value">${symbol}${formatAmount(Math.abs(details.profit))}</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span>`;
-          p_l_color = isProfit ? 'green' : 'red';
-        }
-        html += `<tr onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
-        html += `<td style="overflow: hidden; text-overflow: ellipsis;" title="${getCurrencyDisplay(token.currency)}">${getCurrencyDisplay(token.currency)}</td>`;
-        html += `<td>${formatAmount(details.currentBalance)}</td>`;
-        html += `<td>${formatAmount(details.tokensBought)}</td>`;
-        html += `<td><span class="xrp-cell"><span class="value">${formatAmount(details.xrpSpent)}</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span></td>`;
-        html += `<td>${formatAmount(details.tokensSold)}</td>`;
-        html += `<td><span class="xrp-cell"><span class="value">${formatAmount(details.xrpReceived)}</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span></td>`;
-        html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
-        html += `</tr>`;
-        html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7"><div class="details-content">`;
-        html += `<div class="line">Issuer: ${token.issuer} <a href="https://xrpscan.com/account/${token.issuer}" target="_blank">(view)</a></div>`;
-        if (details.buyTxs.length > 0) {
-          html += `<div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>`;
-          html += `<div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>`;
-        } else {
-          html += `<div class="line">Purchases: None</div>`;
-        }
-        if (details.sellTxs.length > 0) {
-          html += `<div class="line">Sales: <span class="expandable" onclick="event.stopPropagation(); toggleSection('sell_txs_${key}')">[view]</span></div>`;
-          html += `<div id="sell_txs_${key}" class="hidden">${buildTableHTML(details.sellTxs, 'sale', getCurrencyDisplay(token.currency))}</div>`;
-        } else {
-          html += `<div class="line">Sales: None</div>`;
-        }
-        html += `</div></td></tr>`;
-      });
-      html += `</table>`;
-    }
-    return html;
+  const { tokens, tokenDetails } = data;
+  let html = `<div class="header">Trade History</div>`;
+  html += `
+    <div class="line">
+      <label style="cursor: pointer; margin-right: 20px;">
+        <input type="checkbox" id="xrp-values-toggle" onchange="toggleXrpValuesOnly()">
+        XRP Values Only
+      </label>
+      <label style="cursor: pointer;">
+        <input type="checkbox" id="zero-balance-toggle" onchange="toggleZeroBalanceOnly()">
+        Zero Balance Only
+      </label>
+    </div>
+  `;
+  if (tokens.length === 0) {
+    html += `<div class="line">No token purchase or sale activity found for this wallet.</div>`;
+  } else {
+    html += `<table>`;
+    html += `<tr><th>Token</th><th>Balance</th><th>Bought</th><th>Spent</th><th>Sold</th><th>Received</th><th>P/L</th></tr>`;
+    tokens.forEach((token, index) => {
+      const key = `${token.issuer}_${token.currency}`;
+      const details = tokenDetails[key] || {
+        currentBalance: token.currentBalance,
+        tokensBought: 0,
+        xrpSpent: 0,
+        tokensSold: 0,
+        xrpReceived: 0,
+        profit: 0,
+        buyTxs: [],
+        sellTxs: []
+      };
+      let p_l_display, p_l_color;
+      if (details.tokensSold === 0) {
+        p_l_display = `<span class="xrp-cell"><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span><span class="xrp-value">0</span></span>`;
+        p_l_color = 'white';
+      } else {
+        const isProfit = details.profit >= 0;
+        const symbol = isProfit ? '+' : '−';
+        p_l_display = `<span class="xrp-cell"><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span><span class="xrp-value">${symbol}${formatAmount(Math.abs(details.profit))}</span></span>`;
+        p_l_color = isProfit ? 'green' : 'red';
+      }
+      html += `<tr onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
+      html += `<td style="overflow: hidden; text-overflow: ellipsis;" title="${getCurrencyDisplay(token.currency)}">${getCurrencyDisplay(token.currency)}</td>`;
+      html += `<td>${formatAmount(details.currentBalance)}</td>`;
+      html += `<td>${formatAmount(details.tokensBought)}</td>`;
+      html += `<td><span class="xrp-cell"><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span><span class="xrp-value">${formatAmount(details.xrpSpent)}</span></span></td>`;
+      html += `<td>${formatAmount(details.tokensSold)}</td>`;
+      html += `<td><span class="xrp-cell"><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span><span class="xrp-value">${formatAmount(details.xrpReceived)}</span></span></td>`;
+      html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
+      html += `</tr>`;
+      html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7"><div class="details-content">`;
+      html += `<div class="line">Issuer: ${token.issuer} <a href="https://xrpscan.com/account/${token.issuer}" target="_blank">(view)</a></div>`;
+      if (details.buyTxs.length > 0) {
+        html += `<div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>`;
+        html += `<div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>`;
+      } else {
+        html += `<div class="line">Purchases: None</div>`;
+      }
+      if (details.sellTxs.length > 0) {
+        html += `<div class="line">Sales: <span class="expandable" onclick="event.stopPropagation(); toggleSection('sell_txs_${key}')">[view]</span></div>`;
+        html += `<div id="sell_txs_${key}" class="hidden">${buildTableHTML(details.sellTxs, 'sale', getCurrencyDisplay(token.currency))}</div>`;
+      } else {
+        html += `<div class="line">Sales: None</div>`;
+      }
+      html += `</div></td></tr>`;
+    });
+    html += `</table>`;
   }
+  return html;
+}
 },
       snipers: {
       async fetchData(issuer, currencyCode) {
@@ -2174,32 +2206,31 @@ th:nth-child(7), td:nth-child(7) { width: 15%; } /* P/L */
         return { payments: enrichedPayments, currencyCode, issuer };
       },
             renderData(data) {
-        const { payments, currencyCode, issuer } = data;
-        let html = `<div class="header">Snipers</div>`;
-        html += `<div class="separator"></div>`;
-        html += `<div class="line">Currency: ${getCurrencyDisplay(currencyCode)}</div>`;
-        html += `<div class="line">Issuer: <a href="https://xrpscan.com/account/${issuer}" target="_blank">${issuer}</a></div>`;
+  const { payments, currencyCode, issuer } = data;
+  let html = `<div class="header">Snipers</div>`;
+  html += `<div class="line">Currency: ${getCurrencyDisplay(currencyCode)}</div>`;
+  html += `<div class="line">Issuer: <a href="https://xrpscan.com/account/${issuer}" target="_blank">${issuer}</a></div>`;
 
-        if (payments.length === 0) {
-          html += `<div class="line">No sniper transactions found.</div>`;
-        } else {
-          html += `<table>`;
-          html += `<tr><th>#</th><th>Transaction</th><th>Purchaser</th><th>Spent</th><th>Tokens Received</th></tr>`;
-          payments.forEach((payment, index) => {
-            const txHash = payment.txHash;
-            html += `<tr onclick="togglePurchaserDetails('${txHash}', '${payment.purchaser}', '${issuer}', '${currencyCode}')">`;
-            html += `<td>${index + 1}</td>`;
-            html += `<td><a href="https://xrpscan.com/tx/${txHash}" target="_blank">view</a></td>`;
-            html += `<td><a href="https://xrpscan.com/account/${payment.purchaser}" target="_blank">${payment.purchaser}</a></td>`;
-            html += `<td><span class="xrp-cell"><span class="value">${formatAmount(payment.xrpSpent)}</span><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span></span></td>`;
-            html += `<td>${formatAmount(payment.amount)} ${getCurrencyDisplay(currencyCode)}</td>`;
-            html += `</tr>`;
-            html += `<tr id="details_${txHash}" class="details-row hidden"><td colspan="5"><div id="details_content_${txHash}"></div></td></tr>`;
-          });
-          html += `</table>`;
-        }
-        return html;
-      }
+  if (payments.length === 0) {
+    html += `<div class="line">No sniper transactions found.</div>`;
+  } else {
+    html += `<table>`;
+    html += `<tr><th>#</th><th>Transaction</th><th>Purchaser</th><th>Spent</th><th>Tokens Received</th></tr>`;
+    payments.forEach((payment, index) => {
+      const txHash = payment.txHash;
+      html += `<tr onclick="togglePurchaserDetails('${txHash}', '${payment.purchaser}', '${issuer}', '${currencyCode}')">`;
+      html += `<td>${index + 1}</td>`;
+      html += `<td><a href="https://xrpscan.com/tx/${txHash}" target="_blank">view</a></td>`;
+      html += `<td><a href="https://xrpscan.com/account/${payment.purchaser}" target="_blank">${payment.purchaser}</a></td>`;
+      html += `<td><span class="xrp-cell"><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span><span class="xrp-value">${formatAmount(payment.xrpSpent)}</span></span></td>`;
+      html += `<td>${formatAmount(payment.amount)} ${getCurrencyDisplay(currencyCode)}</td>`;
+      html += `</tr>`;
+      html += `<tr id="details_${txHash}" class="details-row hidden"><td colspan="5"><div id="details_content_${txHash}"></div></td></tr>`;
+    });
+    html += `</table>`;
+  }
+  return html;
+}
       }
     };
 
