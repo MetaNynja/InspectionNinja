@@ -261,95 +261,66 @@ a:hover {
   transform: translateX(4px);
 }
 
+/* Updated table styling */
 table {
   width: 100%;
-  max-width: 100%; /* Ensure table doesn't exceed container */
+  max-width: 100%;
   border-collapse: collapse;
   margin: 16px 0;
-  font-size: 12px; /* Slightly smaller font for compactness */
+  font-size: 12px;
   border-radius: 12px;
   overflow: hidden;
   background: #222228;
-  table-layout: fixed; /* Force columns to respect assigned widths */
+  table-layout: fixed;
 }
 
+/* Updated th, td styling */
 th, td {
   border: none;
-  padding: 8px 12px; /* Reduced padding for tighter fit */
+  padding: 8px 12px;
   text-align: left;
-  white-space: nowrap; /* Prevent wrapping */
-  overflow: hidden; /* Hide overflow */
-  text-overflow: ellipsis; /* Add ellipsis for long text */
-  min-height: 40px; /* Slightly smaller row height */
-  vertical-align: middle;
-  font-size: 12px; /* Consistent font size */
-}
-
-th {
-  background: #222228;
-  color: #ffffff;
-  font-weight: 600;
-  width: auto; /* Let table-layout manage widths */
-}
-
-td {
-  max-width: 0; /* Allow truncation for long content */
-}
-
-tr {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   min-height: 40px;
-  cursor: pointer;
-  background: #222228;
+  vertical-align: middle;
+  font-size: 12px;
 }
 
-tr:not(:last-child) {
-  border-bottom: 1px solid #3a3a42;
-}
-
-tr:nth-child(even) {
-  background: transparent; /* Consistent background */
-}
-
-tr:hover {
-  background: #3a3a42;
-  transition: background 0.2s ease;
-}
-
-/* Specific column widths for Snipers table (default) */
-th:nth-child(1), td:nth-child(1) { width: 5%; } /* # (Snipers) or Token (Trade History) */
-th:nth-child(2), td:nth-child(2) { width: 15%; } /* Transaction (Snipers) or Balance (Trade History) */
-th:nth-child(3), td:nth-child(3) { width: 30%; } /* Purchaser (Snipers) or Bought (Trade History) */
-th:nth-child(4), td:nth-child(4) { width: 20%; } /* Spent (Snipers) or Spent (Trade History) */
-th:nth-child(5), td:nth-child(5) { width: 30%; } /* Tokens Received (Snipers) or Sold (Trade History) */
-th:nth-child(6), td:nth-child(6) { width: 15%; } /* Received (Trade History) */
-th:nth-child(7), td:nth-child(7) { width: 15%; } /* P/L (Trade History) */
-
-/* Override for Trade History table (identified by .xrp-values-only toggle or context) */
+/* Ensure Token column in Trade History allows wrapping and no truncation */
 table:has(#xrp-values-toggle) th:nth-child(1),
-table:has(#xrp-values-toggle) td:nth-child(1) { width: 20%; } /* Token (Trade History) */
-table:has(#xrp-values-toggle) th:nth-child(3),
-table:has(#xrp-values-toggle) td:nth-child(3) { width: 15%; } /* Bought (Trade History) */
-table:has(#xrp-values-toggle) th:nth-child(4),
-table:has(#xrp-values-toggle) td:nth-child(4) { width: 15%; } /* Spent (Trade History) */
-table:has(#xrp-values-toggle) th:nth-child(5),
-table:has(#xrp-values-toggle) td:nth-child(5) { width: 15%; } /* Sold (Trade History) */
+table:has(#xrp-values-toggle) td:nth-child(1) {
+  width: 20%;
+  white-space: normal; /* Allow text wrapping */
+  overflow: visible; /* Prevent clipping */
+  text-overflow: clip; /* Disable ellipsis */
+}
 
-/* Truncate token names and adjust columns on smaller screens */
+/* Override for Trade History table in xrp-values-only mode */
+.xrp-values-only th:nth-child(1), .xrp-values-only td:nth-child(1) {
+  width: 25%;
+  white-space: normal; /* Allow text wrapping */
+  overflow: visible; /* Prevent clipping */
+  text-overflow: clip; /* Disable ellipsis */
+}
+
+/* Updated media query for smaller screens */
 @media screen and (max-width: 768px) {
   th:nth-child(1), td:nth-child(1) {
-    max-width: 40px; /* Narrower for # (Snipers) */
+    max-width: 40px;
   }
   table:has(#xrp-values-toggle) th:nth-child(1),
   table:has(#xrp-values-toggle) td:nth-child(1) {
-    max-width: 100px; /* Token (Trade History) */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    max-width: none; /* Remove restrictive max-width */
+    width: 20%;
+    white-space: normal; /* Allow text wrapping */
+    overflow: visible; /* Prevent clipping */
+    text-overflow: clip; /* Disable ellipsis */
   }
   th:nth-child(4), td:nth-child(4),
   th:nth-child(6), td:nth-child(6),
   th:nth-child(7), td:nth-child(7) {
-    min-width: 90px; /* Space for icon and number */
+    min-width: 90px;
   }
 }
 
