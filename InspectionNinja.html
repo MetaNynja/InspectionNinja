@@ -649,22 +649,23 @@ table tr.details-row {
     width: 100%; /* Respect container width */
     box-sizing: border-box; /* Include padding in width */
     display: flex;
-    flex-wrap: wrap; /* Allow wrapping to prevent overflow */
+    flex-wrap: nowrap; /* Keep elements on the same line */
     gap: 8px; /* Space between dropdown and input */
+    align-items: center; /* Vertically align items */
   }
 
   .custom-dropdown {
     flex: 0 0 auto; /* Don't grow or shrink, use content width */
-    max-width: 140px; /* Keep dropdown constrained */
+    max-width: 140px; /* Constrain dropdown width */
   }
 
   #cmd-input {
     font-size: 12px; /* Smaller input font */
     padding: 8px 12px; /* Consistent padding */
-    flex: 1 1 calc(100% - 160px); /* Account for dropdown (140px) + gap (8px) + padding */
-    max-width: calc(100% - 160px); /* Prevent overflow beyond container */
+    flex: 1 1 auto; /* Grow to fill available space, allow shrinking */
+    max-width: calc(100% - 156px); /* Account for dropdown (140px max) + gap (8px) + extra buffer */
+    min-width: 100px; /* Ensure input doesn't shrink too much */
     box-sizing: border-box; /* Include padding in width */
-    min-width: 0; /* Allow shrinking if needed */
   }
 
 
