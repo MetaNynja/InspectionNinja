@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -567,11 +568,66 @@ table tr.details-row {
   background-color: rgba(36, 36, 45, 0.98); /* Darker header background */
 }
     
-    @media screen and (max-width: 768px) {
+  @media screen and (max-width: 768px) {
+  /* General Body and Layout Adjustments */
+  body {
+    padding: 16px; /* Reduced padding for mobile */
+    font-size: 12px; /* Smaller base font size */
+  }
+
+  .header-container {
+    padding: 16px; /* Reduced padding */
+    margin-bottom: 12px; /* Tighter spacing */
+  }
+
+  .header-icon {
+    width: 32px; /* Smaller icon */
+    height: 32px;
+    margin-right: 8px;
+    margin-left: 8px;
+  }
+
+  .header-text {
+    font-size: 16px; /* Smaller header text */
+  }
+
+  .header-text .metanynja {
+    font-size: 16px; /* Match header text size */
+    margin-left: 6px; /* Reduced spacing */
+  }
+
+  #console {
+    padding: 8px 12px; /* Reduced padding */
+    border-radius: 12px; /* Slightly smaller radius */
+  }
+
+  #output {
+    padding: 12px; /* Reduced padding */
+  }
+
+  .main-header {
+    font-size: 20px; /* Smaller main header */
+    margin: 16px 0; /* Reduced margin */
+  }
+
+  .header {
+    font-size: 14px; /* Smaller section headers */
+    margin: 16px 0 8px; /* Reduced margin */
+    padding-top: 12px;
+  }
+
+  .line {
+    margin-bottom: 8px; /* Tighter spacing */
+  }
+
+  .separator {
+    margin: 12px 0; /* Reduced margin */
+  }
+
   /* Fix 1: Scope Level Dropdown Stretching */
   .dropdown-toggle {
     max-width: 140px; /* Limit width to prevent stretching */
-    font-size: 12px; /* Smaller font for mobile */
+    font-size: 12px; /* Smaller font */
     padding: 8px 12px; /* Reduced padding */
     white-space: nowrap;
     overflow: hidden;
@@ -579,50 +635,62 @@ table tr.details-row {
   }
 
   .dropdown-menu {
-    width: 180px; /* Smaller dropdown menu width */
+    width: 180px; /* Smaller dropdown menu */
     font-size: 12px; /* Smaller font for options */
+    bottom: calc(100% + 8px); /* Tighter positioning */
   }
 
   .dropdown-option {
-    padding: 8px 12px; /* Reduced padding for options */
+    padding: 8px 12px; /* Reduced padding */
   }
 
-  /* Fix 2: PnL Text Alignment */
+  #input-line {
+    padding: 8px 12px; /* Reduced padding */
+    z-index: 3; /* Ensure below PnL card */
+  }
+
+  #cmd-input {
+    font-size: 12px; /* Smaller input font */
+    padding: 8px 12px; /* Reduced padding */
+  }
+
+  /* Fix 2: PnL Text Alignment in Trade History */
   .pnl-card-header {
     display: flex;
     align-items: center;
     flex-wrap: nowrap; /* Prevent wrapping */
-  }
-
-  .pnl-card-title {
-    font-size: 14px; /* Smaller font to fit on one line */
-    white-space: nowrap; /* Keep text on one line */
-  }
-
-  .pnl-card-title .pnl {
-    font-size: 13px; /* Slightly smaller for PnL */
-    margin-left: 4px; /* Tighten spacing */
+    justify-content: flex-start;
   }
 
   .pnl-card-icon {
-    width: 24px; /* Smaller icon for mobile */
+    width: 24px; /* Smaller icon */
     height: 24px;
     margin-right: 8px; /* Reduced margin */
   }
 
+  .pnl-card-title {
+    font-size: 14px; /* Smaller title */
+    white-space: nowrap; /* Keep on one line */
+  }
+
+  .pnl-card-title .pnl {
+    font-size: 13px; /* Slightly smaller for PnL */
+    margin-left: 4px; /* Tighter spacing */
+  }
+
   /* Fix 3: Token Truncation in Trade History */
   table:has(#xrp-values-toggle) {
-    font-size: 10px; /* Smaller font for table */
+    font-size: 10px; /* Smaller table font */
   }
 
   table:has(#xrp-values-toggle) th,
   table:has(#xrp-values-toggle) td {
-    padding: 6px 8px; /* Reduced padding for compactness */
+    padding: 6px 8px; /* Reduced padding */
   }
 
   table:has(#xrp-values-toggle) th:nth-child(1),
   table:has(#xrp-values-toggle) td:nth-child(1) {
-    width: 30%; /* Increase Token column width */
+    width: 30%; /* Wider Token column */
     max-width: none; /* Remove restrictive max-width */
     white-space: normal; /* Allow wrapping */
     overflow: visible; /* Prevent clipping */
@@ -634,22 +702,105 @@ table tr.details-row {
   table:has(#xrp-values-toggle) td:nth-child(5),
   table:has(#xrp-values-toggle) th:nth-child(6),
   table:has(#xrp-values-toggle) td:nth-child(6) {
-    display: none; /* Hide Sold and Received columns */
+    display: none; /* Hide to save space */
   }
 
   /* Fix 4: PnL Card Overlap */
   .pnl-card {
-    width: 90%; /* Reduce width to fit screen */
+    width: 90%; /* Fit screen width */
     margin: 8px auto; /* Center with smaller margins */
-    padding: 16px; /* Reduced padding */
-    z-index: 5; /* Ensure card is above input line */
-    position: relative; /* Ensure z-index works */
-    transform: translateY(-10px); /* Shift upward to avoid overlap */
+    padding: 12px; /* Reduced padding */
+    z-index: 5; /* Above input line */
+    position: relative;
+    transform: translateY(-10px); /* Shift upward */
+    font-size: 12px; /* Smaller font */
   }
 
-  /* Adjust input line to prevent overlap */
-  #input-line {
-    z-index: 3; /* Lower than PnL card */
+  .pnl-card-token {
+    font-size: 20px; /* Smaller token name */
+    margin: 8px 0; /* Reduced margin */
+  }
+
+  .pnl-card-profit {
+    font-size: 16px; /* Smaller profit/loss text */
+    margin-bottom: 12px; /* Reduced margin */
+  }
+
+  .pnl-card-row {
+    gap: 40px; /* Reduced gap between columns */
+  }
+
+  .pnl-card-label {
+    font-size: 14px; /* Smaller label */
+  }
+
+  .pnl-card-value {
+    font-size: 12px; /* Smaller value */
+    margin-top: 4px; /* Reduced margin */
+  }
+
+  .pnl-transactions {
+    margin-top: 12px; /* Reduced margin */
+    padding-top: 8px; /* Reduced padding */
+  }
+
+  /* General Table Adjustments */
+  table {
+    font-size: 10px; /* Smaller font for all tables */
+    margin: 12px 0; /* Reduced margin */
+  }
+
+  th, td {
+    padding: 6px 8px; /* Reduced padding */
+    min-height: 32px; /* Smaller row height */
+    font-size: 10px; /* Smaller font */
+  }
+
+  /* Adjust XRP Values Only Mode for Trade History */
+  .xrp-values-only th:nth-child(1),
+  .xrp-values-only td:nth-child(1) {
+    width: 30%; /* Wider Token column */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .xrp-values-only th:nth-child(4),
+  .xrp-values-only td:nth-child(4),
+  .xrp-values-only th:nth-child(7),
+  .xrp-values-only td:nth-child(7) {
+    width: 35%; /* Adjust Spent and P/L widths */
+  }
+
+  /* Details Row Adjustments */
+  .details-row td {
+    padding: 12px; /* Reduced padding */
+    min-height: 40px; /* Smaller height */
+  }
+
+  .details-content {
+    padding: 8px; /* Reduced padding */
+  }
+
+  /* Expandable Sections */
+  .expanded {
+    padding: 12px; /* Reduced padding */
+    margin: 8px 0; /* Reduced margin */
+  }
+
+  .expanded .line {
+    margin-bottom: 10px; /* Tighter spacing */
+  }
+
+  /* Links and Expandable Text */
+  a, .expandable {
+    font-size: 12px; /* Smaller font */
+  }
+
+  /* Loading and Error Messages */
+  #loadingLine, .error {
+    font-size: 12px; /* Smaller font */
+    margin: 16px 0; /* Reduced margin */
   }
 }
   </style>
