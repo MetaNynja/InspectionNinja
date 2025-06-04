@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -400,6 +402,140 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   font-size: 20px;
   margin-left: 10px;
   color: #1e90ff;
+}
+    
+/* PnL Card Styling */
+.pnl-card {
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.015), /* Soft white (1.5% opacity) for subtle lines */
+      rgba(255, 255, 255, 0.015) 2px,
+      transparent 2px,
+      transparent 8px
+    ),
+    rgba(34, 34, 40, 0.98); /* Regular background color */
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 12px 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  position: relative;
+  color: #e5e5e7;
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center; /* Center main content */
+}
+
+.pnl-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Align title to the left */
+  margin-bottom: 16px;
+}
+
+.pnl-card-icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+}
+
+.pnl-card-title {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.pnl-card-title .pnl {
+  font-family: 'Nothing You Could Do', cursive;
+  font-size: 17px; /* Matches Inspection and Ninja */
+  color: #FFECB3; /* Softer yellow */
+  margin-left: 2px; /* Reduced gap */
+}
+
+.pnl-card-token {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 28px; /* Large token name */
+  color: #ffffff;
+  margin: 12px 0 12px;
+}
+
+.pnl-card-profit {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 500;
+  font-size: 20px; /* Large font for percentage */
+  margin-bottom: 20px;
+}
+
+.pnl-profit-positive {
+  color: #66bb6a; /* Softer green */
+}
+
+.pnl-profit-negative {
+  color: #ef5350; /* Softer red */
+}
+
+.pnl-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pnl-card-row {
+  display: flex;
+  justify-content: center; /* Center labels and values */
+  align-items: flex-start; /* Align tops for consistent starting points */
+  gap: 80px; /* Spacing between Bought and Profit */
+}
+
+.pnl-card-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center each column’s content */
+}
+
+.pnl-card-label {
+  color: #A7BEFF;
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: underline; /* Individual underlines */
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.pnl-card-value {
+  color: #e5e5e7;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.pnl-transactions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #2a2a30; /* Darker separator line */
+  text-align: left; /* Left-align transaction data */
+}
+
+.pnl-transactions .line {
+  margin-bottom: 12px;
+}
+
+/* Alternating Token Row Colors */
+table tr.token-row.token-row-even {
+  background-color: rgba(40, 40, 48, 0.98); /* First color, kept as is */
+}
+
+table tr.token-row.token-row-odd {
+  background-color: rgba(42, 42, 50, 0.98); /* Slightly lighter than first color */
+}
+
+/* Ensure header row and details row have a consistent background */
+table tr:first-child,
+table tr.details-row {
+  background-color: rgba(36, 36, 45, 0.98); /* Darker header background */
 }
   </style>
   <!-- Add Google Fonts for cursive MetaNynja -->
@@ -2130,39 +2266,60 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
         sellTxs: []
       };
       let p_l_display, p_l_color;
-      if (details.tokensSold === 0) {
-        p_l_display = `<span class="xrp-cell"><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span><span class="xrp-value">0</span></span>`;
+      if (details.tokensSold === 0 && details.xrpReceived === 0) {
+        p_l_display = `0 XRP`;
         p_l_color = 'white';
       } else {
         const isProfit = details.profit >= 0;
         const symbol = isProfit ? '+' : '−';
-        p_l_display = `<span class="xrp-cell"><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span><span class="xrp-value">${symbol}${formatAmount(Math.abs(details.profit))}</span></span>`;
-        p_l_color = isProfit ? 'green' : 'red';
+        p_l_display = `${symbol}${formatAmount(Math.abs(details.profit))} XRP`;
+        p_l_color = isProfit ? '#66bb6a' : '#ef5350'; /* Softer green/red */
       }
-      html += `<tr onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
-      html += `<td style="overflow: hidden; text-overflow: ellipsis;" title="${getCurrencyDisplay(token.currency)}">${getCurrencyDisplay(token.currency)}</td>`;
+      const rowParityClass = index % 2 === 0 ? 'token-row-even' : 'token-row-odd'; /* Alternating classes */
+      html += `<tr class="token-row ${rowParityClass}" onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
+      html += `<td style="overflow: hidden; text-overflow: ellipsis;" title="${getCurrencyDisplay(token.currency)}"><a href="https://xrpscan.com/account/${token.issuer}" target="_blank">${getCurrencyDisplay(token.currency)}</a></td>`;
       html += `<td>${formatAmount(details.currentBalance)}</td>`;
       html += `<td>${formatAmount(details.tokensBought)}</td>`;
-      html += `<td><span class="xrp-cell"><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span><span class="xrp-value">${formatAmount(details.xrpSpent)}</span></span></td>`;
+      html += `<td>${formatAmount(details.xrpSpent)} XRP</td>`;
       html += `<td>${formatAmount(details.tokensSold)}</td>`;
-      html += `<td><span class="xrp-cell"><span class="icon"><img src="https://i.ibb.co/0j9qD7J3/Magic-Eraser-250603-113358.png" alt="XRP" class="xrp-icon"></span><span class="xrp-value">${formatAmount(details.xrpReceived)}</span></span></td>`;
+      html += `<td>${formatAmount(details.xrpReceived)} XRP</td>`;
       html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
       html += `</tr>`;
-      html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7"><div class="details-content">`;
-      html += `<div class="line">Issuer: ${token.issuer} <a href="https://xrpscan.com/account/${token.issuer}" target="_blank">(view)</a></div>`;
-      if (details.buyTxs.length > 0) {
-        html += `<div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>`;
-        html += `<div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>`;
-      } else {
-        html += `<div class="line">Purchases: None</div>`;
-      }
-      if (details.sellTxs.length > 0) {
-        html += `<div class="line">Sales: <span class="expandable" onclick="event.stopPropagation(); toggleSection('sell_txs_${key}')">[view]</span></div>`;
-        html += `<div id="sell_txs_${key}" class="hidden">${buildTableHTML(details.sellTxs, 'sale', getCurrencyDisplay(token.currency))}</div>`;
-      } else {
-        html += `<div class="line">Sales: None</div>`;
-      }
-      html += `</div></td></tr>`;
+      html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7">`;
+      html += `
+        <div class="pnl-card">
+          <div class="pnl-card-header">
+            <img src="https://i.ibb.co/svZT9rZQ/Magic-Eraser-250603-140451.png" alt="Inspection Ninja Icon" class="pnl-card-icon">
+            <div class="pnl-card-title">Inspection Ninja <span class="pnl">PnL</span></div>
+          </div>
+          <div class="pnl-card-token">${getCurrencyDisplay(token.currency)}</div>
+          <div class="pnl-card-profit ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">
+            ${details.profit >= 0 ? '+' : '-'}${Math.abs((details.xrpSpent > 0 ? (details.profit / details.xrpSpent) * 100 : (details.profit > 0 ? Infinity : 0))).toFixed(2)}%
+          </div>
+          <div class="pnl-card-content">
+            <div class="pnl-card-row">
+              <div class="pnl-card-column">
+                <span class="pnl-card-label">Bought</span>
+                <span class="pnl-card-value">${formatAmount(details.xrpSpent)} XRP</span>
+              </div>
+              <div class="pnl-card-column">
+                <span class="pnl-card-label">${details.profit >= 0 ? 'Profit' : 'Loss'}</span>
+                <span class="pnl-card-value ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">${formatAmount(Math.abs(details.profit))} XRP</span>
+              </div>
+            </div>
+            <div class="pnl-transactions">
+              ${details.buyTxs.length > 0 ? `
+                <div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>
+                <div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>
+              ` : `<div class="line">Purchases: None</div>`}
+              ${details.sellTxs.length > 0 ? `
+                <div class="line">Sales: <span class="expandable" onclick="event.stopPropagation(); toggleSection('sell_txs_${key}')">[view]</span></div>
+                <div id="sell_txs_${key}" class="hidden">${buildTableHTML(details.sellTxs, 'sale', getCurrencyDisplay(token.currency))}</div>
+              ` : `<div class="line">Sales: None</div>`}
+            </div>
+          </div>
+        </div>`;
+      html += `</td></tr>`;
     });
     html += `</table>`;
   }
