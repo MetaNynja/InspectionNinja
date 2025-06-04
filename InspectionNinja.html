@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -649,10 +650,11 @@ table tr.details-row {
     z-index: 3; /* Ensure below PnL card */
   }
 
-  #cmd-input {
-    font-size: 12px; /* Smaller input font */
-    padding: 8px 12px; /* Reduced padding */
-  }
+  /* Within the existing @media screen and (max-width: 768px) query */
+#cmd-input {
+  max-width: 60%; /* Limit width to fit screen */
+  flex: 0 1 auto; /* Prevent over-expansion */
+}
 
   /* Fix 2: PnL Text Alignment in Trade History */
   .pnl-card-header {
@@ -2082,7 +2084,8 @@ table tr.details-row {
   function downloadPnLCard(cardId, tokenName) {
   const cardElement = document.getElementById(cardId);
   if (!cardElement) {
-    console.error(`PnL card with ID ${cardId} not found`);
+    console.error(`PnL card with ID ${cardId} not found Ascot`);
+    alert('PnL card not found.');
     return;
   }
 
@@ -2092,15 +2095,25 @@ table tr.details-row {
     section.classList.remove('hidden');
   });
 
+  // Temporarily hide the Purchases and Sales sections and the Download button
+  const transactionsSection = cardElement.querySelector('.pnl-transactions');
+  const downloadButton = cardElement.querySelector('.download-button');
+  const originalTransactionsDisplay = transactionsSection ? transactionsSection.style.display : '';
+  const originalButtonDisplay = downloadButton ? downloadButton.style.display : '';
+  if (transactionsSection) transactionsSection.style.display = 'none';
+  if (downloadButton) downloadButton.style.display = 'none';
+
   html2canvas(cardElement, {
     backgroundColor: null, // Preserve transparent background
     scale: 2, // Increase resolution for better quality
     useCORS: true // Enable CORS for external images
   }).then(canvas => {
-    // Restore hidden sections
+    // Restore hidden sections and elements
     expandableSections.forEach(section => {
       section.classList.add('hidden');
     });
+    if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
+    if (downloadButton) downloadButton.style.display = originalButtonDisplay;
 
     // Create download link
     const link = document.createElement('a');
@@ -2108,6 +2121,12 @@ table tr.details-row {
     link.download = `PnL_Card_${tokenName.replace(/\s+/g, '_')}.png`;
     link.click();
   }).catch(error => {
+    // Restore hidden sections and elements even on error
+    expandableSections.forEach(section => {
+      section.classList.add('hidden');
+    });
+    if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
+    if (downloadButton) downloadButton.style.display = originalButtonDisplay;
     console.error('Error generating PnL card image:', error);
     alert('Failed to download PnL card. Please try again.');
   });
@@ -2621,10 +2640,7 @@ table tr.details-row {
               ` : `<div class="line">Sales: None</div>`}
             </div>
           </div>
-          <button class="download-btn" onclick="event.stopPropagation(); downloadPnLCard('pnl-card-${key}', '${getCurrencyDisplay(token.currency).replace(/'/g, "\\'")}')">
-            <img src="https://i.ibb.co/2K6W3zV/download-icon.png" alt="Download Icon">
-            Download PnL Card
-          </button>
+          <button class="download-button" onclick="downloadPnlCard('pnl-card-${key}')">Download</button>
         </div>`;
       html += `</td></tr>`;
     });
@@ -2864,6 +2880,17 @@ function updateInputPlaceholder(scope) {
       e.preventDefault();
     }
   });
+  
+  /* Check XRP Values Only by default on mobile */
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    const xrpToggle = document.getElementById('xrp-values-toggle');
+    if (xrpToggle) {
+      xrpToggle.checked = true;
+      toggleXrpValuesOnly(); // Update table display
+    }
+  }
+});
 </script>
 </body>
 </html>
