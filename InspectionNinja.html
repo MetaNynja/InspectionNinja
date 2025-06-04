@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -522,6 +520,37 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 .pnl-transactions .line {
   margin-bottom: 12px;
 }
+    
+    /* Download Button Styling */
+.download-btn {
+  background: rgba(44, 44, 50, 0.95);
+  color: #e5e5e7;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid #4a4a52;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  margin: 16px auto 0; /* Center button with top margin */
+}
+
+.download-btn:hover {
+  background: #3a3a42;
+  transform: translateY(-1px);
+}
+
+.download-btn img {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+}
+
+.download-btn:active {
+  transform: translateY(0);
+}
 
 /* Alternating Token Row Colors */
 table tr.token-row.token-row-even {
@@ -537,9 +566,97 @@ table tr:first-child,
 table tr.details-row {
   background-color: rgba(36, 36, 45, 0.98); /* Darker header background */
 }
+    
+    @media screen and (max-width: 768px) {
+  /* Fix 1: Scope Level Dropdown Stretching */
+  .dropdown-toggle {
+    max-width: 140px; /* Limit width to prevent stretching */
+    font-size: 12px; /* Smaller font for mobile */
+    padding: 8px 12px; /* Reduced padding */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Truncate long text */
+  }
+
+  .dropdown-menu {
+    width: 180px; /* Smaller dropdown menu width */
+    font-size: 12px; /* Smaller font for options */
+  }
+
+  .dropdown-option {
+    padding: 8px 12px; /* Reduced padding for options */
+  }
+
+  /* Fix 2: PnL Text Alignment */
+  .pnl-card-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap; /* Prevent wrapping */
+  }
+
+  .pnl-card-title {
+    font-size: 14px; /* Smaller font to fit on one line */
+    white-space: nowrap; /* Keep text on one line */
+  }
+
+  .pnl-card-title .pnl {
+    font-size: 13px; /* Slightly smaller for PnL */
+    margin-left: 4px; /* Tighten spacing */
+  }
+
+  .pnl-card-icon {
+    width: 24px; /* Smaller icon for mobile */
+    height: 24px;
+    margin-right: 8px; /* Reduced margin */
+  }
+
+  /* Fix 3: Token Truncation in Trade History */
+  table:has(#xrp-values-toggle) {
+    font-size: 10px; /* Smaller font for table */
+  }
+
+  table:has(#xrp-values-toggle) th,
+  table:has(#xrp-values-toggle) td {
+    padding: 6px 8px; /* Reduced padding for compactness */
+  }
+
+  table:has(#xrp-values-toggle) th:nth-child(1),
+  table:has(#xrp-values-toggle) td:nth-child(1) {
+    width: 30%; /* Increase Token column width */
+    max-width: none; /* Remove restrictive max-width */
+    white-space: normal; /* Allow wrapping */
+    overflow: visible; /* Prevent clipping */
+    text-overflow: clip; /* Disable ellipsis */
+  }
+
+  /* Hide Sold and Received columns to reduce content */
+  table:has(#xrp-values-toggle) th:nth-child(5),
+  table:has(#xrp-values-toggle) td:nth-child(5),
+  table:has(#xrp-values-toggle) th:nth-child(6),
+  table:has(#xrp-values-toggle) td:nth-child(6) {
+    display: none; /* Hide Sold and Received columns */
+  }
+
+  /* Fix 4: PnL Card Overlap */
+  .pnl-card {
+    width: 90%; /* Reduce width to fit screen */
+    margin: 8px auto; /* Center with smaller margins */
+    padding: 16px; /* Reduced padding */
+    z-index: 5; /* Ensure card is above input line */
+    position: relative; /* Ensure z-index works */
+    transform: translateY(-10px); /* Shift upward to avoid overlap */
+  }
+
+  /* Adjust input line to prevent overlap */
+  #input-line {
+    z-index: 3; /* Lower than PnL card */
+  }
+}
   </style>
   <!-- Add Google Fonts for cursive MetaNynja -->
   <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
+  
+  
 </head>
 <body>
   <div class="header-container">
@@ -579,7 +696,8 @@ table tr.details-row {
 
   <!-- External Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://unpkg.com/xrpl@2.6.0/build/xrpl-latest-min.js"></script><script>
+  <script src="https://unpkg.com/xrpl@2.6.0/build/xrpl-latest-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script><script>
   /* ---------- Global State ---------- */
   let enrichedPayments = [];
   let lastIssuer = null;
@@ -1809,6 +1927,40 @@ table tr.details-row {
     row.style.display = isZeroBalanceOnly && balance !== 0 ? 'none' : '';
   });
 }
+  
+  function downloadPnLCard(cardId, tokenName) {
+  const cardElement = document.getElementById(cardId);
+  if (!cardElement) {
+    console.error(`PnL card with ID ${cardId} not found`);
+    return;
+  }
+
+  // Temporarily show all expandable content to include in the screenshot
+  const expandableSections = cardElement.querySelectorAll('.hidden');
+  expandableSections.forEach(section => {
+    section.classList.remove('hidden');
+  });
+
+  html2canvas(cardElement, {
+    backgroundColor: null, // Preserve transparent background
+    scale: 2, // Increase resolution for better quality
+    useCORS: true // Enable CORS for external images
+  }).then(canvas => {
+    // Restore hidden sections
+    expandableSections.forEach(section => {
+      section.classList.add('hidden');
+    });
+
+    // Create download link
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = `PnL_Card_${tokenName.replace(/\s+/g, '_')}.png`;
+    link.click();
+  }).catch(error => {
+    console.error('Error generating PnL card image:', error);
+    alert('Failed to download PnL card. Please try again.');
+  });
+}
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
     overview: {
@@ -2287,7 +2439,7 @@ table tr.details-row {
       html += `</tr>`;
       html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7">`;
       html += `
-        <div class="pnl-card">
+        <div class="pnl-card" id="pnl-card-${key}">
           <div class="pnl-card-header">
             <img src="https://i.ibb.co/svZT9rZQ/Magic-Eraser-250603-140451.png" alt="Inspection Ninja Icon" class="pnl-card-icon">
             <div class="pnl-card-title">Inspection Ninja <span class="pnl">PnL</span></div>
@@ -2318,6 +2470,10 @@ table tr.details-row {
               ` : `<div class="line">Sales: None</div>`}
             </div>
           </div>
+          <button class="download-btn" onclick="event.stopPropagation(); downloadPnLCard('pnl-card-${key}', '${getCurrencyDisplay(token.currency).replace(/'/g, "\\'")}')">
+            <img src="https://i.ibb.co/2K6W3zV/download-icon.png" alt="Download Icon">
+            Download PnL Card
+          </button>
         </div>`;
       html += `</td></tr>`;
     });
