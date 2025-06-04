@@ -649,23 +649,22 @@ table tr.details-row {
     width: 100%; /* Respect container width */
     box-sizing: border-box; /* Include padding in width */
     display: flex;
-    flex-wrap: nowrap; /* Keep elements on the same line */
+    flex-wrap: wrap; /* Allow wrapping to prevent overflow */
     gap: 8px; /* Space between dropdown and input */
-    align-items: center; /* Vertically align items */
   }
 
   .custom-dropdown {
     flex: 0 0 auto; /* Don't grow or shrink, use content width */
-    max-width: 140px; /* Constrain dropdown width */
+    max-width: 140px; /* Keep dropdown constrained */
   }
 
   #cmd-input {
     font-size: 12px; /* Smaller input font */
     padding: 8px 12px; /* Consistent padding */
-    flex: 1 1 auto; /* Grow to fill available space, allow shrinking */
-    max-width: calc(100% - 156px); /* Account for dropdown (140px max) + gap (8px) + extra buffer */
-    min-width: 100px; /* Ensure input doesn't shrink too much */
+    flex: 1 1 calc(100% - 160px); /* Account for dropdown (140px) + gap (8px) + padding */
+    max-width: calc(100% - 160px); /* Prevent overflow beyond container */
     box-sizing: border-box; /* Include padding in width */
+    min-width: 0; /* Allow shrinking if needed */
   }
 
 
@@ -2558,7 +2557,7 @@ table tr.details-row {
   html += `
     <div class="line">
       <label style="cursor: pointer; margin-right: 20px;">
-        <input type="checkbox" id="xrp-values-toggle" onchange="toggleXrpValuesOnly()">
+        <input type="checkbox" id="xrp-values-toggle" onchange="toggleXrpValuesOnly()" checked>
         XRP Values Only
       </label>
       <label style="cursor: pointer;">
@@ -2592,9 +2591,9 @@ table tr.details-row {
         const isProfit = details.profit >= 0;
         const symbol = isProfit ? '+' : '−';
         p_l_display = `${symbol}${formatAmount(Math.abs(details.profit))} XRP`;
-        p_l_color = isProfit ? '#66bb6a' : '#ef5350'; /* Softer green/red */
+        p_l_color = isProfit ? '#66bb6a' : '#ef5350';
       }
-      const rowParityClass = index % 2 === 0 ? 'token-row-even' : 'token-row-odd'; /* Alternating classes */
+      const rowParityClass = index % 2 === 0 ? 'token-row-even' : 'token-row-odd';
       html += `<tr class="token-row ${rowParityClass}" onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
       html += `<td style="overflow: hidden; text-overflow: ellipsis;" title="${getCurrencyDisplay(token.currency)}"><a href="https://xrpscan.com/account/${token.issuer}" target="_blank">${getCurrencyDisplay(token.currency)}</a></td>`;
       html += `<td>${formatAmount(details.currentBalance)}</td>`;
@@ -2646,6 +2645,10 @@ table tr.details-row {
     });
     html += `</table>`;
   }
+  // Call toggleXrpValuesOnly to apply the XRP Values Only styling
+  setTimeout(() => {
+    toggleXrpValuesOnly();
+  }, 0);
   return html;
 }
 },
