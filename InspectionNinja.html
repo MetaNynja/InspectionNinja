@@ -807,7 +807,7 @@ table tr.details-row {
   max-width: none !important;
   margin: 0 !important;
   transform: none !important;
-  padding: 48px 96px !important; /* Kept top padding at 48px to fix header, sides at 96px */
+  padding: 48px 96px !important;
   font-size: 28px !important;
   line-height: 1.6 !important;
   border-radius: 32px !important;
@@ -830,7 +830,7 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-header {
-  margin-bottom: 180px !important; /* Increased from 160px to shift content below downward */
+  margin-bottom: 100px !important; /* Reduced from 180px to bring title closer to percentage */
   margin-top: 0 !important;
   display: flex !important;
   align-items: center !important;
@@ -844,17 +844,17 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-title {
-  font-size: 96px !important; /* Increased from 80px for larger title */
+  font-size: 96px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-title .pnl {
-  font-size: 90px !important; /* Increased from 76px */
+  font-size: 90px !important;
   margin-left: 8px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-token {
   font-size: 220px !important;
-  margin: 120px 0 !important; /* Increased from 100px to move further down */
+  margin: 140px 0 60px 0 !important; /* Increased top margin from 120px to 140px, reduced bottom to 60px to move closer to percentage */
   word-break: break-word !important;
   max-width: 75% !important;
   margin-left: auto !important;
@@ -863,7 +863,7 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-profit {
-  font-size: 128px !important; /* Increased from 108px for larger percentage */
+  font-size: 128px !important;
   margin-bottom: 160px !important;
 }
 
@@ -885,9 +885,7 @@ table tr.details-row {
 
 #output .pnl-card.downloading .pnl-card-label {
   font-size: 88px !important;
-  text-decoration: underline !important;
-  text-decoration-thickness: 8px !important; /* Increased from 5px for thicker underlines */
-  text-underline-offset: 12px !important; /* Increased from 10px to balance thicker line */
+  text-decoration: none !important; /* Removed underline */
 }
 
 #output .pnl-card.downloading .pnl-card-value {
@@ -951,9 +949,7 @@ table tr.details-row {
 
   #output .pnl-card.downloading .pnl-card-label {
     font-size: 88px !important;
-    text-decoration: underline !important;
-    text-decoration-thickness: 8px !important;
-    text-underline-offset: 12px !important;
+    text-decoration: none !important;
   }
 
   #output .pnl-card.downloading .pnl-card-value {
