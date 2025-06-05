@@ -799,7 +799,7 @@ table tr.details-row {
     margin: 16px 0;
   }
 }
-    /* New CSS for .pnl-card.downloading */
+ /* New CSS for .pnl-card.downloading */
 #output .pnl-card.downloading {
   width: 1800px !important;
   height: 1600px !important;
@@ -809,7 +809,7 @@ table tr.details-row {
   padding: 48px 96px !important;
   font-size: 28px !important;
   line-height: 1.6 !important;
-  border-radius: 0 !important; /* Changed from 32px to 0 for sharp corners */
+  border-radius: 0 !important;
   position: absolute !important;
   z-index: 9999 !important;
   box-sizing: border-box !important;
@@ -829,7 +829,7 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-header {
-  margin-bottom: 140px !important; /* Increased from 100px to move title closer to percentage */
+  margin-bottom: 180px !important; /* Increased from 140px to shift content below downward */
   margin-top: 0 !important;
   display: flex !important;
   align-items: center !important;
@@ -853,7 +853,7 @@ table tr.details-row {
 
 #output .pnl-card.downloading .pnl-card-token {
   font-size: 220px !important;
-  margin: 140px 0 60px 0 !important;
+  margin: 140px 0 60px 0 !important; /* Kept to maintain spacing with percentage */
   word-break: break-word !important;
   max-width: 75% !important;
   margin-left: auto !important;
@@ -863,11 +863,11 @@ table tr.details-row {
 
 #output .pnl-card.downloading .pnl-card-profit {
   font-size: 128px !important;
-  margin-bottom: 160px !important;
+  margin-bottom: 160px !important; /* Kept to maintain spacing with Bought/Profit */
 }
 
 #output .pnl-card.downloading .pnl-card-content {
-  gap: 48px !important;
+  gap: 48px !important; /* Kept to maintain spacing within Bought/Profit */
 }
 
 #output .pnl-card.downloading .pnl-card-row {
@@ -901,7 +901,7 @@ table tr.details-row {
     transform: none !important;
     padding: 48px 96px !important;
     font-size: 28px !important;
-    border-radius: 0 !important; /* Changed from 32px to 0 for sharp corners */
+    border-radius: 0 !important;
     position: absolute !important;
     z-index: 9999 !important;
     background: 
