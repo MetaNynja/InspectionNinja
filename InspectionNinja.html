@@ -807,23 +807,34 @@ table tr.details-row {
   max-width: none !important;
   margin: 0 !important;
   transform: none !important;
-  padding: 120px 96px !important; /* Increased top padding from 96px to 120px, kept sides at 96px */
+  padding: 48px 96px !important; /* Reduced top padding to 48px to keep header near top, kept sides at 96px */
   font-size: 28px !important;
   line-height: 1.6 !important;
   border-radius: 32px !important;
   position: absolute !important;
   z-index: 9999 !important;
   box-sizing: border-box !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important; /* Center content vertically */
+  background: 
+    linear-gradient(
+      45deg,
+      rgba(34, 34, 40, 0.98) 25%,
+      rgba(255, 255, 255, 0.05) 25%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(34, 34, 40, 0.98) 50%,
+      rgba(34, 34, 40, 0.98) 75%,
+      rgba(255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 0.05) 100%
+    ) !important;
+  background-size: 10px 10px !important; /* Increased from 5px to make stripes more visible */
+  background-color: rgba(34, 34, 40, 0.98) !important;
 }
 
 #output .pnl-card.downloading .pnl-card-header {
-  margin-bottom: 80px !important; /* Increased from 64px to shift downward */
+  margin-bottom: 80px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
+  margin-top: 0 !important; /* Ensure header stays near top */
 }
 
 #output .pnl-card.downloading .pnl-card-icon {
@@ -843,7 +854,7 @@ table tr.details-row {
 
 #output .pnl-card.downloading .pnl-card-token {
   font-size: 120px !important;
-  margin: 64px 0 !important; /* Increased from 48px to shift downward */
+  margin: 100px 0 !important; /* Increased from 64px to shift downward and center */
   word-break: break-word !important;
   max-width: 85% !important;
   margin-left: auto !important;
@@ -852,15 +863,15 @@ table tr.details-row {
 
 #output .pnl-card.downloading .pnl-card-profit {
   font-size: 96px !important;
-  margin-bottom: 96px !important; /* Increased from 80px to shift downward */
+  margin-bottom: 100px !important; /* Increased from 96px to center content */
 }
 
 #output .pnl-card.downloading .pnl-card-content {
-  gap: 48px !important; /* Increased from 32px to spread content */
+  gap: 48px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-row {
-  gap: 360px !important; /* Increased from 320px to spread Bought/Profit */
+  gap: 360px !important;
   justify-content: center !important;
   align-items: flex-start !important;
 }
@@ -872,15 +883,15 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-label {
-  font-size: 80px !important; /* Increased from 64px for Bought/Profit */
-  text-decoration: underline !important; /* Restore horizontal lines */
-  text-decoration-thickness: 5px !important; /* Increased from 4px */
-  text-underline-offset: 10px !important; /* Increased from 8px */
+  font-size: 80px !important;
+  text-decoration: underline !important;
+  text-decoration-thickness: 5px !important;
+  text-underline-offset: 10px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-value {
-  font-size: 72px !important; /* Increased from 56px for values */
-  margin-top: 24px !important; /* Increased from 16px */
+  font-size: 72px !important;
+  margin-top: 24px !important;
 }
 
 @media screen and (max-width: 768px) {
@@ -890,14 +901,24 @@ table tr.details-row {
     max-width: none !important;
     margin: 0 !important;
     transform: none !important;
-    padding: 120px 96px !important;
+    padding: 48px 96px !important;
     font-size: 28px !important;
     border-radius: 32px !important;
     position: absolute !important;
     z-index: 9999 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
+    background: 
+      linear-gradient(
+        45deg,
+        rgba(34, 34, 40, 0.98) 25%,
+        rgba(255, 255, 255, 0.05) 25%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(34, 34, 40, 0.98) 50%,
+        rgba(34, 34, 40, 0.98) 75%,
+        rgba(255, 255, 255, 0.05) 75%,
+        rgba(255, 255, 255, 0.05) 100%
+      ) !important;
+    background-size: 10px 10px !important;
+    background-color: rgba(34, 34, 40, 0.98) !important;
   }
 
   #output .pnl-card.downloading .pnl-card-icon {
