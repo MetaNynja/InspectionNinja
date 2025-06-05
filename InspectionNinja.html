@@ -941,8 +941,6 @@ table tr.details-row {
   margin-left: auto !important;
   margin-right: auto !important;
   line-height: 1.1 !important;
-  overflow: hidden !important; /* Prevent overflow */
-  text-overflow: clip !important; /* Ensure no ellipsis or wrapping */
 }
 
   #output .pnl-card.downloading .pnl-card-profit {
@@ -2234,7 +2232,7 @@ table tr.details-row {
   });
 }
   
-  function downloadPnLCard(cardId, tokenName) {
+ function downloadPnLCard(cardId, tokenName) {
   const cardElement = document.getElementById(cardId);
   if (!cardElement) {
     console.error(`PnL card with ID ${cardId} not found`);
@@ -2262,9 +2260,7 @@ table tr.details-row {
   const originalTokenStyle = {
     fontSize: tokenElement.style.fontSize,
     whiteSpace: tokenElement.style.whiteSpace,
-    maxWidth: tokenElement.style.maxWidth,
-    overflow: tokenElement.style.overflow,
-    textOverflow: tokenElement.style.textOverflow
+    maxWidth: tokenElement.style.maxWidth
   };
 
   // Temporarily show all expandable content except transactions and download button
@@ -2297,7 +2293,7 @@ table tr.details-row {
   cardElement.classList.add('downloading');
 
   // Dynamically adjust font size to fit within max-width (75% of 1800px = 1350px)
-  const maxWidth = desiredWidth * 0.75 * 0.90; // 1350px * 0.90 = 1215px for safety
+  const maxWidth = desiredWidth * 0.75 * 0.80; // 1350px * 0.80 = 1080px for safety
   const baseFontSize = 220; // Default font size in pixels
   const minFontSize = 100; // Minimum font size in pixels
   let fontSize = baseFontSize;
@@ -2305,8 +2301,6 @@ table tr.details-row {
   // Temporarily set styles for measurement
   tokenElement.style.whiteSpace = 'nowrap';
   tokenElement.style.maxWidth = 'none'; // Remove max-width for accurate measurement
-  tokenElement.style.overflow = 'visible'; // Ensure full width is measured
-  tokenElement.style.textOverflow = 'clip';
 
   // Function to get the actual rendered width of the token element
   const getTextWidth = () => {
@@ -2321,26 +2315,26 @@ table tr.details-row {
   let textWidth = getTextWidth();
   let iteration = 0;
   const maxIterations = 20; // Prevent infinite loops
-  while (textWidth > maxWidth && fontSize > minFontSize && iteration < maxIterations) {
-    const scaleFactor = maxWidth / textWidth;
-    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.95), minFontSize); // Extra 5% reduction
+  const capitalLetterCount = (tokenName.match(/[A-Z]/g) || []).length;
+  const capitalWidthFactor = 1 + (capitalLetterCount / tokenName.length) * 0.2; // Adjust for wider capitals
+  while (textWidth * capitalWidthFactor > maxWidth && fontSize > minFontSize && iteration < maxIterations) {
+    const scaleFactor = maxWidth / (textWidth * capitalWidthFactor);
+    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.90), minFontSize); // Extra 10% reduction
     textWidth = getTextWidth();
     iteration++;
   }
 
   // Final verification: reduce font size slightly more if close to maxWidth
-  if (textWidth > maxWidth * 0.95) {
-    fontSize = Math.max(Math.floor(fontSize * 0.95), minFontSize);
+  if (textWidth * capitalWidthFactor > maxWidth * 0.95) {
+    fontSize = Math.max(Math.floor(fontSize * 0.90), minFontSize);
     tokenElement.style.fontSize = `${fontSize}px`;
     textWidth = getTextWidth();
   }
 
-  console.log(`Final font size for "${tokenName}": ${fontSize}px, text width: ${textWidth}px, max width: ${maxWidth}px, iterations: ${iteration}`);
+  console.log(`Final font size for "${tokenName}": ${fontSize}px, text width: ${textWidth}px, adjusted width (with capital factor ${capitalWidthFactor.toFixed(2)}): ${(textWidth * capitalWidthFactor).toFixed(2)}px, max width: ${maxWidth}px, iterations: ${iteration}, capital letters: ${capitalLetterCount}`);
 
-  // Restore max-width and other styles for rendering
+  // Restore max-width for rendering
   tokenElement.style.maxWidth = '75%';
-  tokenElement.style.overflow = 'hidden';
-  tokenElement.style.textOverflow = 'clip';
 
   // Force reflow to ensure styles are applied
   cardElement.offsetHeight;
@@ -2385,7 +2379,7 @@ table tr.details-row {
       if (downloadButton) downloadButton.style.display = originalButtonDisplay;
       alert('Failed to download PnL card. Please check the console for errors and try again.');
     });
-  }, 200); // Increased delay to ensure rendering
+  }, 200); // Keep 200ms delay
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
