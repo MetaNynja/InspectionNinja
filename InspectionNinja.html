@@ -799,7 +799,7 @@ table tr.details-row {
     margin: 16px 0;
   }
 }
- /* New CSS for .pnl-card.downloading */
+/* New CSS for .pnl-card.downloading */
 #output .pnl-card.downloading {
   width: 1800px !important;
   height: 1600px !important;
@@ -821,15 +821,14 @@ table tr.details-row {
       rgba(255, 255, 255, 0.05) 50%,
       rgba(34, 34, 40, 0.98) 50%,
       rgba(34, 34, 40, 0.98) 75%,
-      rgba(255, 255, 255, 0.05) 75%,
-      rgba(255, 255, 255, 0.05) 100%
-    ) !important;
-  background-size: 20px 20px !important;
-  background-color: rgba(34, 34, 40, 0.98) !important;
+      rgba(255, 255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 255, 0.05) !important;
+  background-size: 20px !important;
+  background-color: rgba(34,34,34,40,0.98) !important;
 }
 
 #output .pnl-card.downloading .pnl-card-header {
-  margin-bottom: 180px !important; /* Increased from 140px to shift content below downward */
+  margin-bottom: 180px !important;
   margin-top: 0 !important;
   display: flex !important;
   align-items: center !important;
@@ -852,22 +851,25 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-token {
-  font-size: 220px !important;
-  margin: 140px 0 60px 0 !important; /* Kept to maintain spacing with percentage */
-  word-break: break-word !important;
-  max-width: 75% !important;
+  font-size: 320px !important; /* Initial size, may be adjusted by JavaScript */
+  margin: 140px !important; 0 60px 0 !important;
+  white-space: nowrap !important; /* Prevent line wrapping */
+  max-width: 75% !important; /* Limit width to fit within card */
   margin-left: auto !important;
   margin-right: auto !important;
-  line-height: 1.1 !important;
+  overflow: hidden !important; /* Hide overflow */
+  text-overflow: ellipsis !important; /* Fallback ellipsis if text is too wide */
+  line-height: normal !important; /* Normalize line-height for single line */
+  display: inline-block !important; /* Allow width measurement for JavaScript */
 }
 
 #output .pnl-card.downloading .pnl-card-profit {
   font-size: 128px !important;
-  margin-bottom: 160px !important; /* Kept to maintain spacing with Bought/Profit */
+  margin-bottom: 160px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-content {
-  gap: 48px !important; /* Kept to maintain spacing within Bought/Profit */
+  gap: 48px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-row {
@@ -904,19 +906,19 @@ table tr.details-row {
     border-radius: 0 !important;
     position: absolute !important;
     z-index: 9999 !important;
+    box-sizing: border-box !important;
     background: 
       linear-gradient(
         45deg,
-        rgba(34, 34, 40, 0.98) 25%,
-        rgba(255, 255, 255, 0.05) 25%,
-        rgba(255, 255, 255, 0.05) 50%,
-        rgba(34, 34, 40, 0.98) 50%,
-        rgba(34, 34, 40, 0.98) 75%,
-        rgba(255, 255, 255, 0.05) 75%,
-        rgba(255, 255, 255, 0.05) 100%
+        rgba(34,34,34,40,40,0.98) 25%,
+        rgba(255,255,255,255,255,0.05) 25%,
+        rgba(255,255,255,255,255,0.05) 50%,
+        rgba(34,34,34,40,40,0.98) 50%,
+        rgba(34,34,34,255,255,255,255,0.05) 75%,
+        rgba(255,255,255,255,255,0.05) 100%
       ) !important;
     background-size: 20px 20px !important;
-    background-color: rgba(34, 34, 40, 0.98) !important;
+    background-color: rgba(34,34,34,40,0.98) !important;
   }
 
   #output .pnl-card.downloading .pnl-card-icon {
@@ -934,12 +936,15 @@ table tr.details-row {
   }
 
   #output .pnl-card.downloading .pnl-card-token {
-    font-size: 220px !important;
-    word-break: break-word !important;
+    font-size: 320px !important; /* Initial size, may be adjusted by JavaScript */
+    white-space: nowrap !important; /* Prevent line wrapping */
     max-width: 75% !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    line-height: 1.1 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: normal !important;
+    display: inline-block !important;
   }
 
   #output .pnl-card.downloading .pnl-card-profit {
