@@ -25,7 +25,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 10px 20px 20px 20px; /* Reduced top padding from 20px to 10px */
+  padding: 10px 20px 20px 20px;
   background: rgba(34, 34, 40, 0.95);
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
@@ -39,13 +39,13 @@ body {
 #output {
   flex: 1;
   overflow-y: auto;
-  overflow-x: auto; /* Enable horizontal scrolling for wide tables */
+  overflow-x: auto;
   padding: 16px;
   min-height: 0;
 }
 
 #output .header:first-child {
-  margin-top: 0; /* Remove top margin for the first header */
+  margin-top: 0;
 }
 
 .line {
@@ -261,7 +261,6 @@ a:hover {
   transform: translateX(4px);
 }
 
-/* Updated table styling */
 table {
   width: 100%;
   max-width: 100%;
@@ -274,7 +273,6 @@ table {
   table-layout: fixed;
 }
 
-/* Updated th, td styling */
 th, td {
   border: none;
   padding: 8px 12px;
@@ -287,35 +285,32 @@ th, td {
   font-size: 12px;
 }
 
-/* Ensure Token column in Trade History allows wrapping and no truncation */
 table:has(#xrp-values-toggle) th:nth-child(1),
 table:has(#xrp-values-toggle) td:nth-child(1) {
   width: 20%;
-  white-space: normal; /* Allow text wrapping */
-  overflow: visible; /* Prevent clipping */
-  text-overflow: clip; /* Disable ellipsis */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
-/* Override for Trade History table in xrp-values-only mode */
 .xrp-values-only th:nth-child(1), .xrp-values-only td:nth-child(1) {
   width: 25%;
-  white-space: normal; /* Allow text wrapping */
-  overflow: visible; /* Prevent clipping */
-  text-overflow: clip; /* Disable ellipsis */
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
-/* Updated media query for smaller screens */
 @media screen and (max-width: 768px) {
   th:nth-child(1), td:nth-child(1) {
     max-width: 40px;
   }
   table:has(#xrp-values-toggle) th:nth-child(1),
   table:has(#xrp-values-toggle) td:nth-child(1) {
-    max-width: none; /* Remove restrictive max-width */
+    max-width: none;
     width: 20%;
-    white-space: normal; /* Allow text wrapping */
-    overflow: visible; /* Prevent clipping */
-    text-overflow: clip; /* Disable ellipsis */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
   th:nth-child(4), td:nth-child(4),
   th:nth-child(6), td:nth-child(6),
@@ -324,30 +319,29 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   }
 }
 
-/* Adjust column widths when XRP Values Only is toggled (Trade History only) */
-.xrp-values-only th:nth-child(1), .xrp-values-only td:nth-child(1) { width: 25%; } /* Token */
-.xrp-values-only th:nth-child(4), .xrp-values-only td:nth-child(4) { width: 25%; } /* Spent */
-.xrp-values-only th:nth-child(6), .xrp-values-only td:nth-child(6) { width: 25%; } /* Received */
-.xrp-values-only th:nth-child(7), .xrp-values-only td:nth-child(7) { width: 25%; } /* P/L */
+.xrp-values-only th:nth-child(1), .xrp-values-only td:nth-child(1) { width: 25%; }
+.xrp-values-only th:nth-child(4), .xrp-values-only td:nth-child(4) { width: 25%; }
+.xrp-values-only th:nth-child(6), .xrp-values-only td:nth-child(6) { width: 25%; }
+.xrp-values-only th:nth-child(7), .xrp-values-only td:nth-child(7) { width: 25%; }
 
 .xrp-cell {
   display: flex;
   align-items: center;
-  gap: 6px; /* Space between icon and number */
+  gap: 6px;
 }
 
 .xrp-value {
-  display: inline-block; /* Natural alignment under header */
+  display: inline-block;
 }
 
 .xrp-icon {
-  max-height: 20px; /* Compact size */
+  max-height: 20px;
   width: auto;
   vertical-align: middle;
 }
 
 .details-row {
-  background: rgba(44, 44, 50, 0.98); /* Retain distinct background for details */
+  background: rgba(44, 44, 50, 0.98);
   backdrop-filter: blur(10px);
   border-top: none;
 }
@@ -356,7 +350,7 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   padding: 16px;
   border-top: none;
   min-height: 48px;
-  white-space: normal; /* Allow wrapping in details for readability */
+  white-space: normal;
 }
 
 .details-content {
@@ -401,428 +395,7 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   margin-left: 10px;
   color: #1e90ff;
 }
-    
-/* PnL Card Styling */
-.pnl-card {
-  background: 
-    linear-gradient(
-      45deg,
-      rgba(34, 34, 40, 0.98) 25%, /* Darker color for wider parts */
-      rgba(255, 255, 255, 0.05) 25%, /* Lighter color for narrower parts */
-      rgba(255, 255, 255, 0.05) 50%, /* Continue lighter */
-      rgba(34, 34, 40, 0.98) 50%, /* Back to darker */
-      rgba(34, 34, 40, 0.98) 75%, /* Darker continues */
-      rgba(255, 255, 255, 0.05) 75%, /* Lighter stripe */
-      rgba(255, 255, 255, 0.05) 100% /* Finish lighter */
-    );
-  background-size: 5px 5px; /* Wider stripes as you set */
-  background-color: rgba(34, 34, 40, 0.98); /* Base color for consistency */
-  border-radius: 16px;
-  padding: 24px;
-  margin: 12px 0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  position: relative;
-  color: #e5e5e7;
-  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  text-align: center;
-}
 
-.pnl-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* Align title to the left */
-  margin-bottom: 16px;
-}
-
-.pnl-card-icon {
-  width: 32px;
-  height: 32px;
-  margin-right: 12px;
-}
-
-.pnl-card-title {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 600;
-  font-size: 18px;
-  color: #ffffff;
-}
-
-.pnl-card-title .pnl {
-  font-family: 'Nothing You Could Do', cursive;
-  font-size: 17px; /* Matches Inspection and Ninja */
-  color: #FFECB3; /* Softer yellow */
-  margin-left: 2px; /* Reduced gap */
-}
-
-.pnl-card-token {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 600;
-  font-size: 28px; /* Large token name */
-  color: #ffffff;
-  margin: 12px 0 12px;
-}
-
-.pnl-card-profit {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 500;
-  font-size: 20px; /* Large font for percentage */
-  margin-bottom: 20px;
-}
-
-.pnl-profit-positive {
-  color: #66bb6a; /* Softer green */
-}
-
-.pnl-profit-negative {
-  color: #ef5350; /* Softer red */
-}
-
-.pnl-card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.pnl-card-row {
-  display: flex;
-  justify-content: center; /* Center labels and values */
-  align-items: flex-start; /* Align tops for consistent starting points */
-  gap: 80px; /* Spacing between Bought and Profit */
-}
-
-.pnl-card-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Center each column’s content */
-}
-
-.pnl-card-label {
-  color: #A7BEFF;
-  font-weight: 500;
-  font-size: 16px;
-  text-decoration: underline; /* Individual underlines */
-  text-decoration-thickness: 1px;
-  text-underline-offset: 2px;
-}
-
-.pnl-card-value {
-  color: #e5e5e7;
-  font-size: 14px;
-  margin-top: 8px;
-}
-
-.pnl-transactions {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid #2a2a30; /* Darker separator line */
-  text-align: left; /* Left-align transaction data */
-}
-
-.pnl-transactions .line {
-  margin-bottom: 12px;
-}
-    
-    /* Download Button Styling */
-.download-btn {
-  background: rgba(44, 44, 50, 0.95);
-  color: #e5e5e7;
-  font-size: 14px;
-  padding: 10px 24px; 
-  border-radius: 12px;
-  border: 1px solid #4a4a52;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px; 
-  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  margin: 16px auto 0;
-}
-
-.download-btn:hover {
-  background: #3a3a42;
-  transform: translateY(-1px);
-}
-
-.download-btn img {
-  width: 18px; 
-  height: 18px;
-  vertical-align: middle;
-}
-
-.download-btn:active {
-  transform: translateY(0);
-}
-
-/* Alternating Token Row Colors */
-table tr.token-row.token-row-even {
-  background-color: rgba(40, 40, 48, 0.98); /* First color, kept as is */
-}
-
-table tr.token-row.token-row-odd {
-  background-color: rgba(42, 42, 50, 0.98); /* Slightly lighter than first color */
-}
-
-/* Ensure header row and details row have a consistent background */
-table tr:first-child,
-table tr.details-row {
-  background-color: rgba(36, 36, 45, 0.98); /* Darker header background */
-}
-    
-  @media screen and (max-width: 768px) {
-  /* General Body and Layout Adjustments */
-  body {
-    padding: 16px; /* Reduced padding for mobile */
-    font-size: 12px; /* Smaller base font size */
-  }
-
-  .header-container {
-    padding: 16px; /* Reduced padding */
-    margin-bottom: 12px; /* Tighter spacing */
-  }
-
-  .header-icon {
-    width: 32px; /* Smaller icon */
-    height: 32px;
-    margin-right: 8px;
-    margin-left: 8px;
-  }
-
-  .header-text {
-    font-size: 16px; /* Smaller header text */
-  }
-
-  .header-text .metanynja {
-    font-size: 16px; /* Match header text size */
-    margin-left: 6px; /* Reduced spacing */
-  }
-
-  #console {
-    padding: 8px 12px; /* Reduced padding */
-    border-radius: 12px; /* Slightly smaller radius */
-  }
-
-  #output {
-    padding: 12px; /* Reduced padding */
-  }
-
-  .main-header {
-    font-size: 20px; /* Smaller main header */
-    margin: 16px 0; /* Reduced margin */
-  }
-
-  .header {
-    font-size: 14px; /* Smaller section headers */
-    margin: 16px 0 8px; /* Reduced margin */
-    padding-top: 12px;
-  }
-
-  .line {
-    margin-bottom: 8px; /* Tighter spacing */
-  }
-
-  .separator {
-    margin: 12px 0; /* Reduced margin */
-  }
-
-  /* Fix 1: Scope Level Dropdown Stretching */
-  .dropdown-toggle {
-    max-width: 140px; /* Limit width to prevent stretching */
-    font-size: 12px; /* Smaller font */
-    padding: 8px 12px; /* Reduced padding */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Truncate long text */
-  }
-
-  .dropdown-menu {
-    width: 180px; /* Smaller dropdown menu */
-    font-size: 12px; /* Smaller font for options */
-    bottom: calc(100% + 8px); /* Tighter positioning */
-  }
-
-  .dropdown-option {
-    padding: 8px 12px; /* Reduced padding */
-  }
-
-  #input-line {
-    padding: 8px 12px; /* Consistent padding, including right */
-    z-index: 3; /* Ensure below PnL card */
-    width: 100%; /* Respect container width */
-    box-sizing: border-box; /* Include padding in width */
-    display: flex;
-    flex-wrap: nowrap; /* Keep elements on the same line */
-    gap: 8px; /* Space between dropdown and input */
-    align-items: center; /* Vertically align items */
-  }
-
-  .custom-dropdown {
-    flex: 0 0 auto; /* Don't grow or shrink, use content width */
-    max-width: 140px; /* Constrain dropdown width */
-  }
-
-  #cmd-input {
-    font-size: 12px; /* Smaller input font */
-    padding: 8px 12px; /* Consistent padding */
-    flex: 1 1 auto; /* Grow to fill available space, allow shrinking */
-    max-width: calc(100% - 156px); /* Account for dropdown (140px max) + gap (8px) + extra buffer */
-    min-width: 100px; /* Ensure input doesn't shrink too much */
-    box-sizing: border-box; /* Include padding in width */
-  }
-
-
-
-  /* Fix 2: PnL Text Alignment in Trade History */
-  .pnl-card-header {
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap; /* Prevent wrapping */
-    justify-content: flex-start;
-  }
-
-  .pnl-card-icon {
-    width: 24px; /* Smaller icon */
-    height: 24px;
-    margin-right: 8px; /* Reduced margin */
-  }
-
-  .pnl-card-title {
-    font-size: 14px; /* Smaller title */
-    white-space: nowrap; /* Keep on one line */
-  }
-
-  .pnl-card-title .pnl {
-    font-size: 13px; /* Slightly smaller for PnL */
-    margin-left: 4px; /* Tighter spacing */
-  }
-
-  /* Fix 3: Token Truncation in Trade History */
-  table:has(#xrp-values-toggle) {
-    font-size: 10px; /* Smaller table font */
-  }
-
-  table:has(#xrp-values-toggle) th,
-  table:has(#xrp-values-toggle) td {
-    padding: 6px 8px; /* Reduced padding */
-  }
-
-  table:has(#xrp-values-toggle) th:nth-child(1),
-  table:has(#xrp-values-toggle) td:nth-child(1) {
-    width: 30%; /* Wider Token column */
-    max-width: none; /* Remove restrictive max-width */
-    white-space: normal; /* Allow wrapping */
-    overflow: visible; /* Prevent clipping */
-    text-overflow: clip; /* Disable ellipsis */
-  }
-
-  /* Hide Sold and Received columns to reduce content */
-  table:has(#xrp-values-toggle) th:nth-child(5),
-  table:has(#xrp-values-toggle) td:nth-child(5),
-  table:has(#xrp-values-toggle) th:nth-child(6),
-  table:has(#xrp-values-toggle) td:nth-child(6) {
-    display: none; /* Hide to save space */
-  }
-
-  /* Fix 4: PnL Card Overlap */
-  .pnl-card {
-    width: 90%; /* Fit screen width */
-    margin: 8px auto; /* Center with smaller margins */
-    padding: 12px; /* Reduced padding */
-    z-index: 5; /* Above input line */
-    position: relative;
-    transform: translateY(-10px); /* Shift upward */
-    font-size: 12px; /* Smaller font */
-  }
-
-  .pnl-card-token {
-    font-size: 20px; /* Smaller token name */
-    margin: 8px 0; /* Reduced margin */
-  }
-
-  .pnl-card-profit {
-    font-size: 16px; /* Smaller profit/loss text */
-    margin-bottom: 12px; /* Reduced margin */
-  }
-
-  .pnl-card-row {
-    gap: 40px; /* Reduced gap between columns */
-  }
-
-  .pnl-card-label {
-    font-size: 14px; /* Smaller label */
-  }
-
-  .pnl-card-value {
-    font-size: 12px; /* Smaller value */
-    margin-top: 4px; /* Reduced margin */
-  }
-
-  .pnl-transactions {
-    margin-top: 12px; /* Reduced margin */
-    padding-top: 8px; /* Reduced padding */
-  }
-
-  /* General Table Adjustments */
-  table {
-    font-size: 10px; /* Smaller font for all tables */
-    margin: 12px 0; /* Reduced margin */
-  }
-
-  th, td {
-    padding: 6px 8px; /* Reduced padding */
-    min-height: 32px; /* Smaller row height */
-    font-size: 10px; /* Smaller font */
-  }
-
-  /* Adjust XRP Values Only Mode for Trade History */
-  .xrp-values-only th:nth-child(1),
-  .xrp-values-only td:nth-child(1) {
-    width: 30%; /* Wider Token column */
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-  }
-
-  .xrp-values-only th:nth-child(4),
-  .xrp-values-only td:nth-child(4),
-  .xrp-values-only th:nth-child(7),
-  .xrp-values-only td:nth-child(7) {
-    width: 35%; /* Adjust Spent and P/L widths */
-  }
-
-  /* Details Row Adjustments */
-  .details-row td {
-    padding: 12px; /* Reduced padding */
-    min-height: 40px; /* Smaller height */
-  }
-
-  .details-content {
-    padding: 8px; /* Reduced padding */
-  }
-
-  /* Expandable Sections */
-  .expanded {
-    padding: 12px; /* Reduced padding */
-    margin: 8px 0; /* Reduced margin */
-  }
-
-  .expanded .line {
-    margin-bottom: 10px; /* Tighter spacing */
-  }
-
-  /* Links and Expandable Text */
-  a, .expandable {
-    font-size: 12px; /* Smaller font */
-  }
-
-  /* Loading and Error Messages */
-  #loadingLine, .error {
-    font-size: 12px; /* Smaller font */
-    margin: 16px 0; /* Reduced margin */
-  }
-    
-    /* Existing .pnl-card styles (unchanged) */
 .pnl-card {
   background: 
     linear-gradient(
@@ -850,81 +423,464 @@ table tr.details-row {
   box-sizing: border-box;
 }
 
-/* Styles for download (1800x1600) */
-.pnl-card.downloading {
-  width: 1800px !important;
-  height: 1600px !important;
-  max-width: none !important;
-  margin: 0 !important;
-  transform: none !important;
-  padding: 72px !important; /* Increased from 24px (3x) */
-  font-size: 24px !important; /* Increased from 14px (~1.7x) for base text */
-  line-height: 1.6 !important;
-  border-radius: 32px !important; /* Increased from 16px (2x) */
-}
-
-.pnl-card.downloading .pnl-card-header {
-  margin-bottom: 48px !important; /* Increased from 16px (3x) */
+.pnl-card-header {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  margin-bottom: 16px;
 }
 
-.pnl-card.downloading .pnl-card-icon {
-  width: 96px !important; /* Increased from 32px (3x) */
-  height: 96px !important;
-  margin-right: 36px !important; /* Increased from 12px (3x) */
+.pnl-card-icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
 }
 
-.pnl-card.downloading .pnl-card-title {
-  font-size: 54px !important; /* Increased from 18px (3x) */
+.pnl-card-title {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #ffffff;
 }
 
-.pnl-card.downloading .pnl-card-title .pnl {
-  font-size: 51px !important; /* Increased from 17px (3x) */
-  margin-left: 6px !important; /* Increased from 2px (3x) */
+.pnl-card-title .pnl {
+  font-family: 'Nothing You Could Do', cursive;
+  font-size: 17px;
+  color: #FFECB3;
+  margin-left: 2px;
 }
 
-.pnl-card.downloading .pnl-card-token {
-  font-size: 84px !important; /* Increased from 28px (3x) */
-  margin: 36px 0 !important; /* Increased from 12px (3x) */
+.pnl-card-token {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
+  font-size: 28px;
+  color: #ffffff;
+  margin: 12px 0 12px;
 }
 
-.pnl-card.downloading .pnl-card-profit {
-  font-size: 60px !important; /* Increased from 20px (3x) */
-  margin-bottom: 60px !important; /* Increased from 20px (3x) */
+.pnl-card-profit {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  margin-bottom: 20px;
 }
 
-.pnl-card.downloading .pnl-card-content {
-  gap: 24px !important; /* Increased from 16px (1.5x) */
+.pnl-profit-positive {
+  color: #66bb6a;
 }
 
-.pnl-card.downloading .pnl-card-row {
-  gap: 240px !important; /* Increased from 80px (3x) */
+.pnl-profit-negative {
+  color: #ef5350;
+}
+
+.pnl-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pnl-card-row {
+  display: flex;
   justify-content: center;
   align-items: flex-start;
+  gap: 80px;
 }
 
-.pnl-card.downloading .pnl-card-column {
+.pnl-card-column {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.pnl-card.downloading .pnl-card-label {
-  font-size: 48px !important; /* Increased from 16px (3x) */
-  text-decoration-thickness: 3px !important; /* Increased from 1px (3x) */
-  text-underline-offset: 6px !important; /* Increased from 2px (3x) */
+.pnl-card-label {
+  color: #A7BEFF;
+  font-weight: 500;
+  font-size: 16px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 
-.pnl-card.downloading .pnl-card-value {
-  font-size: 42px !important; /* Increased from 14px (3x) */
-  margin-top: 12px !important; /* Increased from 8px (1.5x) */
+.pnl-card-value {
+  color: #e5e5e7;
+  font-size: 14px;
+  margin-top: 8px;
 }
 
-/* Override mobile styles to prevent interference */
+.pnl-transactions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #2a2a30;
+  text-align: left;
+}
+
+.pnl-transactions .line {
+  margin-bottom: 12px;
+}
+
+.download-btn {
+  background: rgba(44, 44, 50, 0.95);
+  color: #e5e5e7;
+  font-size: 14px;
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: 1px solid #4a4a52;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  margin: 16px auto 0;
+}
+
+.download-btn:hover {
+  background: #3a3a42;
+  transform: translateY(-1px);
+}
+
+.download-btn img {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.download-btn:active {
+  transform: translateY(0);
+}
+
+table tr.token-row.token-row-even {
+  background-color: rgba(40, 40, 48, 0.98);
+}
+
+table tr.token-row.token-row-odd {
+  background-color: rgba(42, 42, 50, 0.98);
+}
+
+table tr:first-child,
+table tr.details-row {
+  background-color: rgba(36, 36, 45, 0.98);
+}
+
 @media screen and (max-width: 768px) {
-  .pnl-card.downloading {
+  body {
+    padding: 16px;
+    font-size: 12px;
+  }
+
+  .header-container {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .header-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+    margin-left: 8px;
+  }
+
+  .header-text {
+    font-size: 16px;
+  }
+
+  .header-text .metanynja {
+    font-size: 16px;
+    margin-left: 6px;
+  }
+
+  #console {
+    padding: 8px 12px;
+    border-radius: 12px;
+  }
+
+  #output {
+    padding: 12px;
+  }
+
+  .main-header {
+    font-size: 20px;
+    margin: 16px 0;
+  }
+
+  .header {
+    font-size: 14px;
+    margin: 16px 0 8px;
+    padding-top: 12px;
+  }
+
+  .line {
+    margin-bottom: 8px;
+  }
+
+  .separator {
+    margin: 12px 0;
+  }
+
+  .dropdown-toggle {
+    max-width: 140px;
+    font-size: 12px;
+    padding: 8px 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dropdown-menu {
+    width: 180px;
+    font-size: 12px;
+    bottom: calc(100% + 8px);
+  }
+
+  .dropdown-option {
+    padding: 8px 12px;
+  }
+
+  #input-line {
+    padding: 8px 12px;
+    z-index: 3;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .custom-dropdown {
+    flex: 0 0 auto;
+    max-width: 140px;
+  }
+
+  #cmd-input {
+    font-size: 12px;
+    padding: 8px 12px;
+    flex: 1 1 auto;
+    max-width: calc(100% - 156px);
+    min-width: 100px;
+    box-sizing: border-box;
+  }
+
+  .pnl-card-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+
+  .pnl-card-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+
+  .pnl-card-title {
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .pnl-card-title .pnl {
+    font-size: 13px;
+    margin-left: 4px;
+  }
+
+  table:has(#xrp-values-toggle) {
+    font-size: 10px;
+  }
+
+  table:has(#xrp-values-toggle) th,
+  table:has(#xrp-values-toggle) td {
+    padding: 6px 8px;
+  }
+
+  table:has(#xrp-values-toggle) th:nth-child(1),
+  table:has(#xrp-values-toggle) td:nth-child(1) {
+    width: 30%;
+    max-width: none;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  table:has(#xrp-values-toggle) th:nth-child(5),
+  table:has(#xrp-values-toggle) td:nth-child(5),
+  table:has(#xrp-values-toggle) th:nth-child(6),
+  table:has(#xrp-values-toggle) td:nth-child(6) {
+    display: none;
+  }
+
+  .pnl-card {
+    width: 90%;
+    margin: 8px auto;
+    padding: 12px;
+    z-index: 5;
+    position: relative;
+    transform: translateY(-10px);
+    font-size: 12px;
+  }
+
+  .pnl-card-token {
+    font-size: 20px;
+    margin: 8px 0;
+  }
+
+  .pnl-card-profit {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .pnl-card-row {
+    gap: 40px;
+  }
+
+  .pnl-card-label {
+    font-size: 14px;
+  }
+
+  .pnl-card-value {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .pnl-transactions {
+    margin-top: 12px;
+    padding-top: 8px;
+  }
+
+  table {
+    font-size: 10px;
+    margin: 12px 0;
+  }
+
+  th, td {
+    padding: 6px 8px;
+    min-height: 32px;
+    font-size: 10px;
+  }
+
+  .xrp-values-only th:nth-child(1),
+  .xrp-values-only td:nth-child(1) {
+    width: 30%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .xrp-values-only th:nth-child(4),
+  .xrp-values-only td:nth-child(4),
+  .xrp-values-only th:nth-child(7),
+  .xrp-values-only td:nth-child(7) {
+    width: 35%;
+  }
+
+  .details-row td {
+    padding: 12px;
+    min-height: 40px;
+  }
+
+  .details-content {
+    padding: 8px;
+  }
+
+  .expanded {
+    padding: 12px;
+    margin: 8px 0;
+  }
+
+  .expanded .line {
+    margin-bottom: 10px;
+  }
+
+  a, .expandable {
+    font-size: 12px;
+  }
+
+  #loadingLine, .error {
+    font-size: 12px;
+    margin: 16px 0;
+  }
+}
+
+/* New CSS for .pnl-card.downloading */
+#output .pnl-card.downloading {
+  width: 1800px !important;
+  height: 1600px !important;
+  max-width: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  padding: 72px !important;
+  font-size: 24px !important;
+  line-height: 1.6 !important;
+  border-radius: 32px !important;
+  position: absolute !important;
+  z-index: 9999 !important;
+  box-sizing: border-box !important;
+}
+
+#output .pnl-card.downloading .pnl-card-header {
+  margin-bottom: 48px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+#output .pnl-card.downloading .pnl-card-icon {
+  width: 96px !important;
+  height: 96px !important;
+  margin-right: 36px !important;
+}
+
+#output .pnl-card.downloading .pnl-card-title {
+  font-size: 54px !important;
+}
+
+#output .pnl-card.downloading .pnl-card-title .pnl {
+  font-size: 51px !important;
+  margin-left: 6px !important;
+}
+
+#output .pnl-card.downloading .pnl-card-token {
+  font-size: 84px !important;
+  margin: 36px 0 !important;
+  word-break: break-word !important;
+  max-width: 80% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+#output .pnl-card.downloading .pnl-card-profit {
+  font-size: 60px !important;
+  margin-bottom: 60px !important;
+}
+
+#output .pnl-card.downloading .pnl-card-content {
+  gap: 24px !important;
+}
+
+#output .pnl-card.downloading .pnl-card-row {
+  gap: 240px !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+}
+
+#output .pnl-card.downloading .pnl-card-column {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+#output .pnl-card.downloading .pnl-card-label {
+  font-size: 48px !important;
+  text-decoration-thickness: 3px !important;
+  text-underline-offset: 6px !important;
+}
+
+#output .pnl-card.downloading .pnl-card-value {
+  font-size: 42px !important;
+  margin-top: 12px !important;
+}
+
+@media screen and (max-width: 768px) {
+  #output .pnl-card.downloading {
     width: 1800px !important;
     height: 1600px !important;
     max-width: none !important;
@@ -933,35 +889,41 @@ table tr.details-row {
     padding: 72px !important;
     font-size: 24px !important;
     border-radius: 32px !important;
+    position: absolute !important;
+    z-index: 9999 !important;
   }
 
-  .pnl-card.downloading .pnl-card-icon {
+  #output .pnl-card.downloading .pnl-card-icon {
     width: 96px !important;
     height: 96px !important;
     margin-right: 36px !important;
   }
 
-  .pnl-card.downloading .pnl-card-title {
+  #output .pnl-card.downloading .pnl-card-title {
     font-size: 54px !important;
   }
 
-  .pnl-card.downloading .pnl-card-title .pnl {
+  #output .pnl-card.downloading .pnl-card-title .pnl {
     font-size: 51px !important;
   }
 
-  .pnl-card.downloading .pnl-card-token {
+  #output .pnl-card.downloading .pnl-card-token {
     font-size: 84px !important;
+    word-break: break-word !important;
+    max-width: 80% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 
-  .pnl-card.downloading .pnl-card-profit {
+  #output .pnl-card.downloading .pnl-card-profit {
     font-size: 60px !important;
   }
 
-  .pnl-card.downloading .pnl-card-label {
+  #output .pnl-card.downloading .pnl-card-label {
     font-size: 48px !important;
   }
 
-  .pnl-card.downloading .pnl-card-value {
+  #output .pnl-card.downloading .pnl-card-value {
     font-size: 42px !important;
   }
 }
@@ -2246,6 +2208,7 @@ table tr.details-row {
   const cardElement = document.getElementById(cardId);
   if (!cardElement) {
     console.error(`PnL card with ID ${cardId} not found`);
+    alert('PnL card not found. Please try again.');
     return;
   }
 
@@ -2258,7 +2221,10 @@ table tr.details-row {
     transform: cardElement.style.transform,
     fontSize: cardElement.style.fontSize,
     padding: cardElement.style.padding,
-    borderRadius: cardElement.style.borderRadius
+    borderRadius: cardElement.style.borderRadius,
+    position: cardElement.style.position,
+    zIndex: cardElement.style.zIndex,
+    boxSizing: cardElement.style.boxSizing
   };
 
   // Temporarily show all expandable content except transactions and download button
@@ -2280,67 +2246,58 @@ table tr.details-row {
   // Set fixed dimensions and apply downloading class
   const desiredWidth = 1800; // Desired width in pixels
   const desiredHeight = 1600; // Desired height in pixels
-  cardElement.classList.add('downloading');
   cardElement.style.width = `${desiredWidth}px`;
   cardElement.style.height = `${desiredHeight}px`;
   cardElement.style.maxWidth = 'none';
   cardElement.style.margin = '0';
   cardElement.style.transform = 'none';
+  cardElement.style.position = 'absolute'; // Ensure it’s not affected by parent layout
+  cardElement.style.zIndex = '9999'; // Bring to front
+  cardElement.style.boxSizing = 'border-box';
+  cardElement.classList.add('downloading');
 
-  // Capture the card with html2canvas
-  html2canvas(cardElement, {
-    backgroundColor: null, // Preserve transparent background
-    width: desiredWidth, // Set canvas width
-    height: desiredHeight, // Set canvas height
-    scale: 2, // Double rendering resolution for sharpness
-    useCORS: true // Enable CORS for external images
-  }).then(canvas => {
-    // Restore original styles
-    cardElement.classList.remove('downloading');
-    cardElement.style.width = originalStyle.width;
-    cardElement.style.height = originalStyle.height;
-    cardElement.style.maxWidth = originalStyle.maxWidth;
-    cardElement.style.margin = originalStyle.margin;
-    cardElement.style.transform = originalStyle.transform;
-    cardElement.style.fontSize = originalStyle.fontSize;
-    cardElement.style.padding = originalStyle.padding;
-    cardElement.style.borderRadius = originalStyle.borderRadius;
+  // Force reflow to ensure styles are applied
+  cardElement.offsetHeight; // Trigger reflow
 
-    // Restore expandable sections, transactions, and download button
-    expandableSections.forEach(section => {
-      section.classList.add('hidden');
+  // Add a small delay to ensure styles are rendered
+  setTimeout(() => {
+    html2canvas(cardElement, {
+      backgroundColor: null, // Preserve transparent background
+      width: desiredWidth, // Set canvas width
+      height: desiredHeight, // Set canvas height
+      scale: 2, // Double rendering resolution for sharpness
+      useCORS: true, // Enable CORS for external images
+      logging: true // Enable logging for debugging
+    }).then(canvas => {
+      // Restore original styles
+      cardElement.classList.remove('downloading');
+      Object.assign(cardElement.style, originalStyle);
+
+      // Restore expandable sections, transactions, and download button
+      expandableSections.forEach(section => {
+        section.classList.add('hidden');
+      });
+      if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
+      if (downloadButton) downloadButton.style.display = originalButtonDisplay;
+
+      // Create download link
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = `PnL_Card_${tokenName.replace(/\s+/g, '_')}.png`;
+      link.click();
+    }).catch(error => {
+      console.error('Error generating PnL card image:', error);
+      // Restore original styles on error
+      cardElement.classList.remove('downloading');
+      Object.assign(cardElement.style, originalStyle);
+      expandableSections.forEach(section => {
+        section.classList.add('hidden');
+      });
+      if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
+      if (downloadButton) downloadButton.style.display = originalButtonDisplay;
+      alert('Failed to download PnL card. Please check the console for errors and try again.');
     });
-    if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
-    if (downloadButton) downloadButton.style.display = originalButtonDisplay;
-
-    // Create download link
-    const link = document.createElement('a');
-    link.href = canvas.toDataURL('image/png');
-    link.download = `PnL_Card_${tokenName.replace(/\s+/g, '_')}.png`;
-    link.click();
-  }).catch(error => {
-    console.error('Error generating PnL card image:', error);
-
-    // Restore original styles on error
-    cardElement.classList.remove('downloading');
-    cardElement.style.width = originalStyle.width;
-    cardElement.style.height = originalStyle.height;
-    cardElement.style.maxWidth = originalStyle.maxWidth;
-    cardElement.style.margin = originalStyle.margin;
-    cardElement.style.transform = originalStyle.transform;
-    cardElement.style.fontSize = originalStyle.fontSize;
-    cardElement.style.padding = originalStyle.padding;
-    cardElement.style.borderRadius = originalStyle.borderRadius;
-
-    // Restore expandable sections, transactions, and download button
-    expandableSections.forEach(section => {
-      section.classList.add('hidden');
-    });
-    if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
-    if (downloadButton) downloadButton.style.display = originalButtonDisplay;
-
-    alert('Failed to download PnL card. Please try again.');
-  });
+  }, 100); // 100ms delay to ensure styles are applied
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
