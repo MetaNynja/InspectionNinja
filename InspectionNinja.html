@@ -807,7 +807,7 @@ table tr.details-row {
   max-width: none !important;
   margin: 0 !important;
   transform: none !important;
-  padding: 48px 96px !important;
+  padding: 48px 96px !important; /* Kept top padding at 48px to fix header, sides at 96px */
   font-size: 28px !important;
   line-height: 1.6 !important;
   border-radius: 32px !important;
@@ -825,12 +825,12 @@ table tr.details-row {
       rgba(255, 255, 255, 0.05) 75%,
       rgba(255, 255, 255, 0.05) 100%
     ) !important;
-  background-size: 20px 20px !important; /* Increased from 10px to make stripes bigger */
+  background-size: 20px 20px !important;
   background-color: rgba(34, 34, 40, 0.98) !important;
 }
 
 #output .pnl-card.downloading .pnl-card-header {
-  margin-bottom: 120px !important;
+  margin-bottom: 160px !important; /* Increased from 120px to shift content below downward */
   margin-top: 0 !important;
   display: flex !important;
   align-items: center !important;
@@ -853,18 +853,18 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-token {
-  font-size: 180px !important;
-  margin: 80px 0 !important; /* Reduced from 120px to move closer to percentage */
+  font-size: 220px !important; /* Increased from 180px to make much bigger */
+  margin: 100px 0 !important; /* Increased from 80px to shift downward */
   word-break: break-word !important;
-  max-width: 80% !important;
+  max-width: 75% !important; /* Reduced from 80% to prevent overflow with larger font */
   margin-left: auto !important;
   margin-right: auto !important;
-  line-height: 1.2 !important;
+  line-height: 1.1 !important; /* Tightened from 1.2 to manage vertical space */
 }
 
 #output .pnl-card.downloading .pnl-card-profit {
   font-size: 108px !important;
-  margin-bottom: 140px !important;
+  margin-bottom: 160px !important; /* Increased from 140px to shift downward */
 }
 
 #output .pnl-card.downloading .pnl-card-content {
@@ -937,12 +937,12 @@ table tr.details-row {
   }
 
   #output .pnl-card.downloading .pnl-card-token {
-    font-size: 180px !important;
+    font-size: 220px !important;
     word-break: break-word !important;
-    max-width: 80% !important;
+    max-width: 75% !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    line-height: 1.2 !important;
+    line-height: 1.1 !important;
   }
 
   #output .pnl-card.downloading .pnl-card-profit {
