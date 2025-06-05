@@ -807,7 +807,7 @@ table tr.details-row {
   max-width: none !important;
   margin: 0 !important;
   transform: none !important;
-  padding: 48px 96px !important; /* Kept top padding at 48px to fix header, sides at 96px */
+  padding: 48px 96px !important;
   font-size: 28px !important;
   line-height: 1.6 !important;
   border-radius: 32px !important;
@@ -830,8 +830,8 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-header {
-  margin-bottom: 120px !important; /* Increased from 80px to shift content below downward */
-  margin-top: 0 !important; /* Keep header near top */
+  margin-bottom: 120px !important;
+  margin-top: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: flex-start !important;
@@ -844,26 +844,27 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-title {
-  font-size: 80px !important; /* Increased from 72px for slightly larger title */
+  font-size: 80px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-title .pnl {
-  font-size: 76px !important; /* Increased from 68px */
+  font-size: 76px !important;
   margin-left: 8px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-token {
-  font-size: 132px !important; /* Increased from 120px for larger token name */
-  margin: 140px 0 !important; /* Increased from 100px to shift downward */
+  font-size: 180px !important; /* Increased from 132px to make much bigger */
+  margin: 120px 0 !important; /* Reduced from 140px to balance with larger size */
   word-break: break-word !important;
-  max-width: 85% !important;
+  max-width: 80% !important; /* Reduced from 85% to prevent overflow */
   margin-left: auto !important;
   margin-right: auto !important;
+  line-height: 1.2 !important; /* Adjusted to prevent excessive vertical spacing */
 }
 
 #output .pnl-card.downloading .pnl-card-profit {
-  font-size: 108px !important; /* Increased from 96px for larger percentage */
-  margin-bottom: 140px !important; /* Increased from 100px to shift downward */
+  font-size: 108px !important;
+  margin-bottom: 140px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-content {
@@ -883,14 +884,14 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-label {
-  font-size: 88px !important; /* Increased from 80px for Bought/Profit titles */
+  font-size: 88px !important;
   text-decoration: underline !important;
   text-decoration-thickness: 5px !important;
   text-underline-offset: 10px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-value {
-  font-size: 80px !important; /* Increased from 72px for values */
+  font-size: 80px !important;
   margin-top: 24px !important;
 }
 
@@ -936,11 +937,12 @@ table tr.details-row {
   }
 
   #output .pnl-card.downloading .pnl-card-token {
-    font-size: 132px !important;
+    font-size: 180px !important;
     word-break: break-word !important;
-    max-width: 85% !important;
+    max-width: 80% !important;
     margin-left: auto !important;
     margin-right: auto !important;
+    line-height: 1.2 !important;
   }
 
   #output .pnl-card.downloading .pnl-card-profit {
