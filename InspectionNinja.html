@@ -2289,29 +2289,42 @@ table tr.details-row {
   cardElement.classList.add('downloading');
 
   // Dynamically adjust font size to fit within max-width (75% of 1800px = 1350px)
-  const maxWidth = desiredWidth * 0.75; // 1350px
+  const maxWidth = desiredWidth * 0.75 * 0.95; // 1350px * 0.95 for safety margin
   const baseFontSize = 220; // Default font size in pixels
   const minFontSize = 100; // Minimum font size in pixels
   let fontSize = baseFontSize;
 
-  // Create a temporary canvas to measure text width
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  context.font = `${baseFontSize}px 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif`;
+  // Temporarily set white-space and max-width to measure text width
+  const originalWhiteSpace = tokenElement.style.whiteSpace;
+  const originalMaxWidth = tokenElement.style.maxWidth;
+  tokenElement.style.whiteSpace = 'nowrap';
+  tokenElement.style.maxWidth = 'none'; // Remove max-width temporarily for measurement
 
-  // Measure the text width
-  const textMetrics = context.measureText(tokenName);
-  let textWidth = textMetrics.width;
-
-  // Scale down font size if text width exceeds maxWidth
-  if (textWidth > maxWidth) {
-    const scaleFactor = maxWidth / textWidth;
-    fontSize = Math.max(Math.floor(baseFontSize * scaleFactor), minFontSize);
+  // Function to get the actual rendered width of the token element
+  const getTextWidth = () => {
     tokenElement.style.fontSize = `${fontSize}px`;
-    console.log(`Scaled font size for "${tokenName}" from ${baseFontSize}px to ${fontSize}px (text width: ${textWidth}px, max width: ${maxWidth}px)`);
-  } else {
-    console.log(`No scaling needed for "${tokenName}" (text width: ${textWidth}px, max width: ${maxWidth}px)`);
+    // Force reflow to ensure the new font size is applied
+    tokenElement.offsetHeight;
+    const width = tokenElement.getBoundingClientRect().width;
+    return width;
+  };
+
+  // Measure text width and adjust font size
+  let textWidth = getTextWidth();
+  let iteration = 0;
+  const maxIterations = 20; // Prevent infinite loops
+  while (textWidth > maxWidth && fontSize > minFontSize && iteration < maxIterations) {
+    const scaleFactor = maxWidth / textWidth;
+    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.98), minFontSize); // Extra 2% reduction for safety
+    textWidth = getTextWidth();
+    iteration++;
   }
+
+  console.log(`Final font size for "${tokenName}": ${fontSize}px, text width: ${textWidth}px, max width: ${maxWidth}px, iterations: ${iteration}`);
+
+  // Restore max-width for rendering
+  tokenElement.style.maxWidth = originalMaxWidth || '';
+  tokenElement.style.whiteSpace = originalWhiteSpace || '';
 
   // Force reflow to ensure styles are applied
   cardElement.offsetHeight;
@@ -2330,6 +2343,8 @@ table tr.details-row {
       cardElement.classList.remove('downloading');
       Object.assign(cardElement.style, originalStyle);
       tokenElement.style.fontSize = originalTokenFontSize || '';
+      tokenElement.style.whiteSpace = originalWhiteSpace || '';
+      tokenElement.style.maxWidth = originalMaxWidth || '';
 
       // Restore expandable sections, transactions, and download button
       expandableSections.forEach(section => {
@@ -2349,6 +2364,8 @@ table tr.details-row {
       cardElement.classList.remove('downloading');
       Object.assign(cardElement.style, originalStyle);
       tokenElement.style.fontSize = originalTokenFontSize || '';
+      tokenElement.style.whiteSpace = originalWhiteSpace || '';
+      tokenElement.style.maxWidth = originalMaxWidth || '';
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
