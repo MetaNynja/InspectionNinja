@@ -934,13 +934,14 @@ table tr.details-row {
   }
 
   #output .pnl-card.downloading .pnl-card-token {
-    font-size: 220px !important;
-    word-break: break-word !important;
-    max-width: 75% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    line-height: 1.1 !important;
-  }
+  font-size: 220px !important;
+  margin: 140px 0 60px 0 !important;
+  white-space: nowrap !important; /* Prevent text wrapping */
+  max-width: 75% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  line-height: 1.1 !important;
+}
 
   #output .pnl-card.downloading .pnl-card-profit {
     font-size: 128px !important;
@@ -2254,6 +2255,10 @@ table tr.details-row {
     boxSizing: cardElement.style.boxSizing
   };
 
+  // Store original token font size
+  const tokenElement = cardElement.querySelector('.pnl-card-token');
+  const originalTokenFontSize = tokenElement.style.fontSize;
+
   // Temporarily show all expandable content except transactions and download button
   const expandableSections = cardElement.querySelectorAll('.hidden:not(.pnl-transactions .hidden)');
   const transactionsSection = cardElement.querySelector('.pnl-transactions');
@@ -2278,27 +2283,39 @@ table tr.details-row {
   cardElement.style.maxWidth = 'none';
   cardElement.style.margin = '0';
   cardElement.style.transform = 'none';
-  cardElement.style.position = 'absolute'; // Ensure it’s not affected by parent layout
-  cardElement.style.zIndex = '9999'; // Bring to front
+  cardElement.style.position = 'absolute';
+  cardElement.style.zIndex = '9999';
   cardElement.style.boxSizing = 'border-box';
   cardElement.classList.add('downloading');
 
+  // Dynamically adjust font size based on token name length
+  const baseFontSize = 220; // Default font size in pixels
+  const maxLengthBeforeScaling = 9; // Length threshold to start scaling
+  let fontSize = baseFontSize;
+  if (tokenName.length > maxLengthBeforeScaling) {
+    // Reduce font size proportionally for longer names
+    const scaleFactor = maxLengthBeforeScaling / tokenName.length;
+    fontSize = Math.max(baseFontSize * scaleFactor, 100); // Minimum font size of 100px
+    tokenElement.style.fontSize = `${fontSize}px`;
+  }
+
   // Force reflow to ensure styles are applied
-  cardElement.offsetHeight; // Trigger reflow
+  cardElement.offsetHeight;
 
   // Add a small delay to ensure styles are rendered
   setTimeout(() => {
     html2canvas(cardElement, {
-      backgroundColor: null, // Preserve transparent background
-      width: desiredWidth, // Set canvas width
-      height: desiredHeight, // Set canvas height
-      scale: 2, // Double rendering resolution for sharpness
-      useCORS: true, // Enable CORS for external images
-      logging: true // Enable logging for debugging
+      backgroundColor: null,
+      width: desiredWidth,
+      height: desiredHeight,
+      scale: 2,
+      useCORS: true,
+      logging: true
     }).then(canvas => {
       // Restore original styles
       cardElement.classList.remove('downloading');
       Object.assign(cardElement.style, originalStyle);
+      tokenElement.style.fontSize = originalTokenFontSize || '';
 
       // Restore expandable sections, transactions, and download button
       expandableSections.forEach(section => {
@@ -2317,6 +2334,7 @@ table tr.details-row {
       // Restore original styles on error
       cardElement.classList.remove('downloading');
       Object.assign(cardElement.style, originalStyle);
+      tokenElement.style.fontSize = originalTokenFontSize || '';
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
@@ -2324,7 +2342,7 @@ table tr.details-row {
       if (downloadButton) downloadButton.style.display = originalButtonDisplay;
       alert('Failed to download PnL card. Please check the console for errors and try again.');
     });
-  }, 100); // 100ms delay to ensure styles are applied
+  }, 100);
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
