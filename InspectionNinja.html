@@ -937,10 +937,12 @@ table tr.details-row {
   font-size: 220px !important;
   margin: 140px 0 60px 0 !important;
   white-space: nowrap !important; /* Prevent text wrapping */
-  max-width: 75% !important;
+  max-width: 75% !important; /* 1350px for 1800px card */
   margin-left: auto !important;
   margin-right: auto !important;
   line-height: 1.1 !important;
+  overflow: hidden !important; /* Prevent overflow */
+  text-overflow: clip !important; /* Ensure no ellipsis or wrapping */
 }
 
   #output .pnl-card.downloading .pnl-card-profit {
@@ -2255,9 +2257,15 @@ table tr.details-row {
     boxSizing: cardElement.style.boxSizing
   };
 
-  // Store original token font size
+  // Store original token styles
   const tokenElement = cardElement.querySelector('.pnl-card-token');
-  const originalTokenFontSize = tokenElement.style.fontSize;
+  const originalTokenStyle = {
+    fontSize: tokenElement.style.fontSize,
+    whiteSpace: tokenElement.style.whiteSpace,
+    maxWidth: tokenElement.style.maxWidth,
+    overflow: tokenElement.style.overflow,
+    textOverflow: tokenElement.style.textOverflow
+  };
 
   // Temporarily show all expandable content except transactions and download button
   const expandableSections = cardElement.querySelectorAll('.hidden:not(.pnl-transactions .hidden)');
@@ -2289,16 +2297,16 @@ table tr.details-row {
   cardElement.classList.add('downloading');
 
   // Dynamically adjust font size to fit within max-width (75% of 1800px = 1350px)
-  const maxWidth = desiredWidth * 0.75 * 0.95; // 1350px * 0.95 for safety margin
+  const maxWidth = desiredWidth * 0.75 * 0.90; // 1350px * 0.90 = 1215px for safety
   const baseFontSize = 220; // Default font size in pixels
   const minFontSize = 100; // Minimum font size in pixels
   let fontSize = baseFontSize;
 
-  // Temporarily set white-space and max-width to measure text width
-  const originalWhiteSpace = tokenElement.style.whiteSpace;
-  const originalMaxWidth = tokenElement.style.maxWidth;
+  // Temporarily set styles for measurement
   tokenElement.style.whiteSpace = 'nowrap';
-  tokenElement.style.maxWidth = 'none'; // Remove max-width temporarily for measurement
+  tokenElement.style.maxWidth = 'none'; // Remove max-width for accurate measurement
+  tokenElement.style.overflow = 'visible'; // Ensure full width is measured
+  tokenElement.style.textOverflow = 'clip';
 
   // Function to get the actual rendered width of the token element
   const getTextWidth = () => {
@@ -2315,21 +2323,29 @@ table tr.details-row {
   const maxIterations = 20; // Prevent infinite loops
   while (textWidth > maxWidth && fontSize > minFontSize && iteration < maxIterations) {
     const scaleFactor = maxWidth / textWidth;
-    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.98), minFontSize); // Extra 2% reduction for safety
+    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.95), minFontSize); // Extra 5% reduction
     textWidth = getTextWidth();
     iteration++;
   }
 
+  // Final verification: reduce font size slightly more if close to maxWidth
+  if (textWidth > maxWidth * 0.95) {
+    fontSize = Math.max(Math.floor(fontSize * 0.95), minFontSize);
+    tokenElement.style.fontSize = `${fontSize}px`;
+    textWidth = getTextWidth();
+  }
+
   console.log(`Final font size for "${tokenName}": ${fontSize}px, text width: ${textWidth}px, max width: ${maxWidth}px, iterations: ${iteration}`);
 
-  // Restore max-width for rendering
-  tokenElement.style.maxWidth = originalMaxWidth || '';
-  tokenElement.style.whiteSpace = originalWhiteSpace || '';
+  // Restore max-width and other styles for rendering
+  tokenElement.style.maxWidth = '75%';
+  tokenElement.style.overflow = 'hidden';
+  tokenElement.style.textOverflow = 'clip';
 
   // Force reflow to ensure styles are applied
   cardElement.offsetHeight;
 
-  // Add a small delay to ensure styles are rendered
+  // Add a delay to ensure styles are rendered
   setTimeout(() => {
     html2canvas(cardElement, {
       backgroundColor: null,
@@ -2342,9 +2358,7 @@ table tr.details-row {
       // Restore original styles
       cardElement.classList.remove('downloading');
       Object.assign(cardElement.style, originalStyle);
-      tokenElement.style.fontSize = originalTokenFontSize || '';
-      tokenElement.style.whiteSpace = originalWhiteSpace || '';
-      tokenElement.style.maxWidth = originalMaxWidth || '';
+      Object.assign(tokenElement.style, originalTokenStyle);
 
       // Restore expandable sections, transactions, and download button
       expandableSections.forEach(section => {
@@ -2363,9 +2377,7 @@ table tr.details-row {
       // Restore original styles on error
       cardElement.classList.remove('downloading');
       Object.assign(cardElement.style, originalStyle);
-      tokenElement.style.fontSize = originalTokenFontSize || '';
-      tokenElement.style.whiteSpace = originalWhiteSpace || '';
-      tokenElement.style.maxWidth = originalMaxWidth || '';
+      Object.assign(tokenElement.style, originalTokenStyle);
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
@@ -2373,7 +2385,7 @@ table tr.details-row {
       if (downloadButton) downloadButton.style.display = originalButtonDisplay;
       alert('Failed to download PnL card. Please check the console for errors and try again.');
     });
-  }, 100);
+  }, 200); // Increased delay to ensure rendering
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
