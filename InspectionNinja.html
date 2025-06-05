@@ -935,12 +935,13 @@ table tr.details-row {
 
   #output .pnl-card.downloading .pnl-card-token {
   font-size: 220px !important;
-  margin: 140px 0 60px 0 !important;
+  margin: 140px 0 60px 0 !important; /* Vertical margins only */
   white-space: nowrap !important; /* Prevent text wrapping */
   max-width: 75% !important; /* 1350px for 1800px card */
-  margin-left: auto !important;
-  margin-right: auto !important;
-  line-height: 1.1 !important;
+  width: 100% !important; /* Ensure it spans the max-width */
+  text-align: center !important; /* Center text horizontally */
+  left: 0 !important; /* Reset any positioning */
+  right: 0 !important;
 }
 
   #output .pnl-card.downloading .pnl-card-profit {
@@ -2260,7 +2261,12 @@ table tr.details-row {
   const originalTokenStyle = {
     fontSize: tokenElement.style.fontSize,
     whiteSpace: tokenElement.style.whiteSpace,
-    maxWidth: tokenElement.style.maxWidth
+    maxWidth: tokenElement.style.maxWidth,
+    width: tokenElement.style.width,
+    textAlign: tokenElement.style.textAlign,
+    margin: tokenElement.style.margin,
+    left: tokenElement.style.left,
+    right: tokenElement.style.right
   };
 
   // Temporarily show all expandable content except transactions and download button
@@ -2301,18 +2307,24 @@ table tr.details-row {
   // Temporarily set styles for measurement
   tokenElement.style.whiteSpace = 'nowrap';
   tokenElement.style.maxWidth = 'none'; // Remove max-width for accurate measurement
+  tokenElement.style.width = 'auto'; // Allow natural width for measurement
+  tokenElement.style.textAlign = 'center';
 
-  // Function to get the actual rendered width of the token element
-  const getTextWidth = () => {
+  // Function to get the actual rendered width and position of the token element
+  const getTextMetrics = () => {
     tokenElement.style.fontSize = `${fontSize}px`;
     // Force reflow to ensure the new font size is applied
     tokenElement.offsetHeight;
-    const width = tokenElement.getBoundingClientRect().width;
-    return width;
+    const rect = tokenElement.getBoundingClientRect();
+    const parentRect = cardElement.getBoundingClientRect();
+    const width = rect.width;
+    const leftOffset = rect.left - parentRect.left;
+    const rightOffset = parentRect.right - rect.right;
+    return { width, leftOffset, rightOffset };
   };
 
   // Measure text width and adjust font size
-  let textWidth = getTextWidth();
+  let { width: textWidth, leftOffset, rightOffset } = getTextMetrics();
   let iteration = 0;
   const maxIterations = 20; // Prevent infinite loops
   const capitalLetterCount = (tokenName.match(/[A-Z]/g) || []).length;
@@ -2320,7 +2332,7 @@ table tr.details-row {
   while (textWidth * capitalWidthFactor > maxWidth && fontSize > minFontSize && iteration < maxIterations) {
     const scaleFactor = maxWidth / (textWidth * capitalWidthFactor);
     fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.90), minFontSize); // Extra 10% reduction
-    textWidth = getTextWidth();
+    ({ width: textWidth, leftOffset, rightOffset } = getTextMetrics());
     iteration++;
   }
 
@@ -2328,13 +2340,27 @@ table tr.details-row {
   if (textWidth * capitalWidthFactor > maxWidth * 0.95) {
     fontSize = Math.max(Math.floor(fontSize * 0.90), minFontSize);
     tokenElement.style.fontSize = `${fontSize}px`;
-    textWidth = getTextWidth();
+    ({ width: textWidth, leftOffset, rightOffset } = getTextMetrics());
   }
 
-  console.log(`Final font size for "${tokenName}": ${fontSize}px, text width: ${textWidth}px, adjusted width (with capital factor ${capitalWidthFactor.toFixed(2)}): ${(textWidth * capitalWidthFactor).toFixed(2)}px, max width: ${maxWidth}px, iterations: ${iteration}, capital letters: ${capitalLetterCount}`);
+  // Verify centering: adjust if left and right offsets differ significantly
+  const offsetDiff = Math.abs(leftOffset - rightOffset);
+  if (offsetDiff > 10) { // Allow small tolerance
+    console.warn(`Centering adjustment needed for "${tokenName}": leftOffset=${leftOffset}px, rightOffset=${rightOffset}px`);
+    tokenElement.style.position = 'relative';
+    tokenElement.style.left = `${(rightOffset - leftOffset) / 2}px`; // Shift to balance offsets
+    ({ leftOffset, rightOffset } = getTextMetrics());
+  }
 
-  // Restore max-width for rendering
+  console.log(`Final metrics for "${tokenName}": fontSize=${fontSize}px, textWidth=${textWidth}px, adjustedWidth=${(textWidth * capitalWidthFactor).toFixed(2)}px, maxWidth=${maxWidth}px, iterations=${iteration}, capitalLetters=${capitalLetterCount}, leftOffset=${leftOffset.toFixed(2)}px, rightOffset=${rightOffset.toFixed(2)}px`);
+
+  // Restore styles for rendering
   tokenElement.style.maxWidth = '75%';
+  tokenElement.style.width = '100%';
+  tokenElement.style.textAlign = 'center';
+  tokenElement.style.position = '';
+  tokenElement.style.left = '';
+  tokenElement.style.right = '';
 
   // Force reflow to ensure styles are applied
   cardElement.offsetHeight;
