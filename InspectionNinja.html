@@ -2288,15 +2288,29 @@ table tr.details-row {
   cardElement.style.boxSizing = 'border-box';
   cardElement.classList.add('downloading');
 
-  // Dynamically adjust font size based on token name length
+  // Dynamically adjust font size to fit within max-width (75% of 1800px = 1350px)
+  const maxWidth = desiredWidth * 0.75; // 1350px
   const baseFontSize = 220; // Default font size in pixels
-  const maxLengthBeforeScaling = 9; // Length threshold to start scaling
+  const minFontSize = 100; // Minimum font size in pixels
   let fontSize = baseFontSize;
-  if (tokenName.length > maxLengthBeforeScaling) {
-    // Reduce font size proportionally for longer names
-    const scaleFactor = maxLengthBeforeScaling / tokenName.length;
-    fontSize = Math.max(baseFontSize * scaleFactor, 100); // Minimum font size of 100px
+
+  // Create a temporary canvas to measure text width
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  context.font = `${baseFontSize}px 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif`;
+
+  // Measure the text width
+  const textMetrics = context.measureText(tokenName);
+  let textWidth = textMetrics.width;
+
+  // Scale down font size if text width exceeds maxWidth
+  if (textWidth > maxWidth) {
+    const scaleFactor = maxWidth / textWidth;
+    fontSize = Math.max(Math.floor(baseFontSize * scaleFactor), minFontSize);
     tokenElement.style.fontSize = `${fontSize}px`;
+    console.log(`Scaled font size for "${tokenName}" from ${baseFontSize}px to ${fontSize}px (text width: ${textWidth}px, max width: ${maxWidth}px)`);
+  } else {
+    console.log(`No scaling needed for "${tokenName}" (text width: ${textWidth}px, max width: ${maxWidth}px)`);
   }
 
   // Force reflow to ensure styles are applied
