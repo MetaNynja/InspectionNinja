@@ -821,10 +821,11 @@ table tr.details-row {
       rgba(255, 255, 255, 0.05) 50%,
       rgba(34, 34, 40, 0.98) 50%,
       rgba(34, 34, 40, 0.98) 75%,
-      rgba(255, 255, 255, 255, 0.05) 75%,
-      rgba(255, 255, 255, 255, 0.05) !important;
-  background-size: 20px !important;
-  background-color: rgba(34,34,34,40,0.98) !important;
+      rgba(255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 0.05) 100%
+    ) !important;
+  background-size: 20px 20px !important;
+  background-color: rgba(34, 34, 40, 0.98) !important;
 }
 
 #output .pnl-card.downloading .pnl-card-header {
@@ -851,16 +852,18 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-token {
-  font-size: 320px !important; /* Initial size, may be adjusted by JavaScript */
-  margin: 140px !important; 0 60px 0 !important;
+  font-size: 220px !important; /* Restored to 220px */
+  margin: 140px 0 60px 0 !important;
   white-space: nowrap !important; /* Prevent line wrapping */
-  max-width: 75% !important; /* Limit width to fit within card */
+  max-width: 75% !important; /* Constrain to ~1350px */
   margin-left: auto !important;
   margin-right: auto !important;
-  overflow: hidden !important; /* Hide overflow */
-  text-overflow: ellipsis !important; /* Fallback ellipsis if text is too wide */
-  line-height: normal !important; /* Normalize line-height for single line */
-  display: inline-block !important; /* Allow width measurement for JavaScript */
+  line-height: normal !important;
+  display: inline-block !important;
+  overflow: hidden !important;
+  text-overflow: clip !important; /* Avoid ellipsis, rely on scaling */
+  /* Scale font size for long text to fit within max-width */
+  font-size: min(220px, calc(1350px / 1.2 * 100 / 1800 * 1vw)) !important;
 }
 
 #output .pnl-card.downloading .pnl-card-profit {
@@ -910,15 +913,16 @@ table tr.details-row {
     background: 
       linear-gradient(
         45deg,
-        rgba(34,34,34,40,40,0.98) 25%,
-        rgba(255,255,255,255,255,0.05) 25%,
-        rgba(255,255,255,255,255,0.05) 50%,
-        rgba(34,34,34,40,40,0.98) 50%,
-        rgba(34,34,34,255,255,255,255,0.05) 75%,
-        rgba(255,255,255,255,255,0.05) 100%
+        rgba(34, 34, 40, 0.98) 25%,
+        rgba(255, 255, 255, 0.05) 25%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(34, 34, 40, 0.98) 50%,
+        rgba(34, 34, 40, 0.98) 75%,
+        rgba(255, 255, 255, 0.05) 75%,
+        rgba(255, 255, 255, 0.05) 100%
       ) !important;
     background-size: 20px 20px !important;
-    background-color: rgba(34,34,34,40,0.98) !important;
+    background-color: rgba(34, 34, 40, 0.98) !important;
   }
 
   #output .pnl-card.downloading .pnl-card-icon {
@@ -936,15 +940,16 @@ table tr.details-row {
   }
 
   #output .pnl-card.downloading .pnl-card-token {
-    font-size: 320px !important; /* Initial size, may be adjusted by JavaScript */
-    white-space: nowrap !important; /* Prevent line wrapping */
+    font-size: 220px !important;
+    white-space: nowrap !important;
     max-width: 75% !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
     line-height: normal !important;
     display: inline-block !important;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+    font-size: min(220px, calc(1350px / 1.2 * 100 / 1800 * 1vw)) !important;
   }
 
   #output .pnl-card.downloading .pnl-card-profit {
@@ -960,7 +965,6 @@ table tr.details-row {
     font-size: 80px !important;
   }
 }
-
   </style>
   <!-- Add Google Fonts for cursive MetaNynja -->
   <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
