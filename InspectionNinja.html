@@ -801,167 +801,111 @@ table tr.details-row {
 }
 /* New CSS for .pnl-card.downloading */
 #output .pnl-card.downloading {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important; /* Center all children horizontally */
+  justify-content: flex-start !important;
   width: 1800px !important;
   height: 1600px !important;
-  max-width: none !important;
-  margin: 0 !important;
-  transform: none !important;
-  padding: 48px 96px !important;
-  font-size: 28px !important;
-  line-height: 1.6 !important;
-  border-radius: 0 !important;
-  position: absolute !important;
-  z-index: 9999 !important;
   box-sizing: border-box !important;
-  background: 
-    linear-gradient(
-      45deg,
-      rgba(34, 34, 40, 0.98) 25%,
-      rgba(255, 255, 255, 0.05) 25%,
-      rgba(255, 255, 255, 0.05) 50%,
-      rgba(34, 34, 40, 0.98) 50%,
-      rgba(34, 34, 40, 0.98) 75%,
-      rgba(255, 255, 255, 0.05) 75%,
-      rgba(255, 255, 255, 0.05) 100%
-    ) !important;
-  background-size: 20px 20px !important;
-  background-color: rgba(34, 34, 40, 0.98) !important;
 }
 
 #output .pnl-card.downloading .pnl-card-header {
-  margin-bottom: 180px !important; /* Increased from 140px to shift content below downward */
-  margin-top: 0 !important;
+  margin-top: 100px !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: flex-start !important;
+  justify-content: center !important;
+  width: 100% !important;
 }
 
 #output .pnl-card.downloading .pnl-card-icon {
-  width: 128px !important;
-  height: 128px !important;
-  margin-right: 48px !important;
+  width: 100px !important;
+  height: 100px !important;
+  margin-right: 20px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-title {
-  font-size: 96px !important;
+  font-size: 60px !important;
+  font-weight: bold !important;
+  color: white !important;
+  text-align: center !important;
 }
 
 #output .pnl-card.downloading .pnl-card-title .pnl {
-  font-size: 90px !important;
-  margin-left: 8px !important;
+  color: #66bb6a !important;
 }
 
-#output .pnl-card.downloading .pnl-card-token {
-  font-size: 220px !important;
-  margin: 140px 0 60px 0 !important; /* Kept to maintain spacing with percentage */
-  word-break: break-word !important;
-  max-width: 75% !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  line-height: 1.1 !important;
-}
-
-#output .pnl-card.downloading .pnl-card-profit {
-  font-size: 128px !important;
-  margin-bottom: 160px !important; /* Kept to maintain spacing with Bought/Profit */
-}
-
-#output .pnl-card.downloading .pnl-card-content {
-  gap: 48px !important; /* Kept to maintain spacing within Bought/Profit */
-}
-
-#output .pnl-card.downloading .pnl-card-row {
-  gap: 360px !important;
-  justify-content: center !important;
-  align-items: flex-start !important;
-}
-
-#output .pnl-card.downloading .pnl-card-column {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-}
-
-#output .pnl-card.downloading .pnl-card-label {
-  font-size: 88px !important;
-  text-decoration: none !important;
-}
-
-#output .pnl-card.downloading .pnl-card-value {
-  font-size: 80px !important;
-  margin-top: 24px !important;
-}
-
-@media screen and (max-width: 768px) {
-  #output .pnl-card.downloading {
-    width: 1800px !important;
-    height: 1600px !important;
-    max-width: none !important;
-    margin: 0 !important;
-    transform: none !important;
-    padding: 48px 96px !important;
-    font-size: 28px !important;
-    border-radius: 0 !important;
-    position: absolute !important;
-    z-index: 9999 !important;
-    background: 
-      linear-gradient(
-        45deg,
-        rgba(34, 34, 40, 0.98) 25%,
-        rgba(255, 255, 255, 0.05) 25%,
-        rgba(255, 255, 255, 0.05) 50%,
-        rgba(34, 34, 40, 0.98) 50%,
-        rgba(34, 34, 40, 0.98) 75%,
-        rgba(255, 255, 255, 0.05) 75%,
-        rgba(255, 255, 255, 0.05) 100%
-      ) !important;
-    background-size: 20px 20px !important;
-    background-color: rgba(34, 34, 40, 0.98) !important;
-  }
-
-  #output .pnl-card.downloading .pnl-card-icon {
-    width: 128px !important;
-    height: 128px !important;
-    margin-right: 48px !important;
-  }
-
-  #output .pnl-card.downloading .pnl-card-title {
-    font-size: 96px !important;
-  }
-
-  #output .pnl-card.downloading .pnl-card-title .pnl {
-    font-size: 90px !important;
-  }
-
-  #output .pnl-card.downloading .pnl-card-token-wrapper {
-  position: absolute !important;
-  left: 50% !important; /* Start at card’s horizontal center */
-  transform: translateX(-50%) !important; /* Offset by half its width */
-  width: auto !important; /* Fit content */
+#output .pnl-card.downloading .pnl-card-token-wrapper {
+  width: 100% !important;
   max-width: 1350px !important; /* 75% of 1800px */
-  top: 140px !important; /* Match original top margin */
-  text-align: center !important; /* Ensure text is centered */
+  margin: 140px 0 60px 0 !important; /* Original spacing */
+  text-align: center !important; /* Center text */
 }
 
 #output .pnl-card.downloading .pnl-card-token {
   font-size: 220px !important;
   white-space: nowrap !important; /* Prevent text wrapping */
   max-width: 100% !important; /* Fit within wrapper */
-  display: inline-block !important; /* Ensure proper width calculation */
+  display: inline-block !important; /* Accurate width */
 }
 
-  #output .pnl-card.downloading .pnl-card-profit {
-    font-size: 128px !important;
-  }
+#output .pnl-card.downloading .pnl-card-profit {
+  margin: 0 auto !important; /* Ensure percentage is centered */
+  text-align: center !important;
+  font-size: 80px !important; /* Assuming original size, adjust if needed */
+}
 
-  #output .pnl-card.downloading .pnl-card-label {
-    font-size: 88px !important;
-    text-decoration: none !important;
-  }
+#output .pnl-card.downloading .pnl-card-profit.pnl-profit-positive {
+  color: #66bb6a !important;
+}
 
-  #output .pnl-card.downloading .pnl-card-value {
-    font-size: 80px !important;
-  }
+#output .pnl-card.downloading .pnl-card-profit.pnl-profit-negative {
+  color: #ef5350 !important;
+}
+
+#output .pnl-card.downloading .pnl-card-content {
+  width: 80% !important;
+  margin: 40px auto !important;
+  text-align: center !important;
+}
+
+#output .pnl-card.downloading .pnl-card-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+}
+
+#output .pnl-card.downloading .pnl-card-column {
+  flex: 1 !important;
+  text-align: center !important;
+}
+
+#output .pnl-card.downloading .pnl-card-label {
+  font-size: 40px !important;
+  color: #888 !important;
+  display: block !important;
+}
+
+#output .pnl-card.downloading .pnl-card-value {
+  font-size: 50px !important;
+  color: white !important;
+  display: block !important;
+}
+
+#output .pnl-card.downloading .pnl-card-value.pnl-profit-positive {
+  color: #66bb6a !important;
+}
+
+#output .pnl-card.downloading .pnl-card-value.pnl-profit-negative {
+  color: #ef5350 !important;
+}
+
+#output .pnl-card.downloading .pnl-transactions {
+  display: none !important; /* Hidden during download */
+}
+
+#output .pnl-card.downloading .download-btn {
+  display: none !important; /* Hidden during download */
 }
   </style>
   <!-- Add Google Fonts for cursive MetaNynja -->
@@ -2238,7 +2182,8 @@ table tr.details-row {
     row.style.display = isZeroBalanceOnly && balance !== 0 ? 'none' : '';
   });
 }
-  function downloadPnLCard(cardId, tokenName) {
+  
+    function downloadPnLCard(cardId, tokenName) {
   const cardElement = document.getElementById(cardId);
   if (!cardElement) {
     console.error(`PnL card with ID ${cardId} not found`);
@@ -2258,19 +2203,21 @@ table tr.details-row {
     borderRadius: cardElement.style.borderRadius,
     position: cardElement.style.position,
     zIndex: cardElement.style.zIndex,
-    boxSizing: cardElement.style.boxSizing
+    boxSizing: cardElement.style.boxSizing,
+    display: cardElement.style.display,
+    flexDirection: cardElement.style.flexDirection,
+    alignItems: cardElement.style.alignItems,
+    justifyContent: cardElement.style.justifyContent
   };
 
   // Store original token and wrapper styles
   const tokenWrapper = cardElement.querySelector('.pnl-card-token-wrapper');
   const tokenElement = cardElement.querySelector('.pnl-card-token');
+  const profitElement = cardElement.querySelector('.pnl-card-profit');
   const originalWrapperStyle = {
-    position: tokenWrapper.style.position,
-    left: tokenWrapper.style.left,
-    transform: tokenWrapper.style.transform,
     width: tokenWrapper.style.width,
     maxWidth: tokenWrapper.style.maxWidth,
-    top: tokenWrapper.style.top,
+    margin: tokenWrapper.style.margin,
     textAlign: tokenWrapper.style.textAlign
   };
   const originalTokenStyle = {
@@ -2278,6 +2225,10 @@ table tr.details-row {
     whiteSpace: tokenElement.style.whiteSpace,
     maxWidth: tokenElement.style.maxWidth,
     display: tokenElement.style.display
+  };
+  const originalProfitStyle = {
+    margin: profitElement.style.margin,
+    textAlign: profitElement.style.textAlign
   };
 
   // Temporarily show all expandable content except transactions and download button
@@ -2307,85 +2258,92 @@ table tr.details-row {
   cardElement.style.position = 'absolute';
   cardElement.style.zIndex = '9999';
   cardElement.style.boxSizing = 'border-box';
+  cardElement.style.display = 'flex';
+  cardElement.style.flexDirection = 'column';
+  cardElement.style.alignItems = 'center';
+  cardElement.style.justifyContent = 'flex-start';
   cardElement.classList.add('downloading');
 
   // Dynamically adjust font size to fit within max-width (60% of 1350px = 810px)
-  const maxWidth = desiredWidth * 0.75 * 0.60; // 1350px * 0.60 = 810px for safety
+  const maxWidth = desiredWidth * 0.75 * 0.60; // 1350px * 0.60 = 810px
   const baseFontSize = 220; // Default font size in pixels
   const minFontSize = 100; // Minimum font size in pixels
   let fontSize = baseFontSize;
 
   // Temporarily set styles for measurement
-  tokenWrapper.style.position = 'absolute';
-  tokenWrapper.style.left = '50%';
-  tokenWrapper.style.transform = 'translateX(-50%)';
-  tokenWrapper.style.width = 'auto';
+  tokenWrapper.style.width = '100%';
   tokenWrapper.style.maxWidth = 'none';
-  tokenWrapper.style.top = '140px';
   tokenWrapper.style.textAlign = 'center';
   tokenElement.style.whiteSpace = 'nowrap';
   tokenElement.style.maxWidth = 'none';
   tokenElement.style.display = 'inline-block';
+  profitElement.style.margin = '0 auto';
+  profitElement.style.textAlign = 'center';
 
-  // Function to get the actual rendered width and position of the token element
-  const getTextMetrics = () => {
+  // Function to get the actual rendered metrics of elements
+  const getMetrics = () => {
     tokenElement.style.fontSize = `${fontSize}px`;
-    // Force reflow to ensure the new font size is applied
-    tokenElement.offsetHeight;
-    const rect = tokenElement.getBoundingClientRect();
+    // Force reflow
+    cardElement.offsetHeight;
+    const tokenRect = tokenElement.getBoundingClientRect();
+    const profitRect = profitElement.getBoundingClientRect();
     const parentRect = cardElement.getBoundingClientRect();
-    const width = rect.width;
-    const leftOffset = rect.left - parentRect.left;
-    const rightOffset = parentRect.right - rect.right;
-    return { width, leftOffset, rightOffset };
+    const tokenWidth = tokenRect.width;
+    const tokenLeftOffset = tokenRect.left - parentRect.left;
+    const tokenRightOffset = parentRect.right - tokenRect.right;
+    const profitLeftOffset = profitRect.left - parentRect.left;
+    const profitRightOffset = parentRect.right - profitRect.right;
+    return { tokenWidth, tokenLeftOffset, tokenRightOffset, profitLeftOffset, profitRightOffset };
   };
 
   // Measure text width and adjust font size
-  let { width: textWidth, leftOffset, rightOffset } = getTextMetrics();
+  let { tokenWidth, tokenLeftOffset, tokenRightOffset, profitLeftOffset, profitRightOffset } = getMetrics();
   let iteration = 0;
-  const maxIterations = 20; // Prevent infinite loops
+  const maxIterations = 20;
   const capitalLetterCount = (tokenName.match(/[A-Z]/g) || []).length;
-  const capitalWidthFactor = 1 + (capitalLetterCount / tokenName.length) * 0.2; // Adjust for wider capitals
-  while (textWidth * capitalWidthFactor > maxWidth && fontSize > minFontSize && iteration < maxIterations) {
-    const scaleFactor = maxWidth / (textWidth * capitalWidthFactor);
-    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.80), minFontSize); // Extra 20% reduction
-    ({ width: textWidth, leftOffset, rightOffset } = getTextMetrics());
+  const capitalWidthFactor = 1 + (capitalLetterCount / tokenName.length) * 0.2;
+  while (tokenWidth * capitalWidthFactor > maxWidth && fontSize > minFontSize && iteration < maxIterations) {
+    const scaleFactor = maxWidth / (tokenWidth * capitalWidthFactor);
+    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.80), minFontSize);
+    ({ tokenWidth, tokenLeftOffset, tokenRightOffset, profitLeftOffset, profitRightOffset } = getMetrics());
     iteration++;
   }
 
-  // Final verification: reduce font size slightly more if close to maxWidth
-  if (textWidth * capitalWidthFactor > maxWidth * 0.95) {
+  // Final verification: reduce font size if close to maxWidth
+  if (tokenWidth * capitalWidthFactor > maxWidth * 0.95) {
     fontSize = Math.max(Math.floor(fontSize * 0.80), minFontSize);
     tokenElement.style.fontSize = `${fontSize}px`;
-    ({ width: textWidth, leftOffset, rightOffset } = getTextMetrics());
+    ({ tokenWidth, tokenLeftOffset, tokenRightOffset, profitLeftOffset, profitRightOffset } = getMetrics());
   }
 
-  // Verify centering: adjust if left and right offsets differ significantly
-  const offsetDiff = Math.abs(leftOffset - rightOffset);
-  if (offsetDiff > 5) { // Tighter tolerance
-    console.warn(`Centering adjustment needed for "${tokenName}": leftOffset=${leftOffset}px, rightOffset=${rightOffset}px`);
-    const adjustment = (rightOffset - leftOffset) / 2;
-    tokenWrapper.style.transform = `translateX(calc(-50% + ${adjustment}px))`;
-    ({ leftOffset, rightOffset } = getTextMetrics());
+  // Verify centering: adjust if token offsets differ significantly
+  const tokenOffsetDiff = Math.abs(tokenLeftOffset - tokenRightOffset);
+  if (tokenOffsetDiff > 5) {
+    console.warn(`Token centering adjustment needed for "${tokenName}": tokenLeftOffset=${tokenLeftOffset}px, tokenRightOffset=${tokenRightOffset}px`);
+    const adjustment = (tokenRightOffset - tokenLeftOffset) / 2;
+    tokenElement.style.position = 'relative';
+    tokenElement.style.left = `${adjustment}px`;
+    ({ tokenWidth, tokenLeftOffset, tokenRightOffset } = getMetrics());
   }
 
-  console.log(`Final metrics for "${tokenName}": fontSize=${fontSize}px, textWidth=${textWidth}px, adjustedWidth=${(textWidth * capitalWidthFactor).toFixed(2)}px, maxWidth=${maxWidth}px, iterations=${iteration}, capitalLetters=${capitalLetterCount}, leftOffset=${leftOffset.toFixed(2)}px, rightOffset=${rightOffset.toFixed(2)}px, cardWidth=${cardElement.getBoundingClientRect().width}px`);
+  console.log(`Final metrics for "${tokenName}": fontSize=${fontSize}px, tokenWidth=${tokenWidth}px, adjustedWidth=${(tokenWidth * capitalWidthFactor).toFixed(2)}px, maxWidth=${maxWidth}px, iterations=${iteration}, capitalLetters=${capitalLetterCount}, tokenLeftOffset=${tokenLeftOffset.toFixed(2)}px, tokenRightOffset=${tokenRightOffset.toFixed(2)}px, profitLeftOffset=${profitLeftOffset.toFixed(2)}px, profitRightOffset=${profitRightOffset.toFixed(2)}px, cardWidth=${cardElement.getBoundingClientRect().width}px`);
 
   // Restore styles for rendering
-  tokenWrapper.style.position = 'absolute';
-  tokenWrapper.style.left = '50%';
-  tokenWrapper.style.transform = 'translateX(-50%)';
-  tokenWrapper.style.width = 'auto';
+  tokenWrapper.style.width = '100%';
   tokenWrapper.style.maxWidth = '1350px';
-  tokenWrapper.style.top = '140px';
+  tokenWrapper.style.margin = '140px 0 60px 0';
   tokenWrapper.style.textAlign = 'center';
   tokenElement.style.maxWidth = '100%';
   tokenElement.style.display = 'inline-block';
+  tokenElement.style.position = '';
+  tokenElement.style.left = '';
+  profitElement.style.margin = '0 auto';
+  profitElement.style.textAlign = 'center';
 
-  // Force reflow to ensure styles are applied
+  // Force reflow
   cardElement.offsetHeight;
 
-  // Increase delay to ensure styles are rendered
+  // Delay for rendering
   setTimeout(() => {
     html2canvas(cardElement, {
       backgroundColor: null,
@@ -2400,6 +2358,7 @@ table tr.details-row {
       Object.assign(cardElement.style, originalStyle);
       Object.assign(tokenWrapper.style, originalWrapperStyle);
       Object.assign(tokenElement.style, originalTokenStyle);
+      Object.assign(profitElement.style, originalProfitStyle);
 
       // Restore expandable sections, transactions, and download button
       expandableSections.forEach(section => {
@@ -2420,6 +2379,7 @@ table tr.details-row {
       Object.assign(cardElement.style, originalStyle);
       Object.assign(tokenWrapper.style, originalWrapperStyle);
       Object.assign(tokenElement.style, originalTokenStyle);
+      Object.assign(profitElement.style, originalProfitStyle);
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
@@ -2427,7 +2387,7 @@ table tr.details-row {
       if (downloadButton) downloadButton.style.display = originalButtonDisplay;
       alert('Failed to download PnL card. Please check the console for errors and try again.');
     });
-  }, 300); // Increased to 300ms for stability
+  }, 300);
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
