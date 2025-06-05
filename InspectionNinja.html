@@ -933,15 +933,20 @@ table tr.details-row {
     font-size: 90px !important;
   }
 
-  #output .pnl-card.downloading .pnl-card-token {
+  #output .pnl-card.downloading .pnl-card-token-wrapper {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 1350px !important; /* 75% of 1800px */
+  margin: 140px auto 60px auto !important; /* Center horizontally, keep vertical spacing */
+}
+
+#output .pnl-card.downloading .pnl-card-token {
   font-size: 220px !important;
-  margin: 140px 0 60px 0 !important; /* Vertical margins only */
   white-space: nowrap !important; /* Prevent text wrapping */
-  max-width: 75% !important; /* 1350px for 1800px card */
-  width: 100% !important; /* Ensure it spans the max-width */
-  text-align: center !important; /* Center text horizontally */
-  left: 0 !important; /* Reset any positioning */
-  right: 0 !important;
+  max-width: 100% !important; /* Fit within wrapper */
+  text-align: center !important; /* Fallback centering */
 }
 
   #output .pnl-card.downloading .pnl-card-profit {
@@ -2256,17 +2261,22 @@ table tr.details-row {
     boxSizing: cardElement.style.boxSizing
   };
 
-  // Store original token styles
+  // Store original token and wrapper styles
+  const tokenWrapper = cardElement.querySelector('.pnl-card-token-wrapper');
   const tokenElement = cardElement.querySelector('.pnl-card-token');
+  const originalWrapperStyle = {
+    display: tokenWrapper.style.display,
+    justifyContent: tokenWrapper.style.justifyContent,
+    alignItems: tokenWrapper.style.alignItems,
+    width: tokenWrapper.style.width,
+    maxWidth: tokenWrapper.style.maxWidth,
+    margin: tokenWrapper.style.margin
+  };
   const originalTokenStyle = {
     fontSize: tokenElement.style.fontSize,
     whiteSpace: tokenElement.style.whiteSpace,
     maxWidth: tokenElement.style.maxWidth,
-    width: tokenElement.style.width,
-    textAlign: tokenElement.style.textAlign,
-    margin: tokenElement.style.margin,
-    left: tokenElement.style.left,
-    right: tokenElement.style.right
+    textAlign: tokenElement.style.textAlign
   };
 
   // Temporarily show all expandable content except transactions and download button
@@ -2298,16 +2308,20 @@ table tr.details-row {
   cardElement.style.boxSizing = 'border-box';
   cardElement.classList.add('downloading');
 
-  // Dynamically adjust font size to fit within max-width (75% of 1800px = 1350px)
-  const maxWidth = desiredWidth * 0.75 * 0.80; // 1350px * 0.80 = 1080px for safety
+  // Dynamically adjust font size to fit within max-width (70% of 1350px = 945px)
+  const maxWidth = desiredWidth * 0.75 * 0.70; // 1350px * 0.70 = 945px for safety
   const baseFontSize = 220; // Default font size in pixels
   const minFontSize = 100; // Minimum font size in pixels
   let fontSize = baseFontSize;
 
   // Temporarily set styles for measurement
+  tokenWrapper.style.display = 'flex';
+  tokenWrapper.style.justifyContent = 'center';
+  tokenWrapper.style.alignItems = 'center';
+  tokenWrapper.style.width = '100%';
+  tokenWrapper.style.maxWidth = 'none'; // Remove max-width for measurement
   tokenElement.style.whiteSpace = 'nowrap';
-  tokenElement.style.maxWidth = 'none'; // Remove max-width for accurate measurement
-  tokenElement.style.width = 'auto'; // Allow natural width for measurement
+  tokenElement.style.maxWidth = 'none';
   tokenElement.style.textAlign = 'center';
 
   // Function to get the actual rendered width and position of the token element
@@ -2331,14 +2345,14 @@ table tr.details-row {
   const capitalWidthFactor = 1 + (capitalLetterCount / tokenName.length) * 0.2; // Adjust for wider capitals
   while (textWidth * capitalWidthFactor > maxWidth && fontSize > minFontSize && iteration < maxIterations) {
     const scaleFactor = maxWidth / (textWidth * capitalWidthFactor);
-    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.90), minFontSize); // Extra 10% reduction
+    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.85), minFontSize); // Extra 15% reduction
     ({ width: textWidth, leftOffset, rightOffset } = getTextMetrics());
     iteration++;
   }
 
   // Final verification: reduce font size slightly more if close to maxWidth
   if (textWidth * capitalWidthFactor > maxWidth * 0.95) {
-    fontSize = Math.max(Math.floor(fontSize * 0.90), minFontSize);
+    fontSize = Math.max(Math.floor(fontSize * 0.85), minFontSize);
     tokenElement.style.fontSize = `${fontSize}px`;
     ({ width: textWidth, leftOffset, rightOffset } = getTextMetrics());
   }
@@ -2347,20 +2361,24 @@ table tr.details-row {
   const offsetDiff = Math.abs(leftOffset - rightOffset);
   if (offsetDiff > 10) { // Allow small tolerance
     console.warn(`Centering adjustment needed for "${tokenName}": leftOffset=${leftOffset}px, rightOffset=${rightOffset}px`);
-    tokenElement.style.position = 'relative';
-    tokenElement.style.left = `${(rightOffset - leftOffset) / 2}px`; // Shift to balance offsets
+    tokenWrapper.style.position = 'relative';
+    tokenWrapper.style.left = `${(rightOffset - leftOffset) / 2}px`; // Shift to balance offsets
     ({ leftOffset, rightOffset } = getTextMetrics());
   }
 
   console.log(`Final metrics for "${tokenName}": fontSize=${fontSize}px, textWidth=${textWidth}px, adjustedWidth=${(textWidth * capitalWidthFactor).toFixed(2)}px, maxWidth=${maxWidth}px, iterations=${iteration}, capitalLetters=${capitalLetterCount}, leftOffset=${leftOffset.toFixed(2)}px, rightOffset=${rightOffset.toFixed(2)}px`);
 
   // Restore styles for rendering
-  tokenElement.style.maxWidth = '75%';
-  tokenElement.style.width = '100%';
+  tokenWrapper.style.display = 'flex';
+  tokenWrapper.style.justifyContent = 'center';
+  tokenWrapper.style.alignItems = 'center';
+  tokenWrapper.style.width = '100%';
+  tokenWrapper.style.maxWidth = '1350px';
+  tokenWrapper.style.margin = '140px auto 60px auto';
+  tokenWrapper.style.position = '';
+  tokenWrapper.style.left = '';
+  tokenElement.style.maxWidth = '100%';
   tokenElement.style.textAlign = 'center';
-  tokenElement.style.position = '';
-  tokenElement.style.left = '';
-  tokenElement.style.right = '';
 
   // Force reflow to ensure styles are applied
   cardElement.offsetHeight;
@@ -2378,6 +2396,7 @@ table tr.details-row {
       // Restore original styles
       cardElement.classList.remove('downloading');
       Object.assign(cardElement.style, originalStyle);
+      Object.assign(tokenWrapper.style, originalWrapperStyle);
       Object.assign(tokenElement.style, originalTokenStyle);
 
       // Restore expandable sections, transactions, and download button
@@ -2397,6 +2416,7 @@ table tr.details-row {
       // Restore original styles on error
       cardElement.classList.remove('downloading');
       Object.assign(cardElement.style, originalStyle);
+      Object.assign(tokenWrapper.style, originalWrapperStyle);
       Object.assign(tokenElement.style, originalTokenStyle);
       expandableSections.forEach(section => {
         section.classList.add('hidden');
@@ -2890,7 +2910,7 @@ table tr.details-row {
             <img src="https://i.ibb.co/svZT9rZQ/Magic-Eraser-250603-140451.png" alt="Inspection Ninja Icon" class="pnl-card-icon">
             <div class="pnl-card-title">Inspection Ninja <span class="pnl">PnL</span></div>
           </div>
-          <div class="pnl-card-token">${getCurrencyDisplay(token.currency)}</div>
+          <div class="pnl-card-token-wrapper"><div class="pnl-card-token">${getCurrencyDisplay(token.currency)}</div></div>
           <div class="pnl-card-profit ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">
             ${details.profit >= 0 ? '+' : '-'}${Math.abs((details.xrpSpent > 0 ? (details.profit / details.xrpSpent) * 100 : (details.profit > 0 ? Infinity : 0))).toFixed(2)}%
           </div>
