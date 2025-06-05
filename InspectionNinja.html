@@ -2105,6 +2105,15 @@ table tr.details-row {
     return;
   }
 
+  // Store original styles
+  const originalStyle = {
+    width: cardElement.style.width,
+    height: cardElement.style.height,
+    maxWidth: cardElement.style.maxWidth,
+    margin: cardElement.style.margin,
+    transform: cardElement.style.transform
+  };
+
   // Temporarily show all expandable content except transactions and download button
   const expandableSections = cardElement.querySelectorAll('.hidden:not(.pnl-transactions .hidden)');
   const transactionsSection = cardElement.querySelector('.pnl-transactions');
@@ -2121,12 +2130,31 @@ table tr.details-row {
   if (transactionsSection) transactionsSection.style.display = 'none';
   if (downloadButton) downloadButton.style.display = 'none';
 
+  // Set fixed dimensions for the card
+  const desiredWidth = 1800; // Desired width in pixels
+  const desiredHeight = 1600; // Desired height in pixels
+  cardElement.style.width = `${desiredWidth}px`;
+  cardElement.style.height = `${desiredHeight}px`;
+  cardElement.style.maxWidth = 'none'; // Remove max-width constraints
+  cardElement.style.margin = '0'; // Remove margins for consistent sizing
+  cardElement.style.transform = 'none'; // Remove any transforms (e.g., mobile adjustments)
+
+  // Capture the card with html2canvas
   html2canvas(cardElement, {
     backgroundColor: null, // Preserve transparent background
+    width: desiredWidth, // Set canvas width
+    height: desiredHeight, // Set canvas height
     scale: 2, // Increase resolution for better quality
     useCORS: true // Enable CORS for external images
   }).then(canvas => {
-    // Restore original state
+    // Restore original styles
+    cardElement.style.width = originalStyle.width;
+    cardElement.style.height = originalStyle.height;
+    cardElement.style.maxWidth = originalStyle.maxWidth;
+    cardElement.style.margin = originalStyle.margin;
+    cardElement.style.transform = originalStyle.transform;
+
+    // Restore expandable sections, transactions, and download button
     expandableSections.forEach(section => {
       section.classList.add('hidden');
     });
@@ -2140,9 +2168,21 @@ table tr.details-row {
     link.click();
   }).catch(error => {
     console.error('Error generating PnL card image:', error);
-    // Restore original state on error
+
+    // Restore original styles on error
+    cardElement.style.width = originalStyle.width;
+    cardElement.style.height = originalStyle.height;
+    cardElement.style.maxWidth = originalStyle.maxWidth;
+    cardElement.style.margin = originalStyle.margin;
+    cardElement.style.transform = originalStyle.transform;
+
+    // Restore expandable sections, transactions, and download button
+    expandableSections.forEach(section => {
+      section.classList.add('hidden');
+    });
     if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
     if (downloadButton) downloadButton.style.display = originalButtonDisplay;
+
     alert('Failed to download PnL card. Please try again.');
   });
 }
