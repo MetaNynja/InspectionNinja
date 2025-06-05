@@ -934,19 +934,20 @@ table tr.details-row {
   }
 
   #output .pnl-card.downloading .pnl-card-token-wrapper {
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  width: 100% !important;
+  position: absolute !important;
+  left: 50% !important; /* Start at card’s horizontal center */
+  transform: translateX(-50%) !important; /* Offset by half its width */
+  width: auto !important; /* Fit content */
   max-width: 1350px !important; /* 75% of 1800px */
-  margin: 140px auto 60px auto !important; /* Center horizontally, keep vertical spacing */
+  top: 140px !important; /* Match original top margin */
+  text-align: center !important; /* Ensure text is centered */
 }
 
 #output .pnl-card.downloading .pnl-card-token {
   font-size: 220px !important;
   white-space: nowrap !important; /* Prevent text wrapping */
   max-width: 100% !important; /* Fit within wrapper */
-  text-align: center !important; /* Fallback centering */
+  display: inline-block !important; /* Ensure proper width calculation */
 }
 
   #output .pnl-card.downloading .pnl-card-profit {
@@ -2237,8 +2238,7 @@ table tr.details-row {
     row.style.display = isZeroBalanceOnly && balance !== 0 ? 'none' : '';
   });
 }
-  
- function downloadPnLCard(cardId, tokenName) {
+  function downloadPnLCard(cardId, tokenName) {
   const cardElement = document.getElementById(cardId);
   if (!cardElement) {
     console.error(`PnL card with ID ${cardId} not found`);
@@ -2265,18 +2265,19 @@ table tr.details-row {
   const tokenWrapper = cardElement.querySelector('.pnl-card-token-wrapper');
   const tokenElement = cardElement.querySelector('.pnl-card-token');
   const originalWrapperStyle = {
-    display: tokenWrapper.style.display,
-    justifyContent: tokenWrapper.style.justifyContent,
-    alignItems: tokenWrapper.style.alignItems,
+    position: tokenWrapper.style.position,
+    left: tokenWrapper.style.left,
+    transform: tokenWrapper.style.transform,
     width: tokenWrapper.style.width,
     maxWidth: tokenWrapper.style.maxWidth,
-    margin: tokenWrapper.style.margin
+    top: tokenWrapper.style.top,
+    textAlign: tokenWrapper.style.textAlign
   };
   const originalTokenStyle = {
     fontSize: tokenElement.style.fontSize,
     whiteSpace: tokenElement.style.whiteSpace,
     maxWidth: tokenElement.style.maxWidth,
-    textAlign: tokenElement.style.textAlign
+    display: tokenElement.style.display
   };
 
   // Temporarily show all expandable content except transactions and download button
@@ -2308,21 +2309,23 @@ table tr.details-row {
   cardElement.style.boxSizing = 'border-box';
   cardElement.classList.add('downloading');
 
-  // Dynamically adjust font size to fit within max-width (70% of 1350px = 945px)
-  const maxWidth = desiredWidth * 0.75 * 0.70; // 1350px * 0.70 = 945px for safety
+  // Dynamically adjust font size to fit within max-width (60% of 1350px = 810px)
+  const maxWidth = desiredWidth * 0.75 * 0.60; // 1350px * 0.60 = 810px for safety
   const baseFontSize = 220; // Default font size in pixels
   const minFontSize = 100; // Minimum font size in pixels
   let fontSize = baseFontSize;
 
   // Temporarily set styles for measurement
-  tokenWrapper.style.display = 'flex';
-  tokenWrapper.style.justifyContent = 'center';
-  tokenWrapper.style.alignItems = 'center';
-  tokenWrapper.style.width = '100%';
-  tokenWrapper.style.maxWidth = 'none'; // Remove max-width for measurement
+  tokenWrapper.style.position = 'absolute';
+  tokenWrapper.style.left = '50%';
+  tokenWrapper.style.transform = 'translateX(-50%)';
+  tokenWrapper.style.width = 'auto';
+  tokenWrapper.style.maxWidth = 'none';
+  tokenWrapper.style.top = '140px';
+  tokenWrapper.style.textAlign = 'center';
   tokenElement.style.whiteSpace = 'nowrap';
   tokenElement.style.maxWidth = 'none';
-  tokenElement.style.textAlign = 'center';
+  tokenElement.style.display = 'inline-block';
 
   // Function to get the actual rendered width and position of the token element
   const getTextMetrics = () => {
@@ -2345,45 +2348,44 @@ table tr.details-row {
   const capitalWidthFactor = 1 + (capitalLetterCount / tokenName.length) * 0.2; // Adjust for wider capitals
   while (textWidth * capitalWidthFactor > maxWidth && fontSize > minFontSize && iteration < maxIterations) {
     const scaleFactor = maxWidth / (textWidth * capitalWidthFactor);
-    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.85), minFontSize); // Extra 15% reduction
+    fontSize = Math.max(Math.floor(fontSize * scaleFactor * 0.80), minFontSize); // Extra 20% reduction
     ({ width: textWidth, leftOffset, rightOffset } = getTextMetrics());
     iteration++;
   }
 
   // Final verification: reduce font size slightly more if close to maxWidth
   if (textWidth * capitalWidthFactor > maxWidth * 0.95) {
-    fontSize = Math.max(Math.floor(fontSize * 0.85), minFontSize);
+    fontSize = Math.max(Math.floor(fontSize * 0.80), minFontSize);
     tokenElement.style.fontSize = `${fontSize}px`;
     ({ width: textWidth, leftOffset, rightOffset } = getTextMetrics());
   }
 
   // Verify centering: adjust if left and right offsets differ significantly
   const offsetDiff = Math.abs(leftOffset - rightOffset);
-  if (offsetDiff > 10) { // Allow small tolerance
+  if (offsetDiff > 5) { // Tighter tolerance
     console.warn(`Centering adjustment needed for "${tokenName}": leftOffset=${leftOffset}px, rightOffset=${rightOffset}px`);
-    tokenWrapper.style.position = 'relative';
-    tokenWrapper.style.left = `${(rightOffset - leftOffset) / 2}px`; // Shift to balance offsets
+    const adjustment = (rightOffset - leftOffset) / 2;
+    tokenWrapper.style.transform = `translateX(calc(-50% + ${adjustment}px))`;
     ({ leftOffset, rightOffset } = getTextMetrics());
   }
 
-  console.log(`Final metrics for "${tokenName}": fontSize=${fontSize}px, textWidth=${textWidth}px, adjustedWidth=${(textWidth * capitalWidthFactor).toFixed(2)}px, maxWidth=${maxWidth}px, iterations=${iteration}, capitalLetters=${capitalLetterCount}, leftOffset=${leftOffset.toFixed(2)}px, rightOffset=${rightOffset.toFixed(2)}px`);
+  console.log(`Final metrics for "${tokenName}": fontSize=${fontSize}px, textWidth=${textWidth}px, adjustedWidth=${(textWidth * capitalWidthFactor).toFixed(2)}px, maxWidth=${maxWidth}px, iterations=${iteration}, capitalLetters=${capitalLetterCount}, leftOffset=${leftOffset.toFixed(2)}px, rightOffset=${rightOffset.toFixed(2)}px, cardWidth=${cardElement.getBoundingClientRect().width}px`);
 
   // Restore styles for rendering
-  tokenWrapper.style.display = 'flex';
-  tokenWrapper.style.justifyContent = 'center';
-  tokenWrapper.style.alignItems = 'center';
-  tokenWrapper.style.width = '100%';
+  tokenWrapper.style.position = 'absolute';
+  tokenWrapper.style.left = '50%';
+  tokenWrapper.style.transform = 'translateX(-50%)';
+  tokenWrapper.style.width = 'auto';
   tokenWrapper.style.maxWidth = '1350px';
-  tokenWrapper.style.margin = '140px auto 60px auto';
-  tokenWrapper.style.position = '';
-  tokenWrapper.style.left = '';
+  tokenWrapper.style.top = '140px';
+  tokenWrapper.style.textAlign = 'center';
   tokenElement.style.maxWidth = '100%';
-  tokenElement.style.textAlign = 'center';
+  tokenElement.style.display = 'inline-block';
 
   // Force reflow to ensure styles are applied
   cardElement.offsetHeight;
 
-  // Add a delay to ensure styles are rendered
+  // Increase delay to ensure styles are rendered
   setTimeout(() => {
     html2canvas(cardElement, {
       backgroundColor: null,
@@ -2425,7 +2427,7 @@ table tr.details-row {
       if (downloadButton) downloadButton.style.display = originalButtonDisplay;
       alert('Failed to download PnL card. Please check the console for errors and try again.');
     });
-  }, 200); // Keep 200ms delay
+  }, 300); // Increased to 300ms for stability
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
