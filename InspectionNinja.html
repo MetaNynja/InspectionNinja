@@ -799,8 +799,7 @@ table tr.details-row {
     margin: 16px 0;
   }
 }
-
-/* New CSS for .pnl-card.downloading */
+    /* New CSS for .pnl-card.downloading */
 #output .pnl-card.downloading {
   width: 1800px !important;
   height: 1600px !important;
@@ -810,7 +809,7 @@ table tr.details-row {
   padding: 48px 96px !important;
   font-size: 28px !important;
   line-height: 1.6 !important;
-  border-radius: 32px !important;
+  border-radius: 0 !important; /* Changed from 32px to 0 for sharp corners */
   position: absolute !important;
   z-index: 9999 !important;
   box-sizing: border-box !important;
@@ -830,7 +829,7 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-header {
-  margin-bottom: 100px !important; /* Reduced from 180px to bring title closer to percentage */
+  margin-bottom: 140px !important; /* Increased from 100px to move title closer to percentage */
   margin-top: 0 !important;
   display: flex !important;
   align-items: center !important;
@@ -854,7 +853,7 @@ table tr.details-row {
 
 #output .pnl-card.downloading .pnl-card-token {
   font-size: 220px !important;
-  margin: 140px 0 60px 0 !important; /* Increased top margin from 120px to 140px, reduced bottom to 60px to move closer to percentage */
+  margin: 140px 0 60px 0 !important;
   word-break: break-word !important;
   max-width: 75% !important;
   margin-left: auto !important;
@@ -885,7 +884,7 @@ table tr.details-row {
 
 #output .pnl-card.downloading .pnl-card-label {
   font-size: 88px !important;
-  text-decoration: none !important; /* Removed underline */
+  text-decoration: none !important;
 }
 
 #output .pnl-card.downloading .pnl-card-value {
@@ -902,7 +901,7 @@ table tr.details-row {
     transform: none !important;
     padding: 48px 96px !important;
     font-size: 28px !important;
-    border-radius: 32px !important;
+    border-radius: 0 !important; /* Changed from 32px to 0 for sharp corners */
     position: absolute !important;
     z-index: 9999 !important;
     background: 
