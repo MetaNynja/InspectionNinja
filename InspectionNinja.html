@@ -2212,116 +2212,85 @@ table tr.details-row {
     return;
   }
 
-  // Store original styles and classes
-  const originalStyle = {
+  // Backup original styles
+  const originalStyles = {
     width: cardElement.style.width,
     height: cardElement.style.height,
-    maxWidth: cardElement.style.maxWidth,
-    margin: cardElement.style.margin,
-    transform: cardElement.style.transform,
-    fontSize: cardElement.style.fontSize,
-    padding: cardElement.style.padding,
-    borderRadius: cardElement.style.borderRadius,
     position: cardElement.style.position,
     zIndex: cardElement.style.zIndex,
-    boxSizing: cardElement.style.boxSizing
+    transform: cardElement.style.transform,
+    overflow: cardElement.style.overflow
   };
-  const originalClasses = cardElement.className;
 
-  // Temporarily show all expandable content except transactions and download button
-  const expandableSections = cardElement.querySelectorAll('.hidden:not(.pnl-transactions .hidden)');
+  // Temporarily show hidden content (except transactions/download button)
+  const hiddenElements = cardElement.querySelectorAll('.hidden:not(.pnl-transactions .hidden)');
   const transactionsSection = cardElement.querySelector('.pnl-transactions');
   const downloadButton = cardElement.querySelector('.download-btn');
-  const originalTransactionsDisplay = transactionsSection ? transactionsSection.style.display : '';
-  const originalButtonDisplay = downloadButton ? downloadButton.style.display : '';
-
-  // Show expandable sections (excluding those inside transactions)
-  expandableSections.forEach(section => {
-    section.classList.remove('hidden');
-  });
-
-  // Hide transactions and download button
+  
+  hiddenElements.forEach(el => el.classList.remove('hidden'));
   if (transactionsSection) transactionsSection.style.display = 'none';
   if (downloadButton) downloadButton.style.display = 'none';
 
-  // Set fixed dimensions and apply downloading class
-  const desiredWidth = 1800;
-  const desiredHeight = 1600;
-  cardElement.style.width = `${desiredWidth}px`;
-  cardElement.style.height = `${desiredHeight}px`;
-  cardElement.style.maxWidth = 'none';
-  cardElement.style.margin = '0';
-  cardElement.style.transform = 'none';
+  // Apply download-optimized styles
+  cardElement.style.width = '1800px';
+  cardElement.style.height = '1600px';
   cardElement.style.position = 'absolute';
   cardElement.style.zIndex = '9999';
-  cardElement.style.boxSizing = 'border-box';
+  cardElement.style.overflow = 'visible';
   cardElement.classList.add('downloading');
 
-  // Create a temporary container for accurate measurement
-  const measureContainer = document.createElement('div');
-  measureContainer.style.position = 'absolute';
-  measureContainer.style.visibility = 'hidden';
-  measureContainer.style.whiteSpace = 'nowrap';
-  measureContainer.style.fontFamily = window.getComputedStyle(cardElement.querySelector('.pnl-card-token')).fontFamily;
-  measureContainer.style.fontSize = '220px';
-  measureContainer.textContent = tokenName;
-  document.body.appendChild(measureContainer);
-
-  // Calculate required font size
+  // Measure text width and adjust font size if needed
   const tokenElement = cardElement.querySelector('.pnl-card-token');
-  const containerWidth = tokenElement.clientWidth * 0.9; // 90% of available width
-  const textWidth = measureContainer.clientWidth;
-  document.body.removeChild(measureContainer);
+  const tempSpan = document.createElement('span');
+  tempSpan.style.visibility = 'hidden';
+  tempSpan.style.whiteSpace = 'nowrap';
+  tempSpan.style.font = window.getComputedStyle(tokenElement).font;
+  tempSpan.textContent = tokenName;
+  document.body.appendChild(tempSpan);
+  
+  const maxWidth = tokenElement.clientWidth * 0.9; // 90% of container
+  const textWidth = tempSpan.clientWidth;
+  document.body.removeChild(tempSpan);
 
-  if (textWidth > containerWidth) {
-    const scaleFactor = containerWidth / textWidth;
-    tokenElement.style.fontSize = `${220 * scaleFactor}px`;
+  if (textWidth > maxWidth) {
+    const scaleFactor = maxWidth / textWidth;
+    tokenElement.style.fontSize = `${220 * scaleFactor}px`; // Scale down from 220px
   }
 
-  // Add a small delay to ensure styles are rendered
+  // Capture after a brief delay
   setTimeout(() => {
     html2canvas(cardElement, {
       backgroundColor: null,
-      width: desiredWidth,
-      height: desiredHeight,
+      width: 1800,
+      height: 1600,
       scale: 2,
       useCORS: true,
-      logging: true,
-      allowTaint: true
+      logging: true
     }).then(canvas => {
       // Restore original state
-      cardElement.className = originalClasses;
-      Object.assign(cardElement.style, originalStyle);
-      tokenElement.style.fontSize = '';
+      cardElement.classList.remove('downloading');
+      Object.assign(cardElement.style, originalStyles);
+      hiddenElements.forEach(el => el.classList.add('hidden'));
+      if (transactionsSection) transactionsSection.style.display = '';
+      if (downloadButton) downloadButton.style.display = '';
+      tokenElement.style.fontSize = ''; // Reset dynamic scaling
 
-      // Restore expandable sections, transactions, and download button
-      expandableSections.forEach(section => {
-        section.classList.add('hidden');
-      });
-      if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
-      if (downloadButton) downloadButton.style.display = originalButtonDisplay;
-
-      // Create download link
+      // Trigger download
       const link = document.createElement('a');
+      link.download = `PnL_${tokenName.replace(/[^\w]/g, '_')}.png`;
       link.href = canvas.toDataURL('image/png');
-      link.download = `PnL_Card_${tokenName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_')}.png`;
-      document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
     }).catch(error => {
-      console.error('Error generating PnL card image:', error);
-      // Restore original state on error
-      cardElement.className = originalClasses;
-      Object.assign(cardElement.style, originalStyle);
-      tokenElement.style.fontSize = '';
-      expandableSections.forEach(section => {
-        section.classList.add('hidden');
-      });
-      if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
-      if (downloadButton) downloadButton.style.display = originalButtonDisplay;
-      alert('Failed to download PnL card. Please check the console for errors and try again.');
+      console.error('Download failed:', error);
+      // Emergency restore
+      cardElement.classList.remove('downloading');
+      Object.assign(cardElement.style, originalStyles);
+      hiddenElements.forEach(el => el.classList.add('hidden'));
+      if (transactionsSection) transactionsSection.style.display = '';
+      if (downloadButton) downloadButton.style.display = '';
+      alert('Download failed. Check console for details.');
     });
-  }, 200); // Increased delay to ensure all styles are applied
+  }, 200); // Slightly longer delay for rendering stability
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
