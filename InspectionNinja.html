@@ -857,13 +857,13 @@ table tr.details-row {
   margin: 140px 0 60px 0 !important;
   word-break: keep-all !important;
   white-space: nowrap !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
-  max-width: 100% !important;
-  width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 80% !important;
+  width: auto !important;
   text-align: center !important;
   line-height: 1 !important;
-  padding: 0 5% !important;
+  padding: 0 10% !important;
   box-sizing: border-box !important;
 }
 
@@ -2204,7 +2204,7 @@ table tr.details-row {
   });
 }
   
-  function downloadPnLCard(cardId, tokenName) {
+ function downloadPnLCard(cardId, tokenName) {
   const cardElement = document.getElementById(cardId);
   if (!cardElement) {
     console.error(`PnL card with ID ${cardId} not found`);
@@ -2248,13 +2248,17 @@ table tr.details-row {
   tempSpan.textContent = tokenName;
   document.body.appendChild(tempSpan);
   
-  const maxWidth = tokenElement.clientWidth * 0.9; // 90% of container
+  // Account for padding (10% on each side = 20% total)
+  const maxWidth = cardElement.clientWidth * 0.8; // Use 80% to prevent overflow
   const textWidth = tempSpan.clientWidth;
   document.body.removeChild(tempSpan);
 
   if (textWidth > maxWidth) {
     const scaleFactor = maxWidth / textWidth;
-    tokenElement.style.fontSize = `${220 * scaleFactor}px`; // Scale down from 220px
+    const newFontSize = Math.max(80, 220 * scaleFactor); // Minimum 80px for readability
+    tokenElement.style.fontSize = `${newFontSize}px`;
+  } else {
+    tokenElement.style.fontSize = '220px'; // Reset to default if no scaling needed
   }
 
   // Capture after a brief delay
