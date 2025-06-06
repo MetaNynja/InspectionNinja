@@ -2630,15 +2630,15 @@ table tr.details-row {
         buyTxs: [],
         sellTxs: []
       };
-      let p_l_display, p_l_color;
+      let p_l, p_l_color;
       if (details.tokensSold === 0 && details.xrpReceived === 0) {
-        p_l_display = `0 XRP`;
+        p_l = `0.00 XRP`;
         p_l_color = 'white';
       } else {
         const isProfit = details.profit >= 0;
         const symbol = isProfit ? '+' : '−';
-        p_l_display = `${symbol}${formatAmount(Math.abs(details.profit))} XRP`;
-        p_l_color = isProfit ? '#66bb6a' : '#ef5350';
+        p_l = `${symbol}${formatAmount(Math.abs(details.profit))} XRP`;
+        p_l_color = 'color: ${isProfit ? '#66bb6a' : '#ef5350'}';
       }
       const rowParityClass = index % 2 === 0 ? 'token-row-even' : 'token-row-odd';
       html += `<tr class="token-row ${rowParityClass}" onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
@@ -2648,9 +2648,11 @@ table tr.details-row {
       html += `<td>${formatAmount(details.xrpSpent)} XRP</td>`;
       html += `<td>${formatAmount(details.tokensSold)}</td>`;
       html += `<td>${formatAmount(details.xrpReceived)} XRP</td>`;
-      html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
+      html += `<td style="${p_l_color}">${p_l}</td>`;
       html += `</tr>`;
       html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7">`;
+      // Strip HTML from token name for download
+      const tokenName = getCurrencyDisplay(token.currency).replace(/<[^>]+>/g, '').replace(/'/g, "\\'");
       html += `
         <div class="pnl-card" id="pnl-card-${key}">
           <div class="pnl-card-header">
@@ -2683,7 +2685,7 @@ table tr.details-row {
               ` : `<div class="line">Sales: None</div>`}
             </div>
           </div>
-          <button class="download-btn" onclick="event.stopPropagation(); downloadPnLCard('pnl-card-${key}', '${getCurrencyDisplayString(token.currency).replace(/'/g, "\\'")}')">
+          <button class="download-btn" onclick="event.stopPropagation(); downloadPnLCard('pnl-card-${key}', '${tokenName}')">
             <img src="https://i.ibb.co/3m0LddNz/IMG-7147.png" alt="Download Icon">
             <span>Download PnL Card</span>
           </button>
