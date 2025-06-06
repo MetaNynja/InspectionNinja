@@ -857,13 +857,11 @@ table tr.details-row {
   margin: 140px 0 60px 0 !important;
   word-break: keep-all !important;
   white-space: nowrap !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
   max-width: 80% !important;
-  width: auto% !important;
+  width: auto !important;
   text-align: center !important;
   line-height: 1 !important;
-  padding: 0 5% !important;
+  padding: 0 10% !important;
   box-sizing: border-box !important;
 }
 
@@ -2241,25 +2239,31 @@ table tr.details-row {
 
   // Measure text width and adjust font size if needed
   const tokenElement = cardElement.querySelector('.pnl-card-token');
+  const maxWidth = cardElement.clientWidth * 0.8; // 80% of card width to account for padding
+  let fontSize = 220; // Starting font size in pixels
+  const minFontSize = 60; // Minimum font size for readability
+
+  // Create a temporary span to measure text width
   const tempSpan = document.createElement('span');
   tempSpan.style.visibility = 'hidden';
   tempSpan.style.whiteSpace = 'nowrap';
-  tempSpan.style.font = window.getComputedStyle(tokenElement).font;
+  tempSpan.style.fontFamily = window.getComputedStyle(tokenElement).fontFamily;
+  tempSpan.style.fontWeight = window.getComputedStyle(tokenElement).fontWeight;
   tempSpan.textContent = tokenName;
   document.body.appendChild(tempSpan);
-  
-  // Account for padding (10% on each side = 20% total)
-  const maxWidth = cardElement.clientWidth * 0.8; // Use 80% to prevent overflow
-  const textWidth = tempSpan.clientWidth;
+
+  // Iteratively reduce font size until text fits
+  tempSpan.style.fontSize = `${fontSize}px`;
+  let textWidth = tempSpan.clientWidth;
+  while (textWidth > maxWidth && fontSize > minFontSize) {
+    fontSize -= 5; // Reduce by 5px increments for precision
+    tempSpan.style.fontSize = `${fontSize}px`;
+    textWidth = tempSpan.clientWidth;
+  }
   document.body.removeChild(tempSpan);
 
-  if (textWidth > maxWidth) {
-    const scaleFactor = maxWidth / textWidth;
-    const newFontSize = Math.max(80, 220 * scaleFactor); // Minimum 80px for readability
-    tokenElement.style.fontSize = `${newFontSize}px`;
-  } else {
-    tokenElement.style.fontSize = '220px'; // Reset to default if no scaling needed
-  }
+  // Apply the calculated font size
+  tokenElement.style.fontSize = `${Math.max(fontSize, minFontSize)}px`;
 
   // Capture after a brief delay
   setTimeout(() => {
@@ -2294,7 +2298,7 @@ table tr.details-row {
       if (downloadButton) downloadButton.style.display = '';
       alert('Download failed. Check console for details.');
     });
-  }, 200); // Slightly longer delay for rendering stability
+  }, 200); // Delay for rendering stability
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
