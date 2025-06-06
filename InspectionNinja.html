@@ -857,11 +857,11 @@ table tr.details-row {
   margin: 140px 0 60px 0 !important;
   word-break: keep-all !important;
   white-space: nowrap !important;
-  max-width: 80% !important;
+  max-width: 1440px !important; /* 1800px * 0.8 to account for 10% padding on each side */
   width: auto !important;
   text-align: center !important;
   line-height: 1 !important;
-  padding: 0 10% !important;
+  padding: 0 180px !important; /* Explicit 10% padding (180px for 1800px width) */
   box-sizing: border-box !important;
 }
 
@@ -2239,9 +2239,11 @@ table tr.details-row {
 
   // Measure text width and adjust font size if needed
   const tokenElement = cardElement.querySelector('.pnl-card-token');
-  const maxWidth = cardElement.clientWidth * 0.8; // 80% of card width to account for padding
+  const cardWidth = 1800; // Fixed card width
+  const padding = 180 * 2; // 10% padding on each side (180px * 2)
+  const maxWidth = cardWidth - padding; // 1440px
   let fontSize = 220; // Starting font size in pixels
-  const minFontSize = 60; // Minimum font size for readability
+  const minFontSize = 40; // Lower minimum for very long names
 
   // Create a temporary span to measure text width
   const tempSpan = document.createElement('span');
@@ -2255,15 +2257,19 @@ table tr.details-row {
   // Iteratively reduce font size until text fits
   tempSpan.style.fontSize = `${fontSize}px`;
   let textWidth = tempSpan.clientWidth;
+  console.log(`Initial text width: ${textWidth}px, maxWidth: ${maxWidth}px, tokenName: "${tokenName}"`);
   while (textWidth > maxWidth && fontSize > minFontSize) {
-    fontSize -= 5; // Reduce by 5px increments for precision
+    fontSize -= 10; // More aggressive reduction
     tempSpan.style.fontSize = `${fontSize}px`;
     textWidth = tempSpan.clientWidth;
+    console.log(`Adjusted fontSize: ${fontSize}px, textWidth: ${textWidth}px`);
   }
   document.body.removeChild(tempSpan);
 
   // Apply the calculated font size
-  tokenElement.style.fontSize = `${Math.max(fontSize, minFontSize)}px`;
+  const finalFontSize = Math.max(fontSize, minFontSize);
+  tokenElement.style.fontSize = `${finalFontSize}px`;
+  console.log(`Final font size applied: ${finalFontSize}px for tokenName: "${tokenName}"`);
 
   // Capture after a brief delay
   setTimeout(() => {
@@ -2298,7 +2304,7 @@ table tr.details-row {
       if (downloadButton) downloadButton.style.display = '';
       alert('Download failed. Check console for details.');
     });
-  }, 200); // Delay for rendering stability
+  }, 300); // Increased delay for rendering stability
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
