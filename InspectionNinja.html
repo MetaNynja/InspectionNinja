@@ -800,6 +800,7 @@ table tr.details-row {
   }
 }
 /* New CSS for .pnl-card.downloading */
+/* Updated PnL Card Download Styles */
 #output .pnl-card.downloading {
   width: 1800px !important;
   height: 1600px !important;
@@ -829,7 +830,7 @@ table tr.details-row {
 }
 
 #output .pnl-card.downloading .pnl-card-header {
-  margin-bottom: 180px !important; /* Increased from 140px to shift content below downward */
+  margin-bottom: 180px !important;
   margin-top: 0 !important;
   display: flex !important;
   align-items: center !important;
@@ -853,21 +854,26 @@ table tr.details-row {
 
 #output .pnl-card.downloading .pnl-card-token {
   font-size: 220px !important;
-  margin: 140px 0 60px 0 !important; /* Kept to maintain spacing with percentage */
-  word-break: break-word !important;
-  max-width: 75% !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  line-height: 1.1 !important;
+  margin: 140px 0 60px 0 !important;
+  word-break: keep-all !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  padding: 0 5% !important;
+  box-sizing: border-box !important;
 }
 
 #output .pnl-card.downloading .pnl-card-profit {
   font-size: 128px !important;
-  margin-bottom: 160px !important; /* Kept to maintain spacing with Bought/Profit */
+  margin-bottom: 160px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-content {
-  gap: 48px !important; /* Kept to maintain spacing within Bought/Profit */
+  gap: 48px !important;
 }
 
 #output .pnl-card.downloading .pnl-card-row {
@@ -892,37 +898,19 @@ table tr.details-row {
   margin-top: 24px !important;
 }
 
+/* Mobile adjustments for downloading state */
 @media screen and (max-width: 768px) {
   #output .pnl-card.downloading {
     width: 1800px !important;
     height: 1600px !important;
-    max-width: none !important;
-    margin: 0 !important;
-    transform: none !important;
     padding: 48px 96px !important;
-    font-size: 28px !important;
-    border-radius: 0 !important;
-    position: absolute !important;
-    z-index: 9999 !important;
-    background: 
-      linear-gradient(
-        45deg,
-        rgba(34, 34, 40, 0.98) 25%,
-        rgba(255, 255, 255, 0.05) 25%,
-        rgba(255, 255, 255, 0.05) 50%,
-        rgba(34, 34, 40, 0.98) 50%,
-        rgba(34, 34, 40, 0.98) 75%,
-        rgba(255, 255, 255, 0.05) 75%,
-        rgba(255, 255, 255, 0.05) 100%
-      ) !important;
-    background-size: 20px 20px !important;
-    background-color: rgba(34, 34, 40, 0.98) !important;
   }
 
-  #output .pnl-card.downloading .pnl-card-icon {
-    width: 128px !important;
-    height: 128px !important;
-    margin-right: 48px !important;
+  #output .pnl-card.downloading .pnl-card-token {
+    font-size: 10vw !important;
+    max-width: 90% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 
   #output .pnl-card.downloading .pnl-card-title {
@@ -932,27 +920,12 @@ table tr.details-row {
   #output .pnl-card.downloading .pnl-card-title .pnl {
     font-size: 90px !important;
   }
+}
 
+/* Portrait orientation adjustment */
+@media (max-aspect-ratio: 1/1) {
   #output .pnl-card.downloading .pnl-card-token {
-    font-size: 220px !important;
-    word-break: break-word !important;
-    max-width: 75% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    line-height: 1.1 !important;
-  }
-
-  #output .pnl-card.downloading .pnl-card-profit {
-    font-size: 128px !important;
-  }
-
-  #output .pnl-card.downloading .pnl-card-label {
-    font-size: 88px !important;
-    text-decoration: none !important;
-  }
-
-  #output .pnl-card.downloading .pnl-card-value {
-    font-size: 80px !important;
+    font-size: 8vh !important;
   }
 }
   </style>
@@ -2239,7 +2212,7 @@ table tr.details-row {
     return;
   }
 
-  // Store original styles
+  // Store original styles and classes
   const originalStyle = {
     width: cardElement.style.width,
     height: cardElement.style.height,
@@ -2253,6 +2226,7 @@ table tr.details-row {
     zIndex: cardElement.style.zIndex,
     boxSizing: cardElement.style.boxSizing
   };
+  const originalClasses = cardElement.className;
 
   // Temporarily show all expandable content except transactions and download button
   const expandableSections = cardElement.querySelectorAll('.hidden:not(.pnl-transactions .hidden)');
@@ -2271,34 +2245,54 @@ table tr.details-row {
   if (downloadButton) downloadButton.style.display = 'none';
 
   // Set fixed dimensions and apply downloading class
-  const desiredWidth = 1800; // Desired width in pixels
-  const desiredHeight = 1600; // Desired height in pixels
+  const desiredWidth = 1800;
+  const desiredHeight = 1600;
   cardElement.style.width = `${desiredWidth}px`;
   cardElement.style.height = `${desiredHeight}px`;
   cardElement.style.maxWidth = 'none';
   cardElement.style.margin = '0';
   cardElement.style.transform = 'none';
-  cardElement.style.position = 'absolute'; // Ensure it’s not affected by parent layout
-  cardElement.style.zIndex = '9999'; // Bring to front
+  cardElement.style.position = 'absolute';
+  cardElement.style.zIndex = '9999';
   cardElement.style.boxSizing = 'border-box';
   cardElement.classList.add('downloading');
 
-  // Force reflow to ensure styles are applied
-  cardElement.offsetHeight; // Trigger reflow
+  // Create a temporary container for accurate measurement
+  const measureContainer = document.createElement('div');
+  measureContainer.style.position = 'absolute';
+  measureContainer.style.visibility = 'hidden';
+  measureContainer.style.whiteSpace = 'nowrap';
+  measureContainer.style.fontFamily = window.getComputedStyle(cardElement.querySelector('.pnl-card-token')).fontFamily;
+  measureContainer.style.fontSize = '220px';
+  measureContainer.textContent = tokenName;
+  document.body.appendChild(measureContainer);
+
+  // Calculate required font size
+  const tokenElement = cardElement.querySelector('.pnl-card-token');
+  const containerWidth = tokenElement.clientWidth * 0.9; // 90% of available width
+  const textWidth = measureContainer.clientWidth;
+  document.body.removeChild(measureContainer);
+
+  if (textWidth > containerWidth) {
+    const scaleFactor = containerWidth / textWidth;
+    tokenElement.style.fontSize = `${220 * scaleFactor}px`;
+  }
 
   // Add a small delay to ensure styles are rendered
   setTimeout(() => {
     html2canvas(cardElement, {
-      backgroundColor: null, // Preserve transparent background
-      width: desiredWidth, // Set canvas width
-      height: desiredHeight, // Set canvas height
-      scale: 2, // Double rendering resolution for sharpness
-      useCORS: true, // Enable CORS for external images
-      logging: true // Enable logging for debugging
+      backgroundColor: null,
+      width: desiredWidth,
+      height: desiredHeight,
+      scale: 2,
+      useCORS: true,
+      logging: true,
+      allowTaint: true
     }).then(canvas => {
-      // Restore original styles
-      cardElement.classList.remove('downloading');
+      // Restore original state
+      cardElement.className = originalClasses;
       Object.assign(cardElement.style, originalStyle);
+      tokenElement.style.fontSize = '';
 
       // Restore expandable sections, transactions, and download button
       expandableSections.forEach(section => {
@@ -2310,13 +2304,16 @@ table tr.details-row {
       // Create download link
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
-      link.download = `PnL_Card_${tokenName.replace(/\s+/g, '_')}.png`;
+      link.download = `PnL_Card_${tokenName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_')}.png`;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     }).catch(error => {
       console.error('Error generating PnL card image:', error);
-      // Restore original styles on error
-      cardElement.classList.remove('downloading');
+      // Restore original state on error
+      cardElement.className = originalClasses;
       Object.assign(cardElement.style, originalStyle);
+      tokenElement.style.fontSize = '';
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
@@ -2324,7 +2321,7 @@ table tr.details-row {
       if (downloadButton) downloadButton.style.display = originalButtonDisplay;
       alert('Failed to download PnL card. Please check the console for errors and try again.');
     });
-  }, 100); // 100ms delay to ensure styles are applied
+  }, 200); // Increased delay to ensure all styles are applied
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
