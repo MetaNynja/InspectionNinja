@@ -897,7 +897,7 @@ table tr.details-row {
 /* Media query for print/download to adjust PnL card spacing */
 @media print {
   .pnl-card {
-    padding: clamp(4px, 0.6vw, 6px); /* Further reduced padding */
+    padding: 2px; /* Minimal padding */
     background: 
       linear-gradient(
         45deg,
@@ -913,48 +913,60 @@ table tr.details-row {
     background-color: rgba(34, 34, 40, 25%);
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Changed from space-between to flex-start */
-    gap: clamp(2px, 0.2vw, 4px); /* Minimal gap between flex children */
-    height: auto; /* Allow natural height to prevent stretching */
+    justify-content: flex-start; /* Align items at the top */
+    align-items: center;
+    gap: 1px; /* Minimal gap between flex children */
+    height: auto; /* Allow natural height */
+    max-height: 300px; /* Constrain height to prevent stretching */
+    overflow: hidden; /* Prevent overflow issues */
+  }
+
+  .pnl-card-header {
+    margin: 0; /* Remove margin */
+    padding: 2px 0; /* Minimal padding */
   }
 
   .pnl-card-token {
-    margin: clamp(2px, 0.05vw, 3px) auto; /* Minimal margin */
-    font-size: clamp(1.6rem, 3vw, 2.8rem); /* Slightly smaller font */
-    line-height: 1; /* Tight line height */
+    margin: 1px auto; /* Minimal margin */
+    font-size: clamp(1.4rem, 2.5vw, 2rem); /* Smaller font */
+    line-height: 1; /* No extra line height */
+    transform: translateY(-2px); /* Pull up slightly to close gap */
   }
 
   .pnl-card-profit {
-    margin: clamp(2px, 0.05vw, 3px) auto; /* Minimal margin */
-    font-size: clamp(1.4rem, 2.8vw, 2.4rem); /* Smaller font */
-    line-height: 1; /* Tight line height */
+    margin: 1px auto; /* Minimal margin */
+    font-size: clamp(1.2rem, 2vw, 1.8rem); /* Smaller font */
+    line-height: 1; /* No extra line height */
+    transform: translateY(-2px); /* Pull up slightly to close gap */
   }
 
   .pnl-card-content {
-    gap: clamp(2px, 0.1vw, 3px); /* Minimal gap for content */
-    margin: clamp(2px, 0.1vw, 3px) 0; /* Minimal vertical margin */
+    margin: 1px 0; /* Minimal margin */
+    gap: 1px; /* Minimal gap for content */
   }
 
   .pnl-card-row {
-    gap: clamp(0.4rem, 1vw, 0.8rem); /* Reduced gap between columns */
+    gap: clamp(0.2rem, 0.5vw, 0.4rem); /* Minimal gap between columns */
     flex-wrap: nowrap;
-    justify-content: center; /* Center columns to avoid spreading */
+    justify-content: center;
+    margin: 0; /* Remove margin */
   }
 
   .pnl-card-column {
     align-items: center;
+    margin: 0; /* Remove margin */
   }
 
   .pnl-card-label {
-    font-size: clamp(1.4rem, 2.5vw, 2.4rem); /* Smaller font */
-    line-height: 1; /* Tight line height */
-    margin-bottom: clamp(1px, 0.05vw, 2px); /* Minimal margin */
+    font-size: clamp(1.2rem, 2vw, 1.8rem); /* Smaller font */
+    line-height: 1; /* No extra line height */
+    margin: 0; /* Remove margin */
   }
 
   .pnl-card-value {
-    font-size: clamp(1.2rem, 2.2vw, 2rem); /* Smaller font */
-    margin-top: clamp(1px, 0.05vw, 2px); /* Minimal margin */
-    line-height: 1; /* Tight line height */
+    font-size: clamp(1rem, 1.8vw, 1.6rem); /* Smaller font */
+    margin: 0; /* Remove margin */
+    line-height: 1; /* No extra line height */
   }
 }
 </style>
