@@ -430,7 +430,9 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  margin-bottom: clamp(2rem, 5vw, 10rem); /* Responsive margin */
+  margin-bottom: clamp(2rem, 5vw, 10rem);
+  flex-wrap: nowrap; /* Prevent wrapping of icon and title */
+  overflow: hidden; /* Prevent overflow from long titles */
 }
 
 .pnl-card-icon {
@@ -442,15 +444,18 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 .pnl-card-title {
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 600;
-  font-size: clamp(3rem, 5vw, 9.6rem); /* Large, responsive title */
+  font-size: clamp(2.5rem, 4vw, 8rem); /* Smaller, responsive title */
   color: #ffffff;
+  white-space: nowrap; /* Prevent wrapping */
+  display: inline-block; /* Support nowrap and scaling */
 }
 
 .pnl-card-title .pnl {
   font-family: 'Nothing You Could Do', cursive;
-  font-size: clamp(2.8rem, 4.8vw, 9rem);
+  font-size: clamp(2.3rem, 3.8vw, 7.5rem); /* Match title scaling */
   color: #FFECB3;
-  margin-left: 0.5rem;
+  margin-left: 0.3rem; /* Reduced for mobile */
+  white-space: nowrap; /* Ensure no wrap */
 }
 
 .pnl-card-token {
@@ -666,10 +671,8 @@ table tr.details-row {
   }
 
   .pnl-card-header {
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
+    margin-bottom: clamp(1.5rem, 4vw, 6rem);
+    flex-wrap: nowrap; /* Reinforce nowrap */
   }
 
   .pnl-card-icon {
@@ -679,12 +682,14 @@ table tr.details-row {
   }
 
   .pnl-card-title {
-    font-size: clamp(2rem, 4vw, 6rem);
+    font-size: clamp(1.8rem, 3.5vw, 4.5rem); /* Smaller for mobile */
+    white-space: nowrap;
   }
 
   .pnl-card-title .pnl {
-    font-size: clamp(1.8rem, 3.8vw, 5.6rem);
-    margin-left: 0.3rem;
+    font-size: clamp(1.6rem, 3.3vw, 4.2rem);
+    margin-left: 0.2rem; /* Tighter for mobile */
+    white-space: nowrap;
   }
 
   table:has(#xrp-values-toggle) {
@@ -723,8 +728,10 @@ table tr.details-row {
   }
 
   .pnl-card-token {
-    font-size: clamp(4rem, 8vw, 14rem);
+    font-size: clamp(3rem, 6vw, 10rem); /* Scale down for long names */
     margin: clamp(1.5rem, 3vw, 8rem) auto clamp(1rem, 2vw, 4rem);
+    white-space: nowrap;
+    transform: scale(0.9); /* Slightly scale down for very long names */
   }
 
   .pnl-card-profit {
