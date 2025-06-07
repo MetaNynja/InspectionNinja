@@ -381,10 +381,9 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 }
 
 .header-text {
-  font-family: 'SF Pro Display', cursive;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 600;
   font-size: 20px;
-  margin-left: 10px;
   color: #ffffff;
   letter-spacing: 0.02em;
 }
@@ -392,7 +391,6 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 .header-text .metanynja {
   font-family: 'Nothing You Could Do', cursive;
   font-size: 18px;
-  margin-left: 8px;
   color: #1e90ff;
 }
 
@@ -413,9 +411,9 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   border-radius: 0;
   padding: clamp(10px, 1.5vw, 12px);
   margin: 0.5rem auto;
-  box-shadow: 0 0.4rem  rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0.4rem rgba(0, 0, 0, 0.3);
   color: #e5e5e7;
-  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-size: clamp(14px, 1.8vw, 16px);
   line-height: 1.4;
   text-align: center;
@@ -439,8 +437,8 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   flex-wrap: nowrap;
   overflow: hidden;
   text-align: left;
-  width: 100%; /* Ensure full width for left alignment */
-  padding-left: clamp(0.5rem, 1vw, 1rem); /* Add padding for left spacing */
+  width: 100%;
+  padding-left: clamp(0.5rem, 1vw, 1rem);
 }
 
 .pnl-card-icon {
@@ -609,9 +607,8 @@ table tr.details-row {
     font-size: 14px;
   }
 
-  .header-text .info {
+  .header-text .metanynja {
     font-size: 14px;
-    margin-left: 4px;
   }
 
   #console {
@@ -698,7 +695,7 @@ table tr.details-row {
   .pnl-card-icon {
     width: clamp(32px, 6vw, 64px);
     height: clamp(32px, 6vw, 64px);
-    margin-right: clamp(0.4rem, 0.8vw, 0.8rem); /* Reduced for tighter left alignment */
+    margin-right: clamp(0.4rem, 0.8vw, 0.8rem);
   }
 
   .pnl-card-title {
@@ -834,10 +831,10 @@ table tr.details-row {
   }
 
   .download-btn {
-    font-size: clamp(0.8rem, 1.3vw, 1.1rem); /* Reduced font size */
-    padding: clamp(0.4rem, 0.8vw, 0.8rem) clamp(1rem, 2vw, 2rem); /* Increased horizontal padding */
+    font-size: clamp(0.8rem, 1.3vw, 1.1rem);
+    padding: clamp(0.4rem, 0.8vw, 0.8rem) clamp(1rem, 2vw, 2rem);
     margin: clamp(0.4rem, 0.8vw, 0.8rem) auto clamp(1rem, 1.5vw, 1.5rem);
-    max-width: clamp(180px, 50vw, 240px); /* Increased width */
+    max-width: clamp(180px, 50vw, 240px);
     white-space: nowrap;
     box-sizing: border-box;
   }
@@ -894,6 +891,42 @@ table tr.details-row {
   .transactions-card-content .line {
     margin-bottom: clamp(0.8rem, 1.2vw, 1.6rem);
     font-size: clamp(1.2rem, 1.8vw, 2rem);
+  }
+}
+
+/* Media query for print/download to adjust PnL card spacing */
+@media print {
+  .pnl-card {
+    padding: clamp(8px, 1.2vw, 10px);
+  }
+
+  .pnl-card-token {
+    margin: clamp(0.1rem, 0.2vw, 0.2rem) auto;
+  }
+
+  .pnl-card-profit {
+    margin: clamp(0.1rem, 0.2vw, 0.2rem) auto;
+  }
+
+  .pnl-card-content {
+    gap: clamp(0.2rem, 0.4vw, 0.4rem);
+  }
+
+  .pnl-card-row {
+    gap: clamp(0.8rem, 2vw, 2rem);
+  }
+
+  .pnl-card-column {
+    align-items: center;
+  }
+
+  .pnl-card-label {
+    font-size: clamp(1.8rem, 3vw, 3.6rem);
+  }
+
+  .pnl-card-value {
+    font-size: clamp(1.6rem, 2.6vw, 3.2rem);
+    margin-top: clamp(0.2rem, 0.4vw, 0.4rem);
   }
 }
 </style>
