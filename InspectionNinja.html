@@ -897,7 +897,7 @@ table tr.details-row {
 /* Media query for print/download to adjust PnL card spacing */
 @media print {
   .pnl-card {
-    padding: clamp(6px, 0.8vw, 8px); /* Reduced padding */
+    padding: clamp(4px, 0.6vw, 6px); /* Further reduced padding */
     background: 
       linear-gradient(
         45deg,
@@ -911,27 +911,34 @@ table tr.details-row {
       );
     background-size: 0.4vw 0.4vw;
     background-color: rgba(34, 34, 40, 25%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Changed from space-between to flex-start */
+    gap: clamp(2px, 0.2vw, 4px); /* Minimal gap between flex children */
+    height: auto; /* Allow natural height to prevent stretching */
   }
 
   .pnl-card-token {
-    margin: clamp(0.05rem, 0.1vw, 0.1rem) auto; /* Tighter margin */
-    font-size: clamp(1.8rem, 3.5vw, 3.2rem); /* Slightly smaller to fit better */
-    line-height: 1; /* Reduced line height */
+    margin: clamp(2px, 0.05vw, 3px) auto; /* Minimal margin */
+    font-size: clamp(1.6rem, 3vw, 2.8rem); /* Slightly smaller font */
+    line-height: 1; /* Tight line height */
   }
 
   .pnl-card-profit {
-    margin: clamp(0.05rem, 0.1vw, 0.1rem) auto; /* Tighter margin */
-    font-size: clamp(1.6rem, 3vw, 2.8rem); /* Slightly smaller */
-    line-height: 1; /* Reduced line height */
+    margin: clamp(2px, 0.05vw, 3px) auto; /* Minimal margin */
+    font-size: clamp(1.4rem, 2.8vw, 2.4rem); /* Smaller font */
+    line-height: 1; /* Tight line height */
   }
 
   .pnl-card-content {
-    gap: clamp(0.1rem, 0.2vw, 0.2rem); /* Reduced gap between rows */
+    gap: clamp(2px, 0.1vw, 3px); /* Minimal gap for content */
+    margin: clamp(2px, 0.1vw, 3px) 0; /* Minimal vertical margin */
   }
 
   .pnl-card-row {
-    gap: clamp(0.6rem, 1.5vw, 1.2rem); /* Slightly reduced gap */
-    flex-wrap: nowrap; /* Prevent wrapping */
+    gap: clamp(0.4rem, 1vw, 0.8rem); /* Reduced gap between columns */
+    flex-wrap: nowrap;
+    justify-content: center; /* Center columns to avoid spreading */
   }
 
   .pnl-card-column {
@@ -939,14 +946,15 @@ table tr.details-row {
   }
 
   .pnl-card-label {
-    font-size: clamp(1.6rem, 2.8vw, 2.8rem); /* Slightly smaller */
-    line-height: 1.1; /* Tighter line height */
+    font-size: clamp(1.4rem, 2.5vw, 2.4rem); /* Smaller font */
+    line-height: 1; /* Tight line height */
+    margin-bottom: clamp(1px, 0.05vw, 2px); /* Minimal margin */
   }
 
   .pnl-card-value {
-    font-size: clamp(1.4rem, 2.4vw, 2.4rem); /* Slightly smaller */
-    margin-top: clamp(0.1rem, 0.2vw, 0.2rem); /* Tighter margin */
-    line-height: 1.1; /* Tighter line height */
+    font-size: clamp(1.2rem, 2.2vw, 2rem); /* Smaller font */
+    margin-top: clamp(1px, 0.05vw, 2px); /* Minimal margin */
+    line-height: 1; /* Tight line height */
   }
 }
 </style>
