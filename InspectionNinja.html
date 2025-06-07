@@ -632,42 +632,47 @@ table tr.details-row {
   }
 
   .dropdown-toggle {
-    width: 100px;
-    font-size: 10px;
-    padding: clamp(0, 2vw, 8px);
+    max-width: 140px;
+    font-size: 12px;
+    padding: 8px 12px;
+    white-space: nowrap;
     overflow: hidden;
-    text-align: right;
+    text-overflow: ellipsis;
   }
 
   .dropdown-menu {
-    width Morin: 160px;
-    font-size: 10px;
-    margin-bottom: clamp(2px, 2vw, 8px);
-}
+    width: 180px;
+    font-size: 12px;
+    bottom: calc(100% + 8px);
+  }
 
   .dropdown-option {
-    padding: clamp(0, 2vw, 8px);
+    padding: 8px 12px;
   }
 
   #input-line {
-    padding: 12px;
-    width: 640px;
-    margin: clamp(0, 2vw, 8px);
+    padding: 8px 12px;
+    z-index: 3;
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-wrap: nowrap;
-    gap: clamp(8px, 2vw, 8px);
-    align-items: stretch;
+    gap: 8px;
+    align-items: center;
   }
 
   .custom-dropdown {
-    width: 100px;
+    flex: 0 0 auto;
+    max-width: 140px;
   }
 
-  #cmd-input {
-    font-size: 10px;
-    padding: clamp(0, 2vw, 10px);
-    width: clamp(360px, 90vw, 540px);
-    min-width: 64px;
+   #cmd-input {
+    font-size: 12px;
+    padding: 8px 12px;
+    flex: 1 1 auto;
+    max-width: calc(100% - 156px);
+    min-width: 100px;
+    box-sizing: border-box;
   }
 
   .pnl-card-header {
@@ -819,6 +824,54 @@ table tr.details-row {
   .download-btn img {
     width: clamp(0px, 2vw, 16px);
     height: clamp(0px, 2vw, 16px);
+  }
+
+.transactions-card {
+  background: rgba(34, 34, 40, 0.98);
+  border-radius: 1.5rem;
+  padding: 2.5vw;
+  margin: 1rem auto;
+  box-shadow: 0 0.4rem 1.6rem rgba(0, 0, 0, 0.3);
+  color: #e5e5e7;
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-size: clamp(1.4rem, 2.5vw, 2.8rem);
+  line-height: 1.6;
+  text-align: left;
+  box-sizing: border-box;
+  width: clamp(800px, 80vw, 1800px);
+  max-width: 100%;
+  position: relative;
+  z-index: 5;
+}
+
+.transactions-card-header {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
+  font-size: clamp(2.5rem, 4vw, 8rem);
+  color: #ffffff;
+  margin-bottom: clamp(2rem, 5vw, 10rem);
+}
+
+.transactions-card-content .line {
+  margin-bottom: clamp(0.8rem, 1.2vw, 2.4rem);
+  font-size: clamp(1.4rem, 2vw, 2.8rem);
+}
+
+@media screen and (max-width: 768px) {
+  .transactions-card {
+    width: clamp(600px, 90vw, 1200px);
+    padding: 3vw;
+    font-size: clamp(1.2rem, 2.2vw, 2rem);
+  }
+
+  .transactions-card-header {
+    font-size: clamp(1.8rem, 3.5vw, 4.5rem);
+    margin-bottom: clamp(1.5rem, 4vw, 6rem);
+  }
+
+  .transactions-card-content .line {
+    margin-bottom: clamp(0.8rem, 1.2vw, 1.6rem);
+    font-size: clamp(1.2rem, 1.8vw, 2rem);
   }
 }
   </style>
@@ -2577,105 +2630,111 @@ table tr.details-row {
     }
   },
   renderData(data) {
-  const { tokens, tokenDetails } = data;
-  let html = `<div class="header">Trade History</div>`;
-  html += `
-    <div class="line">
-      <label style="cursor: pointer; margin-right: 20px;">
-        <input type="checkbox" id="xrp-values-toggle" onchange="toggleXrpValuesOnly()" checked>
-        XRP Values Only
-      </label>
-      <label style="cursor: pointer;">
-        <input type="checkbox" id="zero-balance-toggle" onchange="toggleZeroBalanceOnly()">
-        Zero Balance Only
-      </label>
-    </div>
-  `;
-  if (tokens.length === 0) {
-    html += `<div class="line">No token purchase or sale activity found for this wallet.</div>`;
-  } else {
-    html += `<table>`;
-    html += `<tr><th>Token</th><th>Balance</th><th>Bought</th><th>Spent</th><th>Sold</th><th>Received</th><th>P/L</th></tr>`;
-    tokens.forEach((token, index) => {
-      const key = `${token.issuer}_${token.currency}`;
-      const details = tokenDetails[key] || {
-        currentBalance: token.currentBalance,
-        tokensBought: 0,
-        xrpSpent: 0,
-        tokensSold: 0,
-        xrpReceived: 0,
-        profit: 0,
-        buyTxs: [],
-        sellTxs: []
-      };
-      let p_l_display, p_l_color;
-      if (details.tokensSold === 0 && details.xrpReceived === 0) {
-        p_l_display = `0 XRP`;
-        p_l_color = 'white';
-      } else {
-        const isProfit = details.profit >= 0;
-        const symbol = isProfit ? '+' : '−';
-        p_l_display = `${symbol}${formatAmount(Math.abs(details.profit))} XRP`;
-        p_l_color = isProfit ? '#66bb6a' : '#ef5350';
-      }
-      const rowParityClass = index % 2 === 0 ? 'token-row-even' : 'token-row-odd';
-      html += `<tr class="token-row ${rowParityClass}" onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
-      html += `<td style="overflow: hidden; text-overflow: ellipsis;" title="${getCurrencyDisplay(token.currency)}"><a href="https://xrpscan.com/account/${token.issuer}" target="_blank">${getCurrencyDisplay(token.currency)}</a></td>`;
-      html += `<td>${formatAmount(details.currentBalance)}</td>`;
-      html += `<td>${formatAmount(details.tokensBought)}</td>`;
-      html += `<td>${formatAmount(details.xrpSpent)} XRP</td>`;
-      html += `<td>${formatAmount(details.tokensSold)}</td>`;
-      html += `<td>${formatAmount(details.xrpReceived)} XRP</td>`;
-      html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
-      html += `</tr>`;
-      html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7">`;
-      html += `
-  <div class="pnl-card" id="pnl-card-${key}">
-    <div class="pnl-card-header">
-      <img src="https://i.ibb.co/svZT9rZQ/Magic-Eraser-250603-140451.png" alt="Inspection Ninja Icon" class="pnl-card-icon">
-      <div class="pnl-card-title">Inspection Ninja <span class="pnl">PnL</span></div>
-    </div>
-    <div class="pnl-card-token">${getCurrencyDisplay(token.currency)}</div>
-    <div class="pnl-card-profit ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">
-      ${details.profit >= 0 ? '+' : '-'}${Math.abs((details.xrpSpent > 0 ? (details.profit / details.xrpSpent) * 100 : (details.profit > 0 ? Infinity : 0))).toFixed(2)}%
-    </div>
-    <div class="pnl-card-content">
-      <div class="pnl-card-row">
-        <div class="pnl-card-column">
-          <span class="pnl-card-label">Bought</span>
-          <span class="pnl-card-value">${formatAmount(details.xrpSpent)} XRP</span>
-        </div>
-        <div class="pnl-card-column">
-          <span class="pnl-card-label">${details.profit >= 0 ? 'Profit' : 'Loss'}</span>
-          <span class="pnl-card-value ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">${formatAmount(Math.abs(details.profit))} XRP</span>
-        </div>
+    const { tokens, tokenDetails } = data;
+    let html = `<div class="header">Trade History</div>`;
+    html += `
+      <div class="line">
+        <label style="cursor: pointer; margin-right: 20px;">
+          <input type="checkbox" id="xrp-values-toggle" onchange="toggleXrpValuesOnly()" checked>
+          XRP Values Only
+        </label>
+        <label style="cursor: pointer;">
+          <input type="checkbox" id="zero-balance-toggle" onchange="toggleZeroBalanceOnly()">
+          Zero Balance Only
+        </label>
       </div>
-      <div class="pnl-transactions">
-        ${details.buyTxs.length > 0 ? `
-          <div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>
-          <div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>
-        ` : `<div class="line">Purchases: None</div>`}
-        ${details.sellTxs.length > 0 ? `
-          <div class="line">Sales: <span class="expandable" onclick="event.stopPropagation(); toggleSection('sell_txs_${key}')">[view]</span></div>
-          <div id="sell_txs_${key}" class="hidden">${buildTableHTML(details.sellTxs, 'sale', getCurrencyDisplay(token.currency))}</div>
-        ` : `<div class="line">Sales: None</div>`}
-      </div>
-    </div>
-    <button class="download-btn" onclick="event.stopPropagation(); downloadPnLCard('pnl-card-${key}', '${getCurrencyDisplay(token.currency).replace(/'/g, "\\'")}')">
-      <img src="https://i.ibb.co/3m0LddNz/IMG-7147.png">
-      Download PnL Card
-    </button>
-  </div>`;
-      html += `</td></tr>`;
-    });
-    html += `</table>`;
+    `;
+    if (tokens.length === 0) {
+      html += `<div class="line">No token purchase or sale activity found for this wallet.</div>`;
+    } else {
+      html += `<table>`;
+      html += `<tr><th>Token</th><th>Balance</th><th>Bought</th><th>Spent</th><th>Sold</th><th>Received</th><th>P/L</th></tr>`;
+      tokens.forEach((token, index) => {
+        const key = `${token.issuer}_${token.currency}`;
+        const details = tokenDetails[key] || {
+          currentBalance: token.currentBalance,
+          tokensBought: 0,
+          xrpSpent: 0,
+          tokensSold: 0,
+          xrpReceived: 0,
+          profit: 0,
+          buyTxs: [],
+          sellTxs: []
+        };
+        let p_l_display, p_l_color;
+        if (details.tokensSold === 0 && details.xrpReceived === 0) {
+          p_l_display = `0 XRP`;
+          p_l_color = 'white';
+        } else {
+          const isProfit = details.profit >= 0;
+          const symbol = isProfit ? '+' : '−';
+          p_l_display = `${symbol}${formatAmount(Math.abs(details.profit))} XRP`;
+          p_l_color = isProfit ? '#66bb6a' : '#ef5350';
+        }
+        const rowParityClass = index % 2 === 0 ? 'token-row-even' : 'token-row-odd';
+        html += `<tr class="token-row ${rowParityClass}" onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
+        html += `<td style="overflow: hidden; text-overflow: ellipsis;" title="${getCurrencyDisplay(token.currency)}"><a href="https://xrpscan.com/account/${token.issuer}" target="_blank">${getCurrencyDisplay(token.currency)}</a></td>`;
+        html += `<td>${formatAmount(details.currentBalance)}</td>`;
+        html += `<td>${formatAmount(details.tokensBought)}</td>`;
+        html += `<td>${formatAmount(details.xrpSpent)} XRP</td>`;
+        html += `<td>${formatAmount(details.tokensSold)}</td>`;
+        html += `<td>${formatAmount(details.xrpReceived)} XRP</td>`;
+        html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
+        html += `</tr>`;
+        html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7">`;
+        // PnL Card
+        html += `
+          <div class="pnl-card" id="pnl-card-${key}">
+            <div class="pnl-card-header">
+              <img src="https://i.ibb.co/svZT9rZQ/Magic-Eraser-250603-140451.png" alt="Inspection Ninja Icon" class="pnl-card-icon">
+              <div class="pnl-card-title">Inspection Ninja <span class="pnl">PnL</span></div>
+            </div>
+            <div class="pnl-card-token">${getCurrencyDisplay(token.currency)}</div>
+            <div class="pnl-card-profit ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">
+              ${details.profit >= 0 ? '+' : '-'}${Math.abs((details.xrpSpent > 0 ? (details.profit / details.xrpSpent) * 100 : (details.profit > 0 ? Infinity : 0))).toFixed(2)}%
+            </div>
+            <div class="pnl-card-content">
+              <div class="pnl-card-row">
+                <div class="pnl-card-column">
+                  <span class="pnl-card-label">Bought</span>
+                  <span class="pnl-card-value">${formatAmount(details.xrpSpent)} XRP</span>
+                </div>
+                <div class="pnl-card-column">
+                  <span class="pnl-card-label">${details.profit >= 0 ? 'Profit' : 'Loss'}</span>
+                  <span class="pnl-card-value ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">${formatAmount(Math.abs(details.profit))} XRP</span>
+                </div>
+              </div>
+            </div>
+            <button class="download-btn" onclick="event.stopPropagation(); downloadPnLCard('pnl-card-${key}', '${getCurrencyDisplay(token.currency).replace(/'/g, "\\'")}')">
+              <img src="https://i.ibb.co/3m0LddNz/IMG-7147.png">
+              Download PnL Card
+            </button>
+          </div>`;
+        // Transactions Card
+        html += `
+          <div class="transactions-card" id="transactions-card-${key}">
+            <div class="transactions-card-header">Transaction History</div>
+            <div class="transactions-card-content">
+              ${details.buyTxs.length > 0 ? `
+                <div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>
+                <div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>
+              ` : `<div class="line">Purchases: None</div>`}
+              ${details.sellTxs.length > 0 ? `
+                <div class="line">Sales: <span class="expandable" onclick="event.stopPropagation(); toggleSection('sell_txs_${key}')">[view]</span></div>
+                <div id="sell_txs_${key}" class="hidden">${buildTableHTML(details.sellTxs, 'sale', getCurrencyDisplay(token.currency))}</div>
+              ` : `<div class="line">Sales: None</div>`}
+            </div>
+          </div>`;
+        html += `</td></tr>`;
+      });
+      html += `</table>`;
+    }
+    // Call toggleXrpValuesOnly to apply the XRP Values Only styling
+    setTimeout(() => {
+      toggleXrpValuesOnly();
+    }, 0);
+    return html;
   }
-  // Call toggleXrpValuesOnly to apply the XRP Values Only styling
-  setTimeout(() => {
-    toggleXrpValuesOnly();
-  }, 0);
-  return html;
-}
 },
       snipers: {
       async fetchData(issuer, currencyCode) {
