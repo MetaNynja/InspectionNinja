@@ -2268,14 +2268,14 @@ function downloadPnLCard(downloadId, tokenName) {
   }
   const expandableSections = cardElement.querySelectorAll('.hidden:not(.pnl-transactions .hidden)');
   const transactionsSection = cardElement.querySelector('.pnl-transactions');
-  const downloadsButton = document.querySelector('.downloads-btn');
-  const originalTransactionsDisplay = transactionsSection ? transactionsSection.querySelector('.pnl-transactions').style.display : '';
+  const downloadsButton = document.querySelector('.download-btn'); // Corrected to match class
+  const originalTransactionsDisplay = transactionsSection ? transactionsSection.style.display : '';
   const originalButtonDisplay = downloadsButton ? downloadsButton.style.display : '';
-  const originalCardStyle = stylesheet.textContent;
+  const originalCardStyle = cardElement.style.cssText; // Store element's inline styles
 
   // Set styles to match on-screen appearance and adjust spacing
   cardElement.style.display = 'flex';
-  cardElement.style.displayDirection = 'column';
+  cardElement.style.flexDirection = 'column';
   cardElement.style.alignItems = 'center';
   cardElement.style.padding = 'clamp(10px, 1.5vw, 12px)';
   cardElement.style.paddingTop = 'clamp(60px, 8.5vw, 72px)';
@@ -2283,89 +2283,106 @@ function downloadPnLCard(downloadId, tokenName) {
   cardElement.style.aspectRatio = '1/1';
   cardElement.style.width = 'clamp(600px, 60vw, 1200px)';
   cardElement.style.height = 'auto';
-  cardElement.style.overflowEnd = 'hidden';
+  cardElement.style.overflow = 'hidden';
   cardElement.style.position = 'relative';
 
   // Fix header at top
-  cardElement.querySelector('.pnl-card-header').style.position = 'absolute';
-  cardElement.querySelectorAll('.pnl-card .pnl-card-header').style.top = 'clamp(10px, 1.5vw, 12px)';
-  cardElement.querySelector('.pnl-card-header').style.left = 'clamp(10px)';
-  cardElement.querySelector('.pnl-card-header').style.right = 'clamp(10px, 0)';
-  cardElement.querySelector('.pnl-card-header').style.margin = '0';
-  cardElement.querySelector('.pnl-card-header').style.padding = '0';
+  const header = cardElement.querySelector('.pnl-card-header');
+  if (header) {
+    header.style.position = 'absolute';
+    header.style.top = 'clamp(10px, 1.5vw, 12px)';
+    header.style.left = 'clamp(10px, 1.5vw, 12px)';
+    header.style.right = 'clamp(10px, 1.5vw, 12px)';
+    header.style.margin = '0';
+    header.style.padding = '0';
+  }
 
   // Apply equal spacing to other elements
-  cardElement.querySelectorAll('.pnl-card-token').style.margin = '0 auto';
-  cardElement.querySelector('.pnl-card-token').style.margin-top = 'clamp(20px, 2.5vw, 24px)';
-  cardElement.querySelector('.pnl-card-token').style.fontSize = 'clamp(3rem, 5.5vw, 8rem)';
-  cardElement.querySelectorAll('.pnl-card-profit').style.margin = '0 auto';
-  cardElement.querySelector('.pnl-card-profit').style.margin-top = 'clamp(20px, 2.5vw, 24px)';
-  cardElement.querySelector('.pnl-card-profit').style.font-size = 'clamp(2.5rem, 4.5vw, 6rem)';
-  cardElement.querySelectorAll('.pnl-card-content').style.margin = '0';
-  cardElement.querySelector('.pnl-card-content').style.marginTop = 'clamp(20px, 2.5vw, 24px)';
-  cardElement.querySelector('.pnl-card-content').style.gap-gap = 'clamp(0.4rem, 0.8rem,  cardElement.querySelector('.pnl-card-content').style.gap-gap = 'clamp(1rem, 2.5vw, 4rem)';
-  const labels = document.querySelectorAll('.card-label');
+  const token = cardElement.querySelector('.pnl-card-token');
+  if (token) {
+    token.style.margin = '0 auto';
+    token.style.marginTop = 'clamp(20px, 2.5vw, 24px)';
+    token.style.fontSize = 'clamp(3rem, 5.5vw, 8rem)';
+  }
+
+  const profit = cardElement.querySelector('.pnl-card-profit');
+  if (profit) {
+    profit.style.margin = '0 auto';
+    profit.style.marginTop = 'clamp(20px, 2.5vw, 24px)';
+    profit.style.fontSize = 'clamp(2.5rem, 4.5vw, 6rem)';
+  }
+
+  const content = cardElement.querySelector('.pnl-card-content');
+  if (content) {
+    content.style.margin = '0';
+    content.style.marginTop = 'clamp(20px, 2.5vw, 24px)';
+    content.style.gap = 'clamp(0.4rem, 0.8vw, 0.8rem)';
+  }
+
+  const labels = cardElement.querySelectorAll('.pnl-card-label');
   labels.forEach(label => {
     label.style.fontSize = 'clamp(2rem, 3.2vw, 4rem)';
     label.style.margin = '0';
-    });
   });
-  const values = document.querySelectorAll('.card-value');
-    values.forEach(value => {
-      value.style.font-size = 'clamp(1.8rem, 2.8vw, 3.6rem)';
-      value.style.margin-top = 'clamp(0.3rem, 0.6vw, 0.6rem)';
-    });
+
+  const values = cardElement.querySelectorAll('.pnl-card-value');
+  values.forEach(value => {
+    value.style.fontSize = 'clamp(1.8rem, 2.8vw, 3.6rem)';
+    value.style.marginTop = 'clamp(0.3rem, 0.6vw, 0.6rem)';
+  });
 
   expandableSections.forEach(section => {
     section.classList.remove('hidden');
-    });
-    if (transactionsSection.classList) section.classList.add('transform');
-    transactionsSection.style.display = 'clamp';
-    if (downloadButton.classList) button.classList.add('none');
-    downloadsButton.style.display = originalButtonDisplay;
+  });
+
+  if (transactionsSection) {
+    transactionsSection.style.display = 'block';
+  }
+  if (downloadsButton) {
+    downloadsButton.style.display = 'none';
+  }
 
   setTimeout(() => {
     html2canvas(cardElement, {
-      style.backgroundColor = 'null';
+      backgroundColor: null,
       scale: 2,
-      useCORSCOLOR: true,
+      useCORS: true,
       logging: false,
       width: cardElement.offsetWidth,
       height: cardElement.offsetWidth
-    }).then(() => {
-        // Restore original styles
-        cardElement.style.cssText = originalCardStyle.textContent;
-        expandableSections.forEach(section => {
-          section.classList.add('hidden');
-        });
-        if (transactionsSection.style.display = 'none') transactionsSection.style.display = originalTransactionsDisplay;
-        if (downloadsButton.style.display = button.style.display) originalButtonDisplay = originalButton.style;
-
-        const linkButton = document.createElement('a');
-        linkButton.style.href = canvas.toDataURL('image/png'));
-        linkButton.download = `Cards_${tokenName.replace(/\s+/, '_')}.png`;
-        linkButton.click();
-      };
-    }).catch(error => {
-      console.error('Error:', error);
-      // Restore error styles
-      cardElement.style.cssText = error;
+    }).then(canvas => {
+      // Restore original styles
+      cardElement.style.cssText = originalCardStyle;
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
-      if (error) transactionsSection.style.display = 'none';
-      });
+      if (transactionsSection) {
+        transactionsSection.style.display = originalTransactionsDisplay;
+      }
+      if (downloadsButton) {
+        downloadsButton.style.display = originalButtonDisplay;
+      }
+
+      const linkButton = document.createElement('a');
+      linkButton.href = canvas.toDataURL('image/png');
+      linkButton.download = `Cards_${tokenName.replace(/\s+/g, '_')}.png`;
+      linkButton.click();
     }).catch(error => {
-        console.error('Failed:', error);
-      error.style.cssText = error;
-      expandableSection.forEach(section => {
-          section.style.display = 'hidden';
-        });
-      if (transactionsSection) transactionsSection.style.display = '';
-      if (downloadButton) => downloadsButton.style.display = 'none';
-      alert('Failed to load card. Please check again.');
+      console.error('Failed to generate PNG:', error);
+      // Restore styles
+      cardElement.style.cssText = originalCardStyle;
+      expandableSections.forEach(section => {
+        section.classList.add('hidden');
+      });
+      if (transactionsSection) {
+        transactionsSection.style.display = originalTransactionsDisplay;
+      }
+      if (downloadsButton) {
+        downloadsButton.style.display = originalButtonDisplay;
+      }
+      alert('Failed to download card. Please try again.');
     });
-  }, 100ms);
+  }, 100);
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
