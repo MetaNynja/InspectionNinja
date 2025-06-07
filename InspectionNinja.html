@@ -898,7 +898,7 @@ table tr.details-row {
 @media print {
   .pnl-card {
     padding: clamp(10px, 1.5vw, 12px); /* Match non-print padding */
-    padding-top: clamp(20px, 2.5vw, 24px); /* Increased top padding to shift content down */
+    padding-top: clamp(40px, 5vw, 48px); /* Large top padding to shift content down */
     background: 
       linear-gradient(
         45deg,
@@ -914,40 +914,44 @@ table tr.details-row {
     background-color: rgba(34, 34, 40, 25%);
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Align items at the top */
     align-items: center;
-    gap: clamp(8px, 1vw, 10px); /* Increased gap for more spacing between elements */
+    gap: clamp(12px, 1.5vw, 16px); /* Equal gap between elements */
     aspect-ratio: 1/1; /* Maintain square shape */
     width: clamp(600px, 60vw, 1200px); /* Match non-print width */
     height: auto; /* Respect aspect ratio */
     overflow: hidden; /* Prevent overflow */
+    position: relative; /* For absolute positioning of header */
   }
 
   .pnl-card-header {
-    margin-bottom: clamp(0.5rem, 1vw, 1rem); /* Slightly increased to match non-print */
-    padding: 0; /* Match non-print */
+    position: absolute; /* Fix header at the top */
+    top: clamp(10px, 1.5vw, 12px); /* Align with card padding */
+    left: clamp(10px, 1.5vw, 12px);
+    right: clamp(10px, 1.5vw, 12px);
+    margin: 0;
+    padding: 0;
     flex-wrap: nowrap;
   }
 
   .pnl-card-token {
-    margin: clamp(0.3rem, 0.6vw, 0.6rem) auto; /* Match non-print for spacing */
+    margin: 0 auto; /* Center without extra vertical space */
     font-size: clamp(3rem, 5.5vw, 8rem); /* Match non-print */
     line-height: 1.1; /* Match non-print */
   }
 
   .pnl-card-profit {
-    margin: clamp(0.3rem, 0.6vw, 0.6rem) auto; /* Match non-print for spacing */
+    margin: 0 auto; /* Center without extra vertical space */
     font-size: clamp(2.5rem, 4.5vw, 6rem); /* Match non-print */
     line-height: 1; /* Match non-print */
   }
 
   .pnl-card-content {
-    margin: clamp(0.3rem, 0.6vw, 0.6rem) 0; /* Increased for spacing */
-    gap: clamp(0.4rem, 0.8vw, 0.8rem); /* Match non-print for spacing */
+    margin: 0; /* No extra margin */
+    gap: clamp(0.4rem, 0.8vw, 0.8rem); /* Match non-print */
   }
 
   .pnl-card-row {
-    gap: clamp(1rem, 2.5vw, 4rem); /* Match non-print for spacing */
+    gap: clamp(1rem, 2.5vw, 4rem); /* Match non-print */
     flex-wrap: nowrap;
     justify-content: center;
     margin: 0;
@@ -973,8 +977,14 @@ table tr.details-row {
   .download-btn {
     display: none; /* Ensure button is hidden */
   }
+
+  /* Ensure even spacing to the bottom */
+  .pnl-card::after {
+    content: '';
+    flex: 1; /* Takes up remaining space to push content up and create equal gap at bottom */
+    min-height: clamp(12px, 1.5vw, 16px); /* Match gap size */
+  }
 }
-</style>
   <!-- Add Google Fonts for cursive MetaNynja -->
   <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
   
@@ -2267,24 +2277,30 @@ function downloadPnLCard(cardId, tokenName) {
   // Apply temporary inline styles to match on-screen sizes and adjust spacing
   cardElement.style.display = 'flex';
   cardElement.style.flexDirection = 'column';
-  cardElement.style.justifyContent = 'flex-start';
   cardElement.style.alignItems = 'center';
-  cardElement.style.gap = 'clamp(8px, 1vw, 10px)';
+  cardElement.style.gap = 'clamp(12px, 1.5vw, 16px)';
   cardElement.style.padding = 'clamp(10px, 1.5vw, 12px)';
-  cardElement.style.paddingTop = 'clamp(20px, 2.5vw, 24px)';
+  cardElement.style.paddingTop = 'clamp(40px, 5vw, 48px)';
   cardElement.style.aspectRatio = '1/1';
   cardElement.style.width = 'clamp(600px, 60vw, 1200px)';
   cardElement.style.height = 'auto';
   cardElement.style.overflow = 'hidden';
+  cardElement.style.position = 'relative';
 
-  // Match non-print child element styles
-  cardElement.querySelector('.pnl-card-header').style.marginBottom = 'clamp(0.5rem, 1vw, 1rem)';
+  // Fix header at the top
+  cardElement.querySelector('.pnl-card-header').style.position = 'absolute';
+  cardElement.querySelector('.pnl-card-header').style.top = 'clamp(10px, 1.5vw, 12px)';
+  cardElement.querySelector('.pnl-card-header').style.left = 'clamp(10px, 1.5vw, 12px)';
+  cardElement.querySelector('.pnl-card-header').style.right = 'clamp(10px, 1.5vw, 12px)';
+  cardElement.querySelector('.pnl-card-header').style.margin = '0';
   cardElement.querySelector('.pnl-card-header').style.padding = '0';
-  cardElement.querySelector('.pnl-card-token').style.margin = 'clamp(0.3rem, 0.6vw, 0.6rem) auto';
+
+  // Match non-print styles for other elements
+  cardElement.querySelector('.pnl-card-token').style.margin = '0 auto';
   cardElement.querySelector('.pnl-card-token').style.fontSize = 'clamp(3rem, 5.5vw, 8rem)';
-  cardElement.querySelector('.pnl-card-profit').style.margin = 'clamp(0.3rem, 0.6vw, 0.6rem) auto';
+  cardElement.querySelector('.pnl-card-profit').style.margin = '0 auto';
   cardElement.querySelector('.pnl-card-profit').style.fontSize = 'clamp(2.5rem, 4.5vw, 6rem)';
-  cardElement.querySelector('.pnl-card-content').style.margin = 'clamp(0.3rem, 0.6vw, 0.6rem) 0';
+  cardElement.querySelector('.pnl-card-content').style.margin = '0';
   cardElement.querySelector('.pnl-card-content').style.gap = 'clamp(0.4rem, 0.8vw, 0.8rem)';
   cardElement.querySelector('.pnl-card-row').style.gap = 'clamp(1rem, 2.5vw, 4rem)';
   const labels = cardElement.querySelectorAll('.pnl-card-label');
