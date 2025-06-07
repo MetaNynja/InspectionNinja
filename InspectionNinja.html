@@ -421,13 +421,14 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   text-align: center;
   box-sizing: border-box;
   width: clamp(600px, 60vw, 1200px);
-  aspect-ratio: 1/1; /* Enforce square shape */
+  aspect-ratio: 1/1;
   max-width: 100%;
   position: relative;
   z-index: 5;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center; /* Ensure content is centered */
 }
 
 .pnl-card-header {
@@ -531,7 +532,7 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 
 .pnl-transactions table {
   width: 100%;
-  table-layout: fixed; /* Default for desktop */
+  table-layout: fixed;
 }
 
 .pnl-transactions .line {
@@ -722,7 +723,7 @@ table tr.details-row {
 
   table:has(.xrp-row) th:nth-child(n+4),
   table:has(.xrp-row) td:nth-child(n+4) {
-    display: none; /* Hide columns 4 and beyond to reduce width */
+    display: none;
   }
 
   .pnl-card {
@@ -767,19 +768,19 @@ table tr.details-row {
 
   .pnl-transactions table {
     width: 100%;
-    table-layout: auto; /* Allow dynamic column sizing */
+    table-layout: auto;
   }
 
   table {
-    font-size: clamp(5px, 1.2vw, 6px); /* Further reduced font size */
+    font-size: clamp(5px, 1.2vw, 6px);
     margin: clamp(0px, 2vw, 8px);
   }
 
   th, td {
-    padding: clamp(2px, 1vw, 4px); /* Reduced padding */
+    padding: clamp(2px, 1vw, 4px);
     width: auto;
-    max-width: clamp(40px, 10vw, 60px); /* Tighter column widths */
-    white-space: normal; /* Allow text wrapping */
+    max-width: clamp(40px, 10vw, 60px);
+    white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -795,7 +796,7 @@ table tr.details-row {
 
   .xrp-values-only th:nth-child(1),
   .xrp-values-only td:nth-child(1) {
-    width: clamp(60px, 15vw, 80px); /* Wider first column for token name */
+    width: clamp(60px, 15vw, 80px);
   }
 
   .details-row td {
@@ -826,10 +827,11 @@ table tr.details-row {
   }
 
   .download-btn {
-    font-size: clamp(1rem, 1.5vw, 1.4rem);
-    padding: clamp(0.4rem, 0.8vw, 0.8rem) clamp(0.6rem, 1vw, 1rem);
-    margin: clamp(0.4rem, 0.8vw, 0.8rem) clamp(0.8rem, 1.5vw, 1.5rem) clamp(1rem, 1.5vw, 1.5rem);
-    max-width: clamp(120px, 30vw, 160px);
+    font-size: clamp(0.9rem, 1.4vw, 1.2rem); /* Slightly smaller font */
+    padding: clamp(0.4rem, 0.8vw, 0.8rem) clamp(0.8rem, 1.5vw, 1.5rem); /* Increased horizontal padding */
+    margin: clamp(0.4rem, 0.8vw, 0.8rem) auto clamp(1rem, 1.5vw, 1.5rem);
+    max-width: clamp(160px, 40vw, 200px); /* Increased width */
+    white-space: nowrap; /* Prevent text wrapping */
   }
 
   .download-btn img {
