@@ -915,58 +915,60 @@ table tr.details-row {
     flex-direction: column;
     justify-content: flex-start; /* Align items at the top */
     align-items: center;
-    gap: 1px; /* Minimal gap between flex children */
-    height: auto; /* Allow natural height */
-    max-height: 300px; /* Constrain height to prevent stretching */
-    overflow: hidden; /* Prevent overflow issues */
+    gap: 0; /* No gap between flex children */
+    height: auto; /* Natural height */
+    max-height: 250px; /* Constrain height tightly */
+    overflow: hidden; /* Prevent overflow */
   }
 
   .pnl-card-header {
-    margin: 0; /* Remove margin */
-    padding: 2px 0; /* Minimal padding */
+    margin: 0; /* No margin */
+    padding: 1px 0; /* Minimal padding */
   }
 
   .pnl-card-token {
-    margin: 1px auto; /* Minimal margin */
-    font-size: clamp(1.4rem, 2.5vw, 2rem); /* Smaller font */
+    margin: 0; /* No margin */
+    font-size: clamp(1.2rem, 2vw, 1.6rem); /* Smaller font */
     line-height: 1; /* No extra line height */
-    transform: translateY(-2px); /* Pull up slightly to close gap */
   }
 
   .pnl-card-profit {
-    margin: 1px auto; /* Minimal margin */
-    font-size: clamp(1.2rem, 2vw, 1.8rem); /* Smaller font */
+    margin: 0; /* No margin */
+    font-size: clamp(1rem, 1.8vw, 1.4rem); /* Smaller font */
     line-height: 1; /* No extra line height */
-    transform: translateY(-2px); /* Pull up slightly to close gap */
   }
 
   .pnl-card-content {
-    margin: 1px 0; /* Minimal margin */
-    gap: 1px; /* Minimal gap for content */
+    margin: 0; /* No margin */
+    gap: 0; /* No gap for content */
   }
 
   .pnl-card-row {
-    gap: clamp(0.2rem, 0.5vw, 0.4rem); /* Minimal gap between columns */
+    gap: clamp(0.1rem, 0.3vw, 0.2rem); /* Minimal gap between columns */
     flex-wrap: nowrap;
     justify-content: center;
-    margin: 0; /* Remove margin */
+    margin: 0; /* No margin */
   }
 
   .pnl-card-column {
     align-items: center;
-    margin: 0; /* Remove margin */
+    margin: 0; /* No margin */
   }
 
   .pnl-card-label {
-    font-size: clamp(1.2rem, 2vw, 1.8rem); /* Smaller font */
+    font-size: clamp(1rem, 1.8vw, 1.4rem); /* Smaller font */
     line-height: 1; /* No extra line height */
-    margin: 0; /* Remove margin */
+    margin: 0; /* No margin */
   }
 
   .pnl-card-value {
-    font-size: clamp(1rem, 1.8vw, 1.6rem); /* Smaller font */
-    margin: 0; /* Remove margin */
+    font-size: clamp(0.8rem, 1.6vw, 1.2rem); /* Smaller font */
+    margin: 0; /* No margin */
     line-height: 1; /* No extra line height */
+  }
+
+  .download-btn {
+    display: none; /* Ensure button is hidden */
   }
 }
 </style>
@@ -2245,7 +2247,7 @@ table tr.details-row {
   });
 }
   
-  function downloadPnLCard(cardId, tokenName) {
+ function downloadPnLCard(cardId, tokenName) {
   const cardElement = document.getElementById(cardId);
   if (!cardElement) {
     console.error(`PnL card with ID ${cardId} not found`);
@@ -2257,11 +2259,32 @@ table tr.details-row {
   const downloadButton = cardElement.querySelector('.download-btn');
   const originalTransactionsDisplay = transactionsSection ? transactionsSection.style.display : '';
   const originalButtonDisplay = downloadButton ? downloadButton.style.display : '';
+  const originalCardStyle = cardElement.style.cssText; // Save original styles
+
+  // Apply temporary inline styles to ensure compact layout
+  cardElement.style.display = 'flex';
+  cardElement.style.flexDirection = 'column';
+  cardElement.style.justifyContent = 'flex-start';
+  cardElement.style.gap = '0';
+  cardElement.style.padding = '2px';
+  cardElement.style.maxHeight = '250px';
+  cardElement.style.overflow = 'hidden';
+
+  // Apply minimal margins to child elements
+  cardElement.querySelector('.pnl-card-header').style.margin = '0';
+  cardElement.querySelector('.pnl-card-header').style.padding = '1px 0';
+  cardElement.querySelector('.pnl-card-token').style.margin = '0';
+  cardElement.querySelector('.pnl-card-profit').style.margin = '0';
+  cardElement.querySelector('.pnl-card-content').style.margin = '0';
+  cardElement.querySelector('.pnl-card-content').style.gap = '0';
+  cardElement.querySelector('.pnl-card-row').style.gap = '0.2rem';
+
   expandableSections.forEach(section => {
     section.classList.remove('hidden');
   });
   if (transactionsSection) transactionsSection.style.display = 'none';
   if (downloadButton) downloadButton.style.display = 'none';
+
   setTimeout(() => {
     html2canvas(cardElement, {
       backgroundColor: null,
@@ -2271,17 +2294,22 @@ table tr.details-row {
       width: cardElement.offsetWidth,
       height: cardElement.offsetHeight
     }).then(canvas => {
+      // Restore original styles
+      cardElement.style.cssText = originalCardStyle;
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
       if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
       if (downloadButton) downloadButton.style.display = originalButtonDisplay;
+
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
       link.download = `PnL_Card_${tokenName.replace(/\s+/g, '_')}.png`;
       link.click();
     }).catch(error => {
       console.error('Error generating PnL card image:', error);
+      // Restore original styles on error
+      cardElement.style.cssText = originalCardStyle;
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
