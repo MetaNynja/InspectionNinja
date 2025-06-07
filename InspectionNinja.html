@@ -919,12 +919,14 @@ table tr.details-row {
     width: clamp(600px, 60vw, 1200px); /* Match non-print width */
     height: auto; /* Respect aspect ratio */
     overflow: hidden; /* Prevent overflow */
-    position: relative; /* For absolute header positioning */
+    position: relative; /* For absolute header */
+    padding-top: clamp(60px, 7.5vw, 72px); /* Large space for header and gap */
+    padding-bottom: clamp(20px, 2.5vw, 24px); /* Equal gap at bottom */
   }
 
   .pnl-card-header {
-    position: absolute; /* Fix header at the top */
-    top: clamp(10px, 1.5vw, 12px); /* Align with card padding */
+    position: absolute; /* Fix header at top */
+    top: clamp(10px, 1.5vw, 12px); /* Align with side padding */
     left: clamp(10px, 1.5vw, 12px);
     right: clamp(10px, 1.5vw, 12px);
     margin: 0;
@@ -932,35 +934,24 @@ table tr.details-row {
     flex-wrap: nowrap;
   }
 
-  /* Wrapper for content to control spacing */
-  .pnl-card-token,
-  .pnl-card-profit,
-  .pnl-card-content {
-    margin: 0 auto; /* Center elements */
-  }
-
-  /* Create a content container effect with padding */
-  .pnl-card {
-    padding-top: clamp(40px, 5vw, 48px); /* Space for header and top gap */
-    padding-bottom: clamp(12px, 1.5vw, 16px); /* Equal bottom gap */
-  }
-
   .pnl-card-token {
     font-size: clamp(3rem, 5.5vw, 8rem); /* Match non-print */
     line-height: 1.1; /* Match non-print */
-    margin-top: clamp(12px, 1.5vw, 16px); /* Equal gap from top */
+    margin: 0 auto;
+    margin-top: clamp(20px, 2.5vw, 24px); /* Equal gap from header */
   }
 
   .pnl-card-profit {
     font-size: clamp(2.5rem, 4.5vw, 6rem); /* Match non-print */
     line-height: 1; /* Match non-print */
-    margin-top: clamp(12px, 1.5vw, 16px); /* Equal gap from token */
+    margin: 0 auto;
+    margin-top: clamp(20px, 2.5vw, 24px); /* Equal gap from token */
   }
 
   .pnl-card-content {
     gap: clamp(0.4rem, 0.8vw, 0.8rem); /* Match non-print */
-    margin-top: clamp(12px, 1.5vw, 16px); /* Equal gap from profit */
-    margin-bottom: 0; /* No extra bottom margin */
+    margin: 0;
+    margin-top: clamp(20px, 2.5vw, 24px); /* Equal gap from profit */
   }
 
   .pnl-card-row {
@@ -983,18 +974,12 @@ table tr.details-row {
 
   .pnl-card-value {
     font-size: clamp(1.8rem, 2.8vw, 3.6rem); /* Match non-print */
-    margin-top: clamp(0.3rem, 0.6vw, 0.6rem); /* Match non-print */
+    margin-top: clamp(0.3rem, 0.6vw, 0.6rem);
     line-height: 1.4; /* Match non-print */
   }
 
   .download-btn {
     display: none; /* Ensure button is hidden */
-  }
-
-  /* Ensure equal bottom spacing */
-  .pnl-card::after {
-    content: '';
-    min-height: clamp(12px, 1.5vw, 16px); /* Equal gap at bottom */
   }
 }
 
@@ -2274,102 +2259,113 @@ table tr.details-row {
   });
 }
   
-function downloadPnLCard(cardId, tokenName) {
-  const cardElement = document.getElementById(cardId);
+function downloadPnLCard(downloadId, tokenName) {
+  const cardElement = document.getElementById(downloadId);
   if (!cardElement) {
-    console.error(`PnL card with ID ${cardId} not found`);
-    alert('PnL card not found. Please try again.');
+    console.error('Download card element not found');
+    alert('Failed to download card. Please try again.');
     return;
   }
   const expandableSections = cardElement.querySelectorAll('.hidden:not(.pnl-transactions .hidden)');
   const transactionsSection = cardElement.querySelector('.pnl-transactions');
-  const downloadButton = cardElement.querySelector('.download-btn');
-  const originalTransactionsDisplay = transactionsSection ? transactionsSection.style.display : '';
-  const originalButtonDisplay = downloadButton ? downloadButton.style.display : '';
-  const originalCardStyle = cardElement.style.cssText; // Save original styles
+  const downloadsButton = document.querySelector('.downloads-btn');
+  const originalTransactionsDisplay = transactionsSection ? transactionsSection.querySelector('.pnl-transactions').style.display : '';
+  const originalButtonDisplay = downloadsButton ? downloadsButton.style.display : '';
+  const originalCardStyle = stylesheet.textContent;
 
-  // Apply temporary inline styles to match on-screen sizes and ensure equal spacing
+  // Set styles to match on-screen appearance and adjust spacing
   cardElement.style.display = 'flex';
-  cardElement.style.flexDirection = 'column';
+  cardElement.style.displayDirection = 'column';
   cardElement.style.alignItems = 'center';
   cardElement.style.padding = 'clamp(10px, 1.5vw, 12px)';
-  cardElement.style.paddingTop = 'clamp(40px, 5vw, 48px)';
-  cardElement.style.paddingBottom = 'clamp(12px, 1.5vw, 16px)';
+  cardElement.style.paddingTop = 'clamp(60px, 8.5vw, 72px)';
+  cardElement.style.paddingBottom = 'clamp(20px, 2.5vw, 24px)';
   cardElement.style.aspectRatio = '1/1';
   cardElement.style.width = 'clamp(600px, 60vw, 1200px)';
   cardElement.style.height = 'auto';
-  cardElement.style.overflow = 'hidden';
+  cardElement.style.overflowEnd = 'hidden';
   cardElement.style.position = 'relative';
 
-  // Fix header at the top
+  // Fix header at top
   cardElement.querySelector('.pnl-card-header').style.position = 'absolute';
-  cardElement.querySelector('.pnl-card-header').style.top = 'clamp(10px, 1.5vw, 12px)';
-  cardElement.querySelector('.pnl-card-header').style.left = 'clamp(10px, 1.5vw, 12px)';
-  cardElement.querySelector('.pnl-card-header').style.right = 'clamp(10px, 1.5vw, 12px)';
+  cardElement.querySelectorAll('.pnl-card .pnl-card-header').style.top = 'clamp(10px, 1.5vw, 12px)';
+  cardElement.querySelector('.pnl-card-header').style.left = 'clamp(10px)';
+  cardElement.querySelector('.pnl-card-header').style.right = 'clamp(10px, 0)';
   cardElement.querySelector('.pnl-card-header').style.margin = '0';
   cardElement.querySelector('.pnl-card-header').style.padding = '0';
 
-  // Apply equal spacing
-  cardElement.querySelector('.pnl-card-token').style.margin = '0 auto';
-  cardElement.querySelector('.pnl-card-token').style.marginTop = 'clamp(12px, 1.5vw, 16px)';
+  // Apply equal spacing to other elements
+  cardElement.querySelectorAll('.pnl-card-token').style.margin = '0 auto';
+  cardElement.querySelector('.pnl-card-token').style.margin-top = 'clamp(20px, 2.5vw, 24px)';
   cardElement.querySelector('.pnl-card-token').style.fontSize = 'clamp(3rem, 5.5vw, 8rem)';
-  cardElement.querySelector('.pnl-card-profit').style.margin = '0 auto';
-  cardElement.querySelector('.pnl-card-profit').style.marginTop = 'clamp(12px, 1.5vw, 16px)';
-  cardElement.querySelector('.pnl-card-profit').style.fontSize = 'clamp(2.5rem, 4.5vw, 6rem)';
-  cardElement.querySelector('.pnl-card-content').style.margin = '0';
-  cardElement.querySelector('.pnl-card-content').style.marginTop = 'clamp(12px, 1.5vw, 16px)';
-  cardElement.querySelector('.pnl-card-content').style.gap = 'clamp(0.4rem, 0.8vw, 0.8rem)';
-  cardElement.querySelector('.pnl-card-row').style.gap = 'clamp(1rem, 2.5vw, 4rem)';
-  const labels = cardElement.querySelectorAll('.pnl-card-label');
+  cardElement.querySelectorAll('.pnl-card-profit').style.margin = '0 auto';
+  cardElement.querySelector('.pnl-card-profit').style.margin-top = 'clamp(20px, 2.5vw, 24px)';
+  cardElement.querySelector('.pnl-card-profit').style.font-size = 'clamp(2.5rem, 4.5vw, 6rem)';
+  cardElement.querySelectorAll('.pnl-card-content').style.margin = '0';
+  cardElement.querySelector('.pnl-card-content').style.marginTop = 'clamp(20px, 2.5vw, 24px)';
+  cardElement.querySelector('.pnl-card-content').style.gap-gap = 'clamp(0.4rem, 0.8rem,  cardElement.querySelector('.pnl-card-content').style.gap-gap = 'clamp(1rem, 2.5vw, 4rem)';
+  const labels = document.querySelectorAll('.card-label');
   labels.forEach(label => {
     label.style.fontSize = 'clamp(2rem, 3.2vw, 4rem)';
     label.style.margin = '0';
+    });
   });
-  const values = cardElement.querySelectorAll('.pnl-card-value');
-  values.forEach(value => {
-    value.style.fontSize = 'clamp(1.8rem, 2.8vw, 3.6rem)';
-    value.style.marginTop = 'clamp(0.3rem, 0.6vw, 0.6rem)';
-  });
+  const values = document.querySelectorAll('.card-value');
+    values.forEach(value => {
+      value.style.font-size = 'clamp(1.8rem, 2.8vw, 3.6rem)';
+      value.style.margin-top = 'clamp(0.3rem, 0.6vw, 0.6rem)';
+    });
 
   expandableSections.forEach(section => {
     section.classList.remove('hidden');
-  });
-  if (transactionsSection) transactionsSection.style.display = 'none';
-  if (downloadButton) downloadButton.style.display = 'none';
+    });
+    if (transactionsSection.classList) section.classList.add('transform');
+    transactionsSection.style.display = 'clamp';
+    if (downloadButton.classList) button.classList.add('none');
+    downloadsButton.style.display = originalButtonDisplay;
 
   setTimeout(() => {
     html2canvas(cardElement, {
-      backgroundColor: null,
+      style.backgroundColor = 'null';
       scale: 2,
-      useCORS: true,
-      logging: true,
+      useCORSCOLOR: true,
+      logging: false,
       width: cardElement.offsetWidth,
-      height: cardElement.offsetWidth // Ensure square output
-    }).then(canvas => {
-      // Restore original styles
-      cardElement.style.cssText = originalCardStyle;
-      expandableSections.forEach(section => {
-        section.classList.add('hidden');
-      });
-      if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
-      if (downloadButton) downloadButton.style.display = originalButtonDisplay;
+      height: cardElement.offsetWidth
+    }).then(() => {
+        // Restore original styles
+        cardElement.style.cssText = originalCardStyle.textContent;
+        expandableSections.forEach(section => {
+          section.classList.add('hidden');
+        });
+        if (transactionsSection.style.display = 'none') transactionsSection.style.display = originalTransactionsDisplay;
+        if (downloadsButton.style.display = button.style.display) originalButtonDisplay = originalButton.style;
 
-      const link = document.createElement('a');
-      link.href = canvas.toDataURL('image/png');
-      link.download = `PnL_Card_${tokenName.replace(/\s+/g, '_')}.png`;
-      link.click();
+        const linkButton = document.createElement('a');
+        linkButton.style.href = canvas.toDataURL('image/png'));
+        linkButton.download = `Cards_${tokenName.replace(/\s+/, '_')}.png`;
+        linkButton.click();
+      };
     }).catch(error => {
-      console.error('Error generating PnL card image:', error);
-      // Restore original styles on error
-      cardElement.style.cssText = originalCardStyle;
+      console.error('Error:', error);
+      // Restore error styles
+      cardElement.style.cssText = error;
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
-      if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
-      if (downloadButton) downloadButton.style.display = originalButtonDisplay;
-      alert('Failed to download PnL card. Please check the console for errors and try again.');
+      if (error) transactionsSection.style.display = 'none';
+      });
+    }).catch(error => {
+        console.error('Failed:', error);
+      error.style.cssText = error;
+      expandableSection.forEach(section => {
+          section.style.display = 'hidden';
+        });
+      if (transactionsSection) transactionsSection.style.display = '';
+      if (downloadButton) => downloadsButton.style.display = 'none';
+      alert('Failed to load card. Please check again.');
     });
-  }, 100);
+  }, 100ms);
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
