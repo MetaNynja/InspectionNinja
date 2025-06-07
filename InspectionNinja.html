@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inspection Ninja</title>
-<style>
+  <style>
 body {
   margin: 0;
   padding: 24px;
@@ -281,7 +281,7 @@ th, td {
   overflow: hidden;
   text-overflow: ellipsis;
   min-height: 40px;
-  vertical-align: center;
+  vertical-align: middle;
   font-size: 12px;
 }
 
@@ -337,7 +337,7 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 .xrp-icon {
   max-height: 20px;
   width: auto;
-  vertical-align: center;
+  vertical-align: middle;
 }
 
 .details-row {
@@ -367,8 +367,8 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 .header-container {
   display: flex;
   align-items: center;
-  padding: 24px 12px;
-  background-color: rgba(34, 34, 40, 0.95);
+  padding: 24px 24px;
+  background: rgba(34, 34, 40, 0.95);
   border-radius: 12px;
   margin-bottom: 20px;
 }
@@ -384,13 +384,15 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 600;
   font-size: 20px;
+  margin-left: 10px;
   color: #ffffff;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
 }
 
 .header-text .metanynja {
   font-family: 'Nothing You Could Do', cursive;
-  font-size: 18px;
+  font-size: 20px;
+  margin-left: 10px;
   color: #1e90ff;
 }
 
@@ -398,90 +400,69 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
   background: 
     linear-gradient(
       45deg,
-      rgba(34, 34, 40, 0.75) 25%,
+      rgba(34, 34, 40, 0.98) 25%,
       rgba(255, 255, 255, 0.05) 25%,
       rgba(255, 255, 255, 0.05) 50%,
-      rgba(34, 34, 40, 0.75) 50%,
-      rgba(34, 34, 40, 0.75) 75%,
+      rgba(34, 34, 40, 0.98) 50%,
+      rgba(34, 34, 40, 0.98) 75%,
       rgba(255, 255, 255, 0.05) 75%,
       rgba(255, 255, 255, 0.05) 100%
     );
-  background-size: 0.40vw 0.4vw;
-  background-color: rgba(34, 34, 40, 25%);
-  border-radius: 0;
-  padding: clamp(10px, 1.5vw, 12px);
-  margin: 0.5rem auto;
-  box-shadow: 0 0.4rem rgba(0, 0, 0, 0.3);
+  background-size: 5px 5px;
+  background-color: rgba(34, 34, 40, 0.98);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 12px 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  position: relative;
   color: #e5e5e7;
   font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-size: clamp(14px, 1.8vw, 16px);
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.6;
   text-align: center;
   box-sizing: border-box;
-  width: clamp(600px, 60vw, 1200px);
-  aspect-ratio: 1/1;
-  max-width: 100%;
-  position: relative;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .pnl-card-header {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  margin-bottom: clamp(0.5rem, 1vw, 1rem);
-  flex-wrap: nowrap;
-  overflow: hidden;
-  text-align: left;
-  width: 100%;
-  padding-left: clamp(0.5rem, 1vw, 1rem);
+  margin-bottom: 16px;
 }
 
 .pnl-card-icon {
-  width: clamp(48px, 4vw, 96px);
-  height: clamp(48px, 4vw, 96px);
-  margin-right: clamp(0.8rem, 1vw, 1.5rem);
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
 }
 
 .pnl-card-title {
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 600;
-  font-size: clamp(2.2rem, 3.5vw, 4rem);
+  font-size: 18px;
   color: #ffffff;
-  white-space: nowrap;
-  display: inline-block;
 }
 
 .pnl-card-title .pnl {
   font-family: 'Nothing You Could Do', cursive;
-  font-size: clamp(2rem, 3.2vw, 3.6rem);
+  font-size: 17px;
   color: #FFECB3;
-  margin-left: 0.3rem;
-  white-space: nowrap;
+  margin-left: 2px;
 }
 
 .pnl-card-token {
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 600;
-  font-size: clamp(3rem, 5.5vw, 8rem);
+  font-size: 28px;
   color: #ffffff;
-  margin: clamp(0.3rem, 0.6vw, 0.6rem) auto;
-  white-space: nowrap;
-  transform: scale(1);
-  transform-origin: center;
-  line-height: 1.1;
-  display: inline-block;
+  margin: 12px 0 12px;
 }
 
 .pnl-card-profit {
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 500;
-  font-size: clamp(2.5rem, 4.5vw, 6rem);
-  margin: clamp(0.3rem, 0.6vw, 0.6rem) auto;
+  font-size: 20px;
+  margin-bottom: 20px;
 }
 
 .pnl-profit-positive {
@@ -495,14 +476,14 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 .pnl-card-content {
   display: flex;
   flex-direction: column;
-  gap: clamp(0.4rem, 0.8vw, 0.8rem);
+  gap: 16px;
 }
 
 .pnl-card-row {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: clamp(1rem, 2.5vw, 4rem);
+  gap: 80px;
 }
 
 .pnl-card-column {
@@ -514,61 +495,57 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 .pnl-card-label {
   color: #A7BEFF;
   font-weight: 500;
-  font-size: clamp(2rem, 3.2vw, 4rem);
-  text-decoration: none;
+  font-size: 16px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
 
 .pnl-card-value {
   color: #e5e5e7;
-  font-size: clamp(1.8rem, 2.8vw, 3.6rem);
-  margin-top: clamp(0.3rem, 0.6vw, 0.6rem);
+  font-size: 14px;
+  margin-top: 8px;
 }
 
 .pnl-transactions {
-  margin-top: clamp(16px, 2vw, 24px);
-  padding-top: clamp(0.8rem, 1.2vw, 1.6rem);
-  border-top: 1px solid #2a2e2a;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #2a2a30;
   text-align: left;
 }
 
-.pnl-transactions table {
-  width: 100%;
-  table-layout: fixed;
-}
-
 .pnl-transactions .line {
-  margin-bottom: clamp(0.8rem, 1.2vw, 1.6rem);
-  font-size: clamp(1rem, 2vw, 14px);
+  margin-bottom: 12px;
 }
 
 .download-btn {
   background: rgba(44, 44, 50, 0.95);
   color: #e5e5e7;
-  font-size: clamp(1.2rem, 1.8vw, 2rem);
-  padding: clamp(0.6rem, 1vw, 1rem) clamp(1.2rem, 2vw, 2rem);
-  border-radius: 1rem;
+  font-size: 14px;
+  padding: 10px 24px;
+  border-radius: 12px;
   border: 1px solid #4a4a52;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 10px;
   transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  margin: clamp(0.8rem, 1vw, 1rem) auto clamp(1.5rem, 2vw, 2rem);
-  box-sizing: border-box;
+  margin: 16px auto 0;
 }
 
 .download-btn:hover {
-  background: #3a3a3a;
+  background: #3a3a42;
+  transform: translateY(-1px);
 }
 
 .download-btn img {
-  width: clamp(1.2rem, 1.8vw, 2rem);
-  height: clamp(1.2rem, 1.8vw, 2rem);
+  width: 18px;
+  height: 18px;
   vertical-align: middle;
 }
 
 .download-btn:active {
-  transform: scale(0.95);
+  transform: translateY(0);
 }
 
 table tr.token-row.token-row-even {
@@ -586,58 +563,57 @@ table tr.details-row {
 
 @media screen and (max-width: 768px) {
   body {
-    margin: 0;
-    padding: 8px;
-    font-size: 14px;
+    padding: 16px;
+    font-size: 12px;
   }
 
   .header-container {
-    padding: 12px;
+    padding: 16px;
     margin-bottom: 12px;
   }
 
   .header-icon {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     margin-right: 8px;
-    margin-left: 0px;
+    margin-left: 8px;
   }
 
   .header-text {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .header-text .metanynja {
-    font-size: 14px;
+    font-size: 16px;
+    margin-left: 6px;
   }
 
   #console {
-    padding: 8px;
-    border-radius: 8px;
+    padding: 8px 12px;
+    border-radius: 12px;
   }
 
   #output {
-    width: 640px;
-    padding: 0px;
+    padding: 12px;
   }
 
   .main-header {
-    font-size: 18px;
-    margin-bottom: clamp(10px, 2vw, 12px);
+    font-size: 20px;
+    margin: 16px 0;
   }
 
   .header {
-    font-size: 12px;
-    margin: clamp(8px, 2vw, 12px);
-    padding-top: clamp(0, 2vw, 8px);
+    font-size: 14px;
+    margin: 16px 0 8px;
+    padding-top: 12px;
   }
 
   .line {
-    margin-bottom: clamp(0, 0, 8px);
+    margin-bottom: 8px;
   }
 
   .separator {
-    margin: clamp(0, 2vw, 8px);
+    margin: 12px 0;
   }
 
   .dropdown-toggle {
@@ -685,317 +661,301 @@ table tr.details-row {
   }
 
   .pnl-card-header {
-    margin-bottom: clamp(0.3rem, 0.6vw, 0.6rem);
+    display: flex;
+    align-items: center;
     flex-wrap: nowrap;
-    text-align: left;
-    width: 100%;
-    padding-left: clamp(0.4rem, 0.8vw, 0.8rem);
+    justify-content: flex-start;
   }
 
   .pnl-card-icon {
-    width: clamp(32px, 6vw, 64px);
-    height: clamp(32px, 6vw, 64px);
-    margin-right: clamp(0.4rem, 0.8vw, 0.8rem);
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
   }
 
   .pnl-card-title {
-    font-size: clamp(1.2rem, 2.2vw, 2rem);
+    font-size: 14px;
+    white-space: nowrap;
   }
 
   .pnl-card-title .pnl {
-    font-size: clamp(1rem, 2vw, 1.8rem);
-    margin-left: 0.2rem;
+    font-size: 13px;
+    margin-left: 4px;
   }
 
-  table:has(.txn-row) {
-    font-size: 4px;
+  table:has(#xrp-values-toggle) {
+    font-size: 10px;
   }
 
-  table:has(#xrp-table) th,
-  table:has(.txn) td {
-    padding: clamp(0px, 2vw, 6px);
+  table:has(#xrp-values-toggle) th,
+  table:has(#xrp-values-toggle) td {
+    padding: 6px 8px;
   }
 
-  table:has(.xrp-row) th:nth-child(2),
-  table:has(.xrp-row) td:nth-child(n) {
-    width: 32px;
+  table:has(#xrp-values-toggle) th:nth-child(1),
+  table:has(#xrp-values-toggle) td:nth-child(1) {
+    width: 30%;
     max-width: none;
-    white-space: nowrap;
-    overflow: nowrap;
-    text-overflow: nowrap;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
 
-  table:has(.xrp-row) th:nth-child(n+4),
-  table:has(.xrp-row) td:nth-child(n+4) {
+  table:has(#xrp-values-toggle) th:nth-child(5),
+  table:has(#xrp-values-toggle) td:nth-child(5),
+  table:has(#xrp-values-toggle) th:nth-child(6),
+  table:has(#xrp-values-toggle) td:nth-child(6) {
     display: none;
   }
 
   .pnl-card {
-    width: clamp(320px, 90vw, 640px);
-    padding: clamp(0.8rem, 1.5vw, 1.2rem);
-    margin: clamp(0.8rem, 1.5vw, 1.2rem) auto;
-    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
-    border-radius: 0;
-  }
-
-  .pnl-card-header {
-    margin-bottom: clamp(0.3rem, 0.6vw, 0.6rem);
+    width: 90%;
+    margin: 8px auto;
+    padding: 12px;
+    z-index: 5;
+    position: relative;
+    transform: translateY(-10px);
+    font-size: 12px;
   }
 
   .pnl-card-token {
-    font-size: clamp(2rem, 4vw, 4rem);
-    margin: clamp(0.2rem, 0.4vw, 0.4rem) auto;
-    transform: scale(0.9);
+    font-size: 20px;
+    margin: 8px 0;
   }
 
   .pnl-card-profit {
-    font-size: clamp(1.8rem, 3.5vw, 3.8rem);
-    margin: clamp(0.2rem, 0.4vw, 0.4rem) auto;
+    font-size: 16px;
+    margin-bottom: 12px;
   }
 
   .pnl-card-row {
-    gap: clamp(0.8rem, 2vw, 2rem);
+    gap: 40px;
   }
 
   .pnl-card-label {
-    font-size: clamp(1.6rem, 2.5vw, 2.8rem);
+    font-size: 14px;
   }
 
   .pnl-card-value {
-    font-size: clamp(1.4rem, 2.2vw, 2.4rem);
+    font-size: 12px;
+    margin-top: 4px;
   }
 
   .pnl-transactions {
-    margin-top: clamp(0px, 2vw, 8px);
-    padding: clamp(0px, 2vw, 0px);
-  }
-
-  .pnl-transactions table {
-    width: 100%;
-    table-layout: auto;
+    margin-top: 12px;
+    padding-top: 8px;
   }
 
   table {
-    font-size: clamp(5px, 1.2vw, 6px);
-    margin: clamp(0px, 2vw, 8px);
+    font-size: 10px;
+    margin: 12px 0;
   }
 
   th, td {
-    padding: clamp(2px, 1vw, 4px);
-    width: auto;
-    max-width: clamp(40px, 10vw, 60px);
-    white-space: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .xrp-values-only th,
-  .xrp-values-only td {
-    width: auto;
-    max-width: clamp(40px, 10vw, 60px);
-    white-space: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    padding: 6px 8px;
+    min-height: 32px;
+    font-size: 10px;
   }
 
   .xrp-values-only th:nth-child(1),
   .xrp-values-only td:nth-child(1) {
-    width: clamp(60px, 15vw, 80px);
+    width: 30%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .xrp-values-only th:nth-child(4),
+  .xrp-values-only td:nth-child(4),
+  .xrp-values-only th:nth-child(7),
+  .xrp-values-only td:nth-child(7) {
+    width: 35%;
   }
 
   .details-row td {
-    padding: clamp(0px, 2vw, 8px);
-    height: auto;
+    padding: 12px;
+    min-height: 40px;
   }
 
   .details-content {
-    padding: clamp(0px, 2vw, 8px);
+    padding: 8px;
   }
 
   .expanded {
-    padding: clamp(0px, 2vw, 8px);
-    margin: clamp(0px, 2vw, 8px);
+    padding: 12px;
+    margin: 8px 0;
   }
 
   .expanded .line {
-    margin-bottom: clamp(0px, 0px, 8px);
+    margin-bottom: 10px;
   }
 
   a, .expandable {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   #loadingLine, .error {
-    font-size: 10px;
-    margin: clamp(0px, 2vw, 12px);
-  }
-
-  .download-btn {
-    font-size: clamp(0.8rem, 1.3vw, 1.1rem);
-    padding: clamp(0.4rem, 0.8vw, 0.8rem) clamp(1rem, 2vw, 2rem);
-    margin: clamp(0.4rem, 0.8vw, 0.8rem) auto clamp(1rem, 1.5vw, 1.5rem);
-    max-width: clamp(180px, 50vw, 240px);
-    white-space: nowrap;
-    box-sizing: border-box;
-  }
-
-  .download-btn img {
-    width: clamp(1rem, 1.5vw, 1.4rem);
-    height: clamp(1rem, 1.5vw, 1.4rem);
+    font-size: 12px;
+    margin: 16px 0;
   }
 }
-
-.transactions-card {
-  background: rgba(34, 34, 40, 0.98);
-  border-radius: 1.5rem;
-  padding: 2.5vw;
-  margin: 1rem auto;
-  box-shadow: 0 0.4rem 1.6rem rgba(0, 0, 0, 0.3);
-  color: #e5e5e7;
-  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-size: clamp(1.4rem, 2.5vw, 2.8rem);
-  line-height: 1.6;
-  text-align: left;
-  box-sizing: border-box;
-  width: clamp(800px, 80vw, 1800px);
-  max-width: 100%;
-  position: relative;
-  z-index: 5;
+/* New CSS for .pnl-card.downloading */
+#output .pnl-card.downloading {
+  width: 1800px !important;
+  height: 1600px !important;
+  max-width: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  padding: 48px 96px !important;
+  font-size: 28px !important;
+  line-height: 1.6 !important;
+  border-radius: 0 !important;
+  position: absolute !important;
+  z-index: 9999 !important;
+  box-sizing: border-box !important;
+  background: 
+    linear-gradient(
+      45deg,
+      rgba(34, 34, 40, 0.98) 25%,
+      rgba(255, 255, 255, 0.05) 25%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(34, 34, 40, 0.98) 50%,
+      rgba(34, 34, 40, 0.98) 75%,
+      rgba(255, 255, 255, 0.05) 75%,
+      rgba(255, 255, 255, 0.05) 100%
+    ) !important;
+  background-size: 20px 20px !important;
+  background-color: rgba(34, 34, 40, 0.98) !important;
 }
 
-.transactions-card-header {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 600;
-  font-size: clamp(2.5rem, 4vw, 8rem);
-  color: #ffffff;
-  margin-bottom: clamp(2rem, 5vw, 10rem);
+#output .pnl-card.downloading .pnl-card-header {
+  margin-bottom: 180px !important; /* Increased from 140px to shift content below downward */
+  margin-top: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
 }
 
-.transactions-card-content .line {
-  margin-bottom: clamp(0.8rem, 1.2vw, 2.4rem);
-  font-size: clamp(1.4rem, 2vw, 2.8rem);
+#output .pnl-card.downloading .pnl-card-icon {
+  width: 128px !important;
+  height: 128px !important;
+  margin-right: 48px !important;
+}
+
+#output .pnl-card.downloading .pnl-card-title {
+  font-size: 96px !important;
+}
+
+#output .pnl-card.downloading .pnl-card-title .pnl {
+  font-size: 90px !important;
+  margin-left: 8px !important;
+}
+
+#output .pnl-card.downloading .pnl-card-token {
+  font-size: 220px !important;
+  margin: 140px 0 60px 0 !important; /* Kept to maintain spacing with percentage */
+  word-break: break-word !important;
+  max-width: 75% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  line-height: 1.1 !important;
+}
+
+#output .pnl-card.downloading .pnl-card-profit {
+  font-size: 128px !important;
+  margin-bottom: 160px !important; /* Kept to maintain spacing with Bought/Profit */
+}
+
+#output .pnl-card.downloading .pnl-card-content {
+  gap: 48px !important; /* Kept to maintain spacing within Bought/Profit */
+}
+
+#output .pnl-card.downloading .pnl-card-row {
+  gap: 360px !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+}
+
+#output .pnl-card.downloading .pnl-card-column {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+#output .pnl-card.downloading .pnl-card-label {
+  font-size: 88px !important;
+  text-decoration: none !important;
+}
+
+#output .pnl-card.downloading .pnl-card-value {
+  font-size: 80px !important;
+  margin-top: 24px !important;
 }
 
 @media screen and (max-width: 768px) {
-  .transactions-card {
-    width: clamp(600px, 90vw, 1200px);
-    padding: 3vw;
-    font-size: clamp(1.2rem, 2.2vw, 2rem);
-  }
-
-  .transactions-card-header {
-    font-size: clamp(1.8rem, 3.5vw, 4.5rem);
-    margin-bottom: clamp(1.5rem, 4vw, 6rem);
-  }
-
-  .transactions-card-content .line {
-    margin-bottom: clamp(0.8rem, 1.2vw, 1.6rem);
-    font-size: clamp(1.2rem, 1.8vw, 2rem);
-  }
-}
- 
-
-/* Media query for print/download to adjust PnL card spacing */
-@media print {
-  .pnl-card {
-    padding: clamp(10px, 1.5vw, 12px); /* Match non-print side padding */
+  #output .pnl-card.downloading {
+    width: 1800px !important;
+    height: 1600px !important;
+    max-width: none !important;
+    margin: 0 !important;
+    transform: none !important;
+    padding: 48px 96px !important;
+    font-size: 28px !important;
+    border-radius: 0 !important;
+    position: absolute !important;
+    z-index: 9999 !important;
     background: 
       linear-gradient(
         45deg,
-        rgba(34, 34, 40, 0.75) 25%,
+        rgba(34, 34, 40, 0.98) 25%,
         rgba(255, 255, 255, 0.05) 25%,
         rgba(255, 255, 255, 0.05) 50%,
-        rgba(34, 34, 40, 0.75) 50%,
-        rgba(34, 34, 40, 0.75) 75%,
+        rgba(34, 34, 40, 0.98) 50%,
+        rgba(34, 34, 40, 0.98) 75%,
         rgba(255, 255, 255, 0.05) 75%,
         rgba(255, 255, 255, 0.05) 100%
-      );
-    background-size: 0.4vw 0.4vw;
-    background-color: rgba(34, 34, 40, 25%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    aspect-ratio: 1/1; /* Maintain square shape */
-    width: clamp(600px, 60vw, 1200px); /* Match non-print width */
-    height: auto; /* Respect aspect ratio */
-    overflow: hidden; /* Prevent overflow */
-    position: relative; /* For absolute header positioning */
-    padding-top: clamp(40px, 5vw, 48px); /* Space for header */
-    padding-bottom: 0; /* No extra bottom padding */
+      ) !important;
+    background-size: 20px 20px !important;
+    background-color: rgba(34, 34, 40, 0.98) !important;
   }
 
-  .pnl-card-header {
-    position: absolute; /* Fix header at the top */
-    top: clamp(10px, 1.5vw, 12px); /* Align with card side padding */
-    left: clamp(10px, 1.5vw, 12px);
-    right: clamp(10px, 1.5vw, 12px);
-    margin: 0;
-    padding: 0;
-    flex-wrap: nowrap;
+  #output .pnl-card.downloading .pnl-card-icon {
+    width: 128px !important;
+    height: 128px !important;
+    margin-right: 48px !important;
   }
 
-  /* Add top spacer below header */
-  .pnl-card::before {
-    content: '';
-    min-height: clamp(20px, 2.5vw, 24px); /* Equal gap from header to token */
+  #output .pnl-card.downloading .pnl-card-title {
+    font-size: 96px !important;
   }
 
-  .pnl-card-token {
-    margin: 0 auto; /* Center */
-    font-size: clamp(3rem, 5.5vw, 8rem); /* Match non-print */
-    line-height: 1.1; /* Match non-print */
-    margin-top: clamp(20px, 2.5vw, 24px); /* Equal gap from spacer */
+  #output .pnl-card.downloading .pnl-card-title .pnl {
+    font-size: 90px !important;
   }
 
-  .pnl-card-profit {
-    margin: 0 auto; /* Center */
-    font-size: clamp(2.5rem, 4.5vw, 6rem); /* Match non-print */
-    line-height: 1; /* Match non-print */
-    margin-top: clamp(20px, 2.5vw, 24px); /* Equal gap from token */
+  #output .pnl-card.downloading .pnl-card-token {
+    font-size: 220px !important;
+    word-break: break-word !important;
+    max-width: 75% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    line-height: 1.1 !important;
   }
 
-  .pnl-card-content {
-    margin: 0; /* No extra margin */
-    margin-top: clamp(20px, 2.5vw, 24px); /* Equal gap from profit */
-    gap: clamp(0.4rem, 0.8vw, 0.8rem); /* Match non-print */
+  #output .pnl-card.downloading .pnl-card-profit {
+    font-size: 128px !important;
   }
 
-  .pnl-card-row {
-    gap: clamp(1rem, 2.5vw, 4rem); /* Match non-print */
-    flex-wrap: nowrap;
-    justify-content: center;
-    margin: 0;
+  #output .pnl-card.downloading .pnl-card-label {
+    font-size: 88px !important;
+    text-decoration: none !important;
   }
 
-  .pnl-card-column {
-    align-items: center;
-    margin: 0;
-  }
-
-  .pnl-card-label {
-    font-size: clamp(2rem, 3.2vw, 4rem); /* Match non-print */
-    line-height: 1.4; /* Match non-print */
-    margin: 0;
-  }
-
-  .pnl-card-value {
-    font-size: clamp(1.8rem, 2.8vw, 3.6rem); /* Match non-print */
-    margin-top: clamp(0.3rem, 0.6vw, 0.6rem); /* Match non-print */
-    line-height: 1.4; /* Match non-print */
-  }
-
-  .download-btn {
-    display: none; /* Ensure button is hidden */
-  }
-
-  /* Add bottom spacer */
-  .pnl-card::after {
-    content: '';
-    min-height: clamp(20px, 2.5vw, 24px); /* Equal gap to bottom */
+  #output .pnl-card.downloading .pnl-card-value {
+    font-size: 80px !important;
   }
 }
-
-   </style>
+  </style>
   <!-- Add Google Fonts for cursive MetaNynja -->
   <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
   
@@ -2271,86 +2231,83 @@ table tr.details-row {
   });
 }
   
-function downloadPnLCard(cardId, tokenName) {
+  function downloadPnLCard(cardId, tokenName) {
   const cardElement = document.getElementById(cardId);
   if (!cardElement) {
     console.error(`PnL card with ID ${cardId} not found`);
     alert('PnL card not found. Please try again.');
     return;
   }
+
+  // Store original styles
+  const originalStyle = {
+    width: cardElement.style.width,
+    height: cardElement.style.height,
+    maxWidth: cardElement.style.maxWidth,
+    margin: cardElement.style.margin,
+    transform: cardElement.style.transform,
+    fontSize: cardElement.style.fontSize,
+    padding: cardElement.style.padding,
+    borderRadius: cardElement.style.borderRadius,
+    position: cardElement.style.position,
+    zIndex: cardElement.style.zIndex,
+    boxSizing: cardElement.style.boxSizing
+  };
+
+  // Temporarily show all expandable content except transactions and download button
   const expandableSections = cardElement.querySelectorAll('.hidden:not(.pnl-transactions .hidden)');
   const transactionsSection = cardElement.querySelector('.pnl-transactions');
   const downloadButton = cardElement.querySelector('.download-btn');
   const originalTransactionsDisplay = transactionsSection ? transactionsSection.style.display : '';
   const originalButtonDisplay = downloadButton ? downloadButton.style.display : '';
-  const originalCardStyle = cardElement.style.cssText; // Save original styles
 
-  // Apply temporary inline styles to match on-screen sizes and ensure equal spacing
-  cardElement.style.display = 'flex';
-  cardElement.style.flexDirection = 'column';
-  cardElement.style.alignItems = 'center';
-  cardElement.style.padding = 'clamp(10px, 1.5vw, 12px)';
-  cardElement.style.paddingTop = 'clamp(40px, 5vw, 48px)';
-  cardElement.style.paddingBottom = '0';
-  cardElement.style.aspectRatio = '1/1';
-  cardElement.style.width = 'clamp(600px, 60vw, 1200px)';
-  cardElement.style.height = 'auto';
-  cardElement.style.overflow = 'hidden';
-  cardElement.style.position = 'relative';
-
-  // Fix header at the top
-  cardElement.querySelector('.pnl-card-header').style.position = 'absolute';
-  cardElement.querySelector('.pnl-card-header').style.top = 'clamp(10px, 1.5vw, 12px)';
-  cardElement.querySelector('.pnl-card-header').style.left = 'clamp(10px, 1.5vw, 12px)';
-  cardElement.querySelector('.pnl-card-header').style.right = 'clamp(10px, 1.5vw, 12px)';
-  cardElement.querySelector('.pnl-card-header').style.margin = '0';
-  cardElement.querySelector('.pnl-card-header').style.padding = '0';
-
-  // Apply equal spacing
-  cardElement.querySelector('.pnl-card-token').style.margin = '0 auto';
-  cardElement.querySelector('.pnl-card-token').style.marginTop = 'clamp(20px, 2.5vw, 24px)';
-  cardElement.querySelector('.pnl-card-token').style.fontSize = 'clamp(3rem, 5.5vw, 8rem)';
-  cardElement.querySelector('.pnl-card-profit').style.margin = '0 auto';
-  cardElement.querySelector('.pnl-card-profit').style.marginTop = 'clamp(20px, 2.5vw, 24px)';
-  cardElement.querySelector('.pnl-card-profit').style.fontSize = 'clamp(2.5rem, 4.5vw, 6rem)';
-  cardElement.querySelector('.pnl-card-content').style.margin = '0';
-  cardElement.querySelector('.pnl-card-content').style.marginTop = 'clamp(20px, 2.5vw, 24px)';
-  cardElement.querySelector('.pnl-card-content').style.gap = 'clamp(0.4rem, 0.8vw, 0.8rem)';
-  cardElement.querySelector('.pnl-card-row').style.gap = 'clamp(1rem, 2.5vw, 4rem)';
-  const labels = cardElement.querySelectorAll('.pnl-card-label');
-  labels.forEach(label => {
-    label.style.fontSize = 'clamp(2rem, 3.2vw, 4rem)';
-    label.style.margin = '0';
-  });
-  const values = cardElement.querySelectorAll('.pnl-card-value');
-  values.forEach(value => {
-    value.style.fontSize = 'clamp(1.8rem, 2.8vw, 3.6rem)';
-    value.style.marginTop = 'clamp(0.3rem, 0.6vw, 0.6rem)';
-  });
-
+  // Show expandable sections (excluding those inside transactions)
   expandableSections.forEach(section => {
     section.classList.remove('hidden');
   });
+
+  // Hide transactions and download button
   if (transactionsSection) transactionsSection.style.display = 'none';
   if (downloadButton) downloadButton.style.display = 'none';
 
+  // Set fixed dimensions and apply downloading class
+  const desiredWidth = 1800; // Desired width in pixels
+  const desiredHeight = 1600; // Desired height in pixels
+  cardElement.style.width = `${desiredWidth}px`;
+  cardElement.style.height = `${desiredHeight}px`;
+  cardElement.style.maxWidth = 'none';
+  cardElement.style.margin = '0';
+  cardElement.style.transform = 'none';
+  cardElement.style.position = 'absolute'; // Ensure it’s not affected by parent layout
+  cardElement.style.zIndex = '9999'; // Bring to front
+  cardElement.style.boxSizing = 'border-box';
+  cardElement.classList.add('downloading');
+
+  // Force reflow to ensure styles are applied
+  cardElement.offsetHeight; // Trigger reflow
+
+  // Add a small delay to ensure styles are rendered
   setTimeout(() => {
     html2canvas(cardElement, {
-      backgroundColor: null,
-      scale: 2,
-      useCORS: true,
-      logging: true,
-      width: cardElement.offsetWidth,
-      height: cardElement.offsetWidth // Ensure square output
+      backgroundColor: null, // Preserve transparent background
+      width: desiredWidth, // Set canvas width
+      height: desiredHeight, // Set canvas height
+      scale: 2, // Double rendering resolution for sharpness
+      useCORS: true, // Enable CORS for external images
+      logging: true // Enable logging for debugging
     }).then(canvas => {
       // Restore original styles
-      cardElement.style.cssText = originalCardStyle;
+      cardElement.classList.remove('downloading');
+      Object.assign(cardElement.style, originalStyle);
+
+      // Restore expandable sections, transactions, and download button
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
       if (transactionsSection) transactionsSection.style.display = originalTransactionsDisplay;
       if (downloadButton) downloadButton.style.display = originalButtonDisplay;
 
+      // Create download link
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
       link.download = `PnL_Card_${tokenName.replace(/\s+/g, '_')}.png`;
@@ -2358,7 +2315,8 @@ function downloadPnLCard(cardId, tokenName) {
     }).catch(error => {
       console.error('Error generating PnL card image:', error);
       // Restore original styles on error
-      cardElement.style.cssText = originalCardStyle;
+      cardElement.classList.remove('downloading');
+      Object.assign(cardElement.style, originalStyle);
       expandableSections.forEach(section => {
         section.classList.add('hidden');
       });
@@ -2366,7 +2324,7 @@ function downloadPnLCard(cardId, tokenName) {
       if (downloadButton) downloadButton.style.display = originalButtonDisplay;
       alert('Failed to download PnL card. Please check the console for errors and try again.');
     });
-  }, 100);
+  }, 100); // 100ms delay to ensure styles are applied
 }
   /* ---------- Scope Modules ---------- */
   const scopeModules = {
@@ -2793,91 +2751,80 @@ function downloadPnLCard(cardId, tokenName) {
     }
   },
   renderData(data) {
-    const { tokens, tokenDetails } = data;
-    let html = `<div class="header">Trade History</div>`;
-    html += `
-      <div class="line">
-        <label style="cursor: pointer; margin-right: 20px;">
-          <input type="checkbox" id="xrp-values-toggle" onchange="toggleXrpValuesOnly()" checked>
-          XRP Values Only
-        </label>
-        <label style="cursor: pointer;">
-          <input type="checkbox" id="zero-balance-toggle" onchange="toggleZeroBalanceOnly()">
-          Zero Balance Only
-        </label>
-      </div>
-    `;
-    if (tokens.length === 0) {
-      html += `<div class="line">No token purchase or sale activity found for this wallet.</div>`;
-    } else {
-      html += `<table>`;
-      html += `<tr><th>Token</th><th>Balance</th><th>Bought</th><th>Spent</th><th>Sold</th><th>Received</th><th>P/L</th></tr>`;
-      tokens.forEach((token, index) => {
-        const key = `${token.issuer}_${token.currency}`;
-        const details = tokenDetails[key] || {
-          currentBalance: token.currentBalance,
-          tokensBought: 0,
-          xrpSpent: 0,
-          tokensSold: 0,
-          xrpReceived: 0,
-          profit: 0,
-          buyTxs: [],
-          sellTxs: []
-        };
-        let p_l_display, p_l_color;
-        if (details.tokensSold === 0 && details.xrpReceived === 0) {
-          p_l_display = `0 XRP`;
-          p_l_color = 'white';
-        } else {
-          const isProfit = details.profit >= 0;
-          const symbol = isProfit ? '+' : '−';
-          p_l_display = `${symbol}${formatAmount(Math.abs(details.profit))} XRP`;
-          p_l_color = isProfit ? '#66bb6a' : '#ef5350';
-        }
-        const rowParityClass = index % 2 === 0 ? 'token-row-even' : 'token-row-odd';
-        html += `<tr class="token-row ${rowParityClass}" onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
-        html += `<td style="overflow: hidden; text-overflow: ellipsis;" title="${getCurrencyDisplay(token.currency)}"><a href="https://xrpscan.com/account/${token.issuer}" target="_blank">${getCurrencyDisplay(token.currency)}</a></td>`;
-        html += `<td>${formatAmount(details.currentBalance)}</td>`;
-        html += `<td>${formatAmount(details.tokensBought)}</td>`;
-        html += `<td>${formatAmount(details.xrpSpent)} XRP</td>`;
-        html += `<td>${formatAmount(details.tokensSold)}</td>`;
-        html += `<td>${formatAmount(details.xrpReceived)} XRP</td>`;
-        html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
-        html += `</tr>`;
-        html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7">`;
-        // PnL Card
-        html += `
-          <div class="pnl-card" id="pnl-card-${key}">
-            <div class="pnl-card-header">
-              <img src="https://i.ibb.co/svZT9rZQ/Magic-Eraser-250603-140451.png" alt="Inspection Ninja Icon" class="pnl-card-icon">
-              <div class="pnl-card-title">Inspection Ninja <span class="pnl">PnL</span></div>
-            </div>
-            <div class="pnl-card-token">${getCurrencyDisplay(token.currency)}</div>
-            <div class="pnl-card-profit ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">
-              ${details.profit >= 0 ? '+' : '-'}${Math.abs((details.xrpSpent > 0 ? (details.profit / details.xrpSpent) * 100 : (details.profit > 0 ? Infinity : 0))).toFixed(2)}%
-            </div>
-            <div class="pnl-card-content">
-              <div class="pnl-card-row">
-                <div class="pnl-card-column">
-                  <span class="pnl-card-label">Bought</span>
-                  <span class="pnl-card-value">${formatAmount(details.xrpSpent)} XRP</span>
-                </div>
-                <div class="pnl-card-column">
-                  <span class="pnl-card-label">${details.profit >= 0 ? 'Profit' : 'Loss'}</span>
-                  <span class="pnl-card-value ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">${formatAmount(Math.abs(details.profit))} XRP</span>
-                </div>
+  const { tokens, tokenDetails } = data;
+  let html = `<div class="header">Trade History</div>`;
+  html += `
+    <div class="line">
+      <label style="cursor: pointer; margin-right: 20px;">
+        <input type="checkbox" id="xrp-values-toggle" onchange="toggleXrpValuesOnly()" checked>
+        XRP Values Only
+      </label>
+      <label style="cursor: pointer;">
+        <input type="checkbox" id="zero-balance-toggle" onchange="toggleZeroBalanceOnly()">
+        Zero Balance Only
+      </label>
+    </div>
+  `;
+  if (tokens.length === 0) {
+    html += `<div class="line">No token purchase or sale activity found for this wallet.</div>`;
+  } else {
+    html += `<table>`;
+    html += `<tr><th>Token</th><th>Balance</th><th>Bought</th><th>Spent</th><th>Sold</th><th>Received</th><th>P/L</th></tr>`;
+    tokens.forEach((token, index) => {
+      const key = `${token.issuer}_${token.currency}`;
+      const details = tokenDetails[key] || {
+        currentBalance: token.currentBalance,
+        tokensBought: 0,
+        xrpSpent: 0,
+        tokensSold: 0,
+        xrpReceived: 0,
+        profit: 0,
+        buyTxs: [],
+        sellTxs: []
+      };
+      let p_l_display, p_l_color;
+      if (details.tokensSold === 0 && details.xrpReceived === 0) {
+        p_l_display = `0 XRP`;
+        p_l_color = 'white';
+      } else {
+        const isProfit = details.profit >= 0;
+        const symbol = isProfit ? '+' : '−';
+        p_l_display = `${symbol}${formatAmount(Math.abs(details.profit))} XRP`;
+        p_l_color = isProfit ? '#66bb6a' : '#ef5350';
+      }
+      const rowParityClass = index % 2 === 0 ? 'token-row-even' : 'token-row-odd';
+      html += `<tr class="token-row ${rowParityClass}" onclick="toggleSection('token_details_${key}')" style="cursor: pointer;">`;
+      html += `<td style="overflow: hidden; text-overflow: ellipsis;" title="${getCurrencyDisplay(token.currency)}"><a href="https://xrpscan.com/account/${token.issuer}" target="_blank">${getCurrencyDisplay(token.currency)}</a></td>`;
+      html += `<td>${formatAmount(details.currentBalance)}</td>`;
+      html += `<td>${formatAmount(details.tokensBought)}</td>`;
+      html += `<td>${formatAmount(details.xrpSpent)} XRP</td>`;
+      html += `<td>${formatAmount(details.tokensSold)}</td>`;
+      html += `<td>${formatAmount(details.xrpReceived)} XRP</td>`;
+      html += `<td style="color: ${p_l_color}">${p_l_display}</td>`;
+      html += `</tr>`;
+      html += `<tr id="token_details_${key}" class="details-row hidden"><td colspan="7">`;
+      html += `
+        <div class="pnl-card" id="pnl-card-${key}">
+          <div class="pnl-card-header">
+            <img src="https://i.ibb.co/svZT9rZQ/Magic-Eraser-250603-140451.png" alt="Inspection Ninja Icon" class="pnl-card-icon">
+            <div class="pnl-card-title">Inspection Ninja <span class="pnl">PnL</span></div>
+          </div>
+          <div class="pnl-card-token">${getCurrencyDisplay(token.currency)}</div>
+          <div class="pnl-card-profit ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">
+            ${details.profit >= 0 ? '+' : '-'}${Math.abs((details.xrpSpent > 0 ? (details.profit / details.xrpSpent) * 100 : (details.profit > 0 ? Infinity : 0))).toFixed(2)}%
+          </div>
+          <div class="pnl-card-content">
+            <div class="pnl-card-row">
+              <div class="pnl-card-column">
+                <span class="pnl-card-label">Bought</span>
+                <span class="pnl-card-value">${formatAmount(details.xrpSpent)} XRP</span>
+              </div>
+              <div class="pnl-card-column">
+                <span class="pnl-card-label">${details.profit >= 0 ? 'Profit' : 'Loss'}</span>
+                <span class="pnl-card-value ${details.profit >= 0 ? 'pnl-profit-positive' : 'pnl-profit-negative'}">${formatAmount(Math.abs(details.profit))} XRP</span>
               </div>
             </div>
-            <button class="download-btn" onclick="event.stopPropagation(); downloadPnLCard('pnl-card-${key}', '${getCurrencyDisplay(token.currency).replace(/'/g, "\\'")}')">
-              <img src="https://i.ibb.co/3m0LddNz/IMG-7147.png">
-              Download PnL Card
-            </button>
-          </div>`;
-        // Transactions Card
-        html += `
-          <div class="transactions-card" id="transactions-card-${key}">
-            <div class="transactions-card-header">Transaction History</div>
-            <div class="transactions-card-content">
+            <div class="pnl-transactions">
               ${details.buyTxs.length > 0 ? `
                 <div class="line">Purchases: <span class="expandable" onclick="event.stopPropagation(); toggleSection('buy_txs_${key}')">[view]</span></div>
                 <div id="buy_txs_${key}" class="hidden">${buildTableHTML(details.buyTxs, 'purchase', getCurrencyDisplay(token.currency))}</div>
@@ -2887,17 +2834,22 @@ function downloadPnLCard(cardId, tokenName) {
                 <div id="sell_txs_${key}" class="hidden">${buildTableHTML(details.sellTxs, 'sale', getCurrencyDisplay(token.currency))}</div>
               ` : `<div class="line">Sales: None</div>`}
             </div>
-          </div>`;
-        html += `</td></tr>`;
-      });
-      html += `</table>`;
-    }
-    // Call toggleXrpValuesOnly to apply the XRP Values Only styling
-    setTimeout(() => {
-      toggleXrpValuesOnly();
-    }, 0);
-    return html;
+          </div>
+          <button class="download-btn" onclick="event.stopPropagation(); downloadPnLCard('pnl-card-${key}', '${getCurrencyDisplay(token.currency).replace(/'/g, "\\'")}')">
+            <img src="https://i.ibb.co/3m0LddNz/IMG-7147.png">
+            Download PnL Card
+          </button>
+        </div>`;
+      html += `</td></tr>`;
+    });
+    html += `</table>`;
   }
+  // Call toggleXrpValuesOnly to apply the XRP Values Only styling
+  setTimeout(() => {
+    toggleXrpValuesOnly();
+  }, 0);
+  return html;
+}
 },
       snipers: {
       async fetchData(issuer, currencyCode) {
