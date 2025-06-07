@@ -408,72 +408,74 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
       rgba(255, 255, 255, 0.05) 75%,
       rgba(255, 255, 255, 0.05) 100%
     );
-  background-size: 0.5vw 0.5vw; /* Scaled for responsiveness */
+  background-size: 0.5vw 0.5vw;
   background-color: rgba(34, 34, 40, 0.98);
   border-radius: 1.5rem;
-  padding: 2.5vw; /* Responsive padding */
+  padding: 2.5rem;
   margin: 1rem auto;
   box-shadow: 0 0.4rem 1.6rem rgba(0, 0, 0, 0.3);
   color: #e5e5e7;
   font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-size: clamp(1.4rem, 2.5vw, 2.8rem); /* Responsive font size */
+  font-size: clamp(1.4rem, 2.5vw, 2.8rem);
   line-height: 1.6;
   text-align: center;
   box-sizing: border-box;
-  width: clamp(800px, 80vw, 1800px); /* Constrain width for high-res but responsive */
+  width: clamp(800px, 80vw, 1800px);
   max-width: 100%;
   position: relative;
-  z-index: 5;
+  z-index: 4;
 }
 
 .pnl-card-header {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  margin-bottom: clamp(2rem, 5vw, 10rem);
-  flex-wrap: nowrap; /* Prevent wrapping of icon and title */
-  overflow: hidden; /* Prevent overflow from long titles */
+  margin-bottom: clamp(2rem, 2.2vw, 8px);
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .pnl-card-icon {
-  width: clamp(64px, 6vw, 128px); /* Responsive icon size */
+  width: clamp(64px, 6vw, 128px);
   height: clamp(64px, 6vw, 128px);
   margin-right: clamp(1rem, 2vw, 4rem);
 }
 
 .pnl-card-title {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'SF Pro Display', -apple-system, sans-serif;
   font-weight: 600;
-  font-size: clamp(2.5rem, 4vw, 8rem); /* Smaller, responsive title */
-  color: #ffffff;
-  white-space: nowrap; /* Prevent wrapping */
-  display: inline-block; /* Support nowrap and scaling */
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  color: #fff;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .pnl-card-title .pnl {
   font-family: 'Nothing You Could Do', cursive;
-  font-size: clamp(2.3rem, 3.8vw, 7.5rem); /* Match title scaling */
+  font-size: clamp(2rem, 2vw, 24px);
   color: #FFECB3;
-  margin-left: 0.3rem; /* Reduced for mobile */
-  white-space: nowrap; /* Ensure no wrap */
+  margin-left: 4px;
+  white-space: nowrap;
 }
 
 .pnl-card-token {
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'SF Pro Display', -apple-system, sans-serif;
   font-weight: 600;
-  font-size: clamp(6rem, 10vw, 22rem); /* Large token name */
-  color: #ffffff;
-  margin: clamp(2rem, 4vw, 14rem) auto clamp(1rem, 2vw, 6rem);
-  word-break: break-word;
-  max-width: 75%;
-  line-height: 1.1;
+  font-size: clamp(40px, 6vw, 80px);
+  color: #fff;
+  margin: clamp(0, 2vw, 8px) auto;
+  white-space: nowrap;
+  transform: scale(0.95);
+  transform-origin: center;
+  line-height: 2;
+  display: inline;
 }
 
 .pnl-card-profit {
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-  font-weight: 500;
-  font-size: clamp(4rem, 6vw, 12.8rem); /* Large profit/loss */
-  margin-bottom: clamp(3rem, 5vw, 16rem);
+  font-weight: bold;
+  font-size: clamp(2rem, 2vw, 24px);
+  margin-bottom: clamp(8px, 2vw, 10px);
 }
 
 .pnl-profit-positive {
@@ -487,14 +489,14 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 .pnl-card-content {
   display: flex;
   flex-direction: column;
-  gap: clamp(1.6rem, 2.5vw, 4.8rem);
+  gap: clamp(8px, 2vw, 16px);
 }
 
 .pnl-card-row {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  gap: clamp(4rem, 10vw, 36rem); /* Wide gap for high-res layout */
+  align-items: center;
+  gap: clamp(40px, 2vw, 48px);
 }
 
 .pnl-card-column {
@@ -505,57 +507,58 @@ table:has(#xrp-values-toggle) td:nth-child(1) {
 
 .pnl-card-label {
   color: #A7BEFF;
-  font-weight: 500;
-  font-size: clamp(3rem, 4.5vw, 8.8rem); /* Large labels */
-  text-decoration: none; /* Remove underline for high-res */
+  font-weight: bold;
+  font-size: clamp(1rem, 2vw, 16px);
+  text-decoration: none;
 }
 
 .pnl-card-value {
   color: #e5e5e7;
-  font-size: clamp(2.8rem, 4vw, 8rem); /* Large values */
-  margin-top: clamp(0.8rem, 1.5vw, 2.4rem);
+  font-size: clamp(1rem, 2vw, 16px);
+  margin-bottom: clamp(8px, 2vw, 16px);
 }
 
 .pnl-transactions {
-  margin-top: clamp(1.6rem, 2.5vw, 4rem);
-  padding-top: clamp(1rem, 1.5vw, 3rem);
-  border-top: 1px solid #2a2a30;
+  margin-top: clamp(16px, 2vw, 24px);
+  padding-top: clamp(0.8rem, 1.2vw, 1.6rem);
+  border-top: 1px solid #2a2e2a;
   text-align: left;
 }
 
 .pnl-transactions .line {
-  margin-bottom: clamp(0.8rem, 1.2vw, 2.4rem);
-  font-size: clamp(1.4rem, 2vw, 2.8rem); /* Responsive transaction text */
+  margin-bottom: clamp(0.8rem, 1.2vw, 1.6rem);
+  font-size: clamp(1rem, 2vw, 14px);
 }
 
 .download-btn {
   background: rgba(44, 44, 50, 0.95);
   color: #e5e5e7;
-  font-size: clamp(1.4rem, 2vw, 2.8rem);
-  padding: clamp(0.8rem, 1.5vw, 2rem) clamp(1.6rem, 2.5vw, 4rem);
-  border-radius: 1.2rem;
-  border: 1px solid #4a4a52;
+  font-size: clamp(14px, 2vw, 14px);
+  padding: clamp(8px, 2vw, 24px) clamp(16px, 2vw, 24px);
+  border-radius: 8px;
+  border: 1px solid #4a4a4a;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 8px;
   transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  margin: clamp(1rem, 2vw, 3rem) auto 0;
+  margin-top: clamp(14px, 2vw, 24px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .download-btn:hover {
-  background: #3a3a42;
-  transform: translateY(-0.1rem);
+  background: #3a3a3a;
 }
 
 .download-btn img {
-  width: clamp(1.6rem, 2vw, 3.6rem);
-  height: clamp(1.6rem, 2vw, 3.6rem);
+  width: clamp(1rem, 2vw, 24px);
+  height: clamp(24px, 2vw, 24px);
   vertical-align: middle;
 }
 
 .download-btn:active {
-  transform: translateY(0);
+  transform: scale(0.95);
 }
 
 table tr.token-row.token-row-even {
@@ -573,251 +576,249 @@ table tr.details-row {
 
 @media screen and (max-width: 768px) {
   body {
-    padding: 16px;
-    font-size: 12px;
+    margin: 0;
+    padding: 8px;
+    font-size: 14px;
   }
 
   .header-container {
-    padding: 16px;
+    padding: 12px;
     margin-bottom: 12px;
   }
 
   .header-icon {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
     margin-right: 8px;
-    margin-left: 8px;
+    margin-left: 0px;
   }
 
   .header-text {
-    font-size: 16px;
+    font-size: 14px;
   }
 
-  .header-text .metanynja {
-    font-size: 16px;
-    margin-left: 6px;
+  .header-text .info {
+    font-size: 14px;
+    margin-left: 4px;
   }
 
   #console {
-    padding: 8px 12px;
-    border-radius: 12px;
+    padding: 8px;
+    border-radius: 8px;
   }
 
   #output {
-    padding: 12px;
+    width: 640px;
+    padding: 0px;
   }
 
   .main-header {
-    font-size: 20px;
-    margin: 16px 0;
-  }
+    font-size: 18px;
+    margin-bottom: clamp(10px, 2vw, 12px);
+}
 
   .header {
-    font-size: 14px;
-    margin: 16px 0 8px;
-    padding-top: 12px;
+    font-size: 12px;
+    margin: clamp(8px, 2vw, 12px);
+    padding-top: clamp(0, 2vw, 8px);
   }
 
   .line {
-    margin-bottom: 8px;
+    margin-bottom: clamp(0, 0, 8px);
   }
 
   .separator {
-    margin: 12px 0;
+    margin: clamp(0, 2vw, 8px);
   }
 
   .dropdown-toggle {
-    max-width: 140px;
-    font-size: 12px;
-    padding: 8px 12px;
-    white-space: nowrap;
+    width: 100px;
+    font-size: 10px;
+    padding: clamp(0, 2vw, 8px);
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-align: right;
   }
 
   .dropdown-menu {
-    width: 180px;
-    font-size: 12px;
-    bottom: calc(100% + 8px);
-  }
+    width Morin: 160px;
+    font-size: 10px;
+    margin-bottom: clamp(2px, 2vw, 8px);
+}
 
   .dropdown-option {
-    padding: 8px 12px;
+    padding: clamp(0, 2vw, 8px);
   }
 
   #input-line {
-    padding: 8px 12px;
-    z-index: 3;
-    width: 100%;
-    box-sizing: border-box;
+    padding: 12px;
+    width: 640px;
+    margin: clamp(0, 2vw, 8px);
     display: flex;
     flex-wrap: nowrap;
-    gap: 8px;
-    align-items: center;
+    gap: clamp(8px, 2vw, 8px);
+    align-items: stretch;
   }
 
   .custom-dropdown {
-    flex: 0 0 auto;
-    max-width: 140px;
+    width: 100px;
   }
 
   #cmd-input {
-    font-size: 12px;
-    padding: 8px 12px;
-    flex: 1 1 auto;
-    max-width: calc(100% - 156px);
-    min-width: 100px;
-    box-sizing: border-box;
+    font-size: 10px;
+    padding: clamp(0, 2vw, 10px);
+    width: clamp(360px, 90vw, 540px);
+    min-width: 64px;
   }
 
   .pnl-card-header {
-    margin-bottom: clamp(1.5rem, 4vw, 6rem);
-    flex-wrap: nowrap; /* Reinforce nowrap */
+    display: flex;
+    align-items: center;
+    margin-bottom: 0px;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    width: 640px;
   }
 
   .pnl-card-icon {
-    width: clamp(48px, 8vw, 96px);
-    height: clamp(48px, 8vw, 96px);
-    margin-right: clamp(0.8rem, 2vw, 2rem);
+    width: clamp(48px, 2vw, 48px);
+    height: clamp(48px, 2vw, 48px);
+    margin-right: clamp(0px, 0px, 8px);
   }
 
   .pnl-card-title {
-    font-size: clamp(1.8rem, 3.5vw, 4.5rem); /* Smaller for mobile */
+    font-size: clamp(1rem, 2vw, 10px);
     white-space: nowrap;
   }
 
   .pnl-card-title .pnl {
-    font-size: clamp(1.6rem, 3.3vw, 4.2rem);
-    margin-left: 0.2rem; /* Tighter for mobile */
+    font-size: clamp(20px, 2vw, 10px);
+    margin-left: clamp(0px, 0px, 4px);
     white-space: nowrap;
   }
 
-  table:has(#xrp-values-toggle) {
-    font-size: 10px;
+  table:has(.txn-row) {
+    font-size: 4px;
   }
 
-  table:has(#xrp-values-toggle) th,
-  table:has(#xrp-values-toggle) td {
-    padding: 6px 8px;
+  table:has(#xrp-table) th,
+  table:has(.txn) td {
+    padding: clamp(0px, 2vw, 6px);
   }
 
-  table:has(#xrp-values-toggle) th:nth-child(1),
-  table:has(#xrp-values-toggle) td:nth-child(1) {
-    width: 30%;
+  table:has(.xrp-row) th:nth-child(2),
+  table:has(.xrp-row) td:nth-child(n) {
+    width: 32px;
     max-width: none;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
+    white-space: nowrap;
+    overflow: nowrap;
+    text-overflow: nowrap;
   }
 
-  table:has(#xrp-values-toggle) th:nth-child(5),
-  table:has(#xrp-values-toggle) td:nth-child(5),
-  table:has(#xrp-values-toggle) th:nth-child(6),
-  table:has(#xrp-values-toggle) td:nth-child(6) {
+  table:has(.xrp-row) th:nth-child(n+5),
+  table:has(.xrp-row) td:nth-child(n+5) {
     display: none;
   }
 
   .pnl-card {
-    width: clamp(600px, 90vw, 1200px); /* Smaller but still high-res */
-    padding: 3vw;
-    font-size: clamp(1.2rem, 2.2vw, 2rem);
+    width: clamp(320px, 90vw, 640px);
+    padding: clamp(0px, 2vw, 0px);
+    margin: clamp(0px, 2vw, 8px);
+    font-size: clamp(10px, 2vw, 10px);
   }
 
   .pnl-card-header {
-    margin-bottom: clamp(1.5rem, 4vw, 6rem);
+    margin-bottom: clamp(0px, 2vw, 0px);
   }
 
   .pnl-card-token {
-    font-size: clamp(3rem, 6vw, 10rem); /* Scale down for long names */
-    margin: clamp(1.5rem, 3vw, 8rem) auto clamp(1rem, 2vw, 4rem);
+    font-size: clamp(20px, 20px, 8px);
+    margin: clamp(0px, 2vw, 8px) auto;
+    transform: scale(1);
     white-space: nowrap;
-    transform: scale(0.9); /* Slightly scale down for very long names */
   }
 
   .pnl-card-profit {
-    font-size: clamp(2.5rem, 5vw, 8rem);
-    margin-bottom: clamp(2rem, 4vw, 10rem);
+    font-size: clamp(1rem, 2vw, 10px);
+    margin-bottom: clamp(0px, 2vw, 8px);
   }
 
   .pnl-card-row {
-    gap: clamp(2rem, 8vw, 20rem);
+    gap: clamp(0px, 2vw, 0px);
   }
 
   .pnl-card-label {
-    font-size: clamp(2rem, 3.5vw, 5.5rem);
+    font-size: clamp(1rem, 2vw, 10px);
   }
 
   .pnl-card-value {
-    font-size: clamp(1.8rem, 3vw, 5rem);
-    margin-top: clamp(0.5rem, 1vw, 1.5rem);
+    font-size: clamp(0px, 0px, 8px);
+    margin-bottom: clamp(0px, 0px, 8px);
   }
 
   .pnl-transactions {
-    margin-top: clamp(1rem, 2vw, 2.5rem);
-    padding-top: clamp(0.8rem, 1.2vw, 2rem);
+    margin-top: clamp(0px, 2vw, 8px);
+    padding: clamp(0px, 2vw, 0px);
   }
 
   table {
-    font-size: 10px;
-    margin: 12px 0;
+    font-size: 8px;
+    margin: clamp(0px, 2vw, 8px);
   }
 
   th, td {
-    padding: 6px 8px;
-    min-height: 32px;
-    font-size: 10px;
+    padding: clamp(4px, 2vw, 8px);
+    width: 32px;
+    height: auto;
   }
 
-  .xrp-values-only th:nth-child(1),
-  .xrp-values-only td:nth-child(1) {
-    width: 30%;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
+  .xrp-values-only th,
+  .xrp-values-only td {
+    width: 32px;
+    white-space: nowrap;
+    nowrap: nowrap;
+    overflow: nowrap;
   }
 
-  .xrp-values-only th:nth-child(4),
-  .xrp-values-only td:nth-child(4),
-  .xrp-values-only th:nth-child(7),
-  .xrp-values-only td:nth-child(7) {
-    width: 35%;
+  .xrp-values-only th,
+  .xrp-values-only td {
+    width: nowrap;
   }
 
   .details-row td {
-    padding: 12px;
-    min-height: 40px;
+    padding: clamp(0px, 2vw, 8px);
+    height: auto;
   }
 
   .details-content {
-    padding: 8px;
+    padding: clamp(0px, 2vw, 8px);
   }
 
   .expanded {
-    padding: 12px;
-    margin: 8px 0;
+    padding: clamp(0px, 2vw, 8px);
+    margin: clamp(0px, 2vw, 8px);
   }
 
   .expanded .line {
-    margin-bottom: 10px;
+    margin-bottom: clamp(0px, 0px, 8px);
   }
 
   a, .expandable {
-    font-size: 12px;
+    font-size: 10px;
   }
 
   #loadingLine, .error {
-    font-size: 12px;
-    margin: 16px 0;
+    font-size: 10px;
+    margin: clamp(0px, 2vw, 12px);
   }
 
   .download-btn {
-    font-size: clamp(1.2rem, 1.8vw, 2rem);
-    padding: clamp(0.6rem, 1.2vw, 1.5rem) clamp(1.2rem, 2vw, 3rem);
+    font-size: clamp(10px, 2vw, 10px);
+    padding: clamp(0px, 2vw, 10px) clamp(0px, 2vw, 16px);
   }
 
   .download-btn img {
-    width: clamp(1.4rem, 1.8vw, 2.8rem);
-    height: clamp(1.4rem, 1.8vw, 2.8rem);
+    width: clamp(0px, 2vw, 16px);
+    height: clamp(0px, 2vw, 16px);
   }
 }
   </style>
