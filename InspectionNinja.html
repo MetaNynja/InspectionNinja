@@ -898,6 +898,7 @@ table tr.details-row {
 @media print {
   .pnl-card {
     padding: clamp(10px, 1.5vw, 12px); /* Match non-print padding */
+    padding-top: clamp(20px, 2.5vw, 24px); /* Increased top padding to shift content down */
     background: 
       linear-gradient(
         45deg,
@@ -915,7 +916,7 @@ table tr.details-row {
     flex-direction: column;
     justify-content: flex-start; /* Align items at the top */
     align-items: center;
-    gap: clamp(4px, 0.5vw, 6px); /* Minimal gap to prevent spreading */
+    gap: clamp(8px, 1vw, 10px); /* Increased gap for more spacing between elements */
     aspect-ratio: 1/1; /* Maintain square shape */
     width: clamp(600px, 60vw, 1200px); /* Match non-print width */
     height: auto; /* Respect aspect ratio */
@@ -923,30 +924,30 @@ table tr.details-row {
   }
 
   .pnl-card-header {
-    margin-bottom: clamp(0.3rem, 0.6vw, 0.6rem); /* Slightly reduced to close gaps */
+    margin-bottom: clamp(0.5rem, 1vw, 1rem); /* Slightly increased to match non-print */
     padding: 0; /* Match non-print */
     flex-wrap: nowrap;
   }
 
   .pnl-card-token {
-    margin: clamp(0.2rem, 0.4vw, 0.4rem) auto; /* Slightly reduced from non-print */
+    margin: clamp(0.3rem, 0.6vw, 0.6rem) auto; /* Match non-print for spacing */
     font-size: clamp(3rem, 5.5vw, 8rem); /* Match non-print */
     line-height: 1.1; /* Match non-print */
   }
 
   .pnl-card-profit {
-    margin: clamp(0.2rem, 0.4vw, 0.4rem) auto; /* Slightly reduced from non-print */
+    margin: clamp(0.3rem, 0.6vw, 0.6rem) auto; /* Match non-print for spacing */
     font-size: clamp(2.5rem, 4.5vw, 6rem); /* Match non-print */
     line-height: 1; /* Match non-print */
   }
 
   .pnl-card-content {
-    margin: 0; /* Minimal margin */
-    gap: clamp(0.2rem, 0.4vw, 0.4rem); /* Slightly reduced from non-print */
+    margin: clamp(0.3rem, 0.6vw, 0.6rem) 0; /* Increased for spacing */
+    gap: clamp(0.4rem, 0.8vw, 0.8rem); /* Match non-print for spacing */
   }
 
   .pnl-card-row {
-    gap: clamp(0.8rem, 1.5vw, 2rem); /* Slightly reduced from non-print */
+    gap: clamp(1rem, 2.5vw, 4rem); /* Match non-print for spacing */
     flex-wrap: nowrap;
     justify-content: center;
     margin: 0;
@@ -965,7 +966,7 @@ table tr.details-row {
 
   .pnl-card-value {
     font-size: clamp(1.8rem, 2.8vw, 3.6rem); /* Match non-print */
-    margin-top: clamp(0.2rem, 0.4vw, 0.4rem); /* Slightly reduced from non-print */
+    margin-top: clamp(0.3rem, 0.6vw, 0.6rem); /* Match non-print */
     line-height: 1.4; /* Match non-print */
   }
 
@@ -2263,28 +2264,29 @@ function downloadPnLCard(cardId, tokenName) {
   const originalButtonDisplay = downloadButton ? downloadButton.style.display : '';
   const originalCardStyle = cardElement.style.cssText; // Save original styles
 
-  // Apply temporary inline styles to match on-screen sizes and prevent gaps
+  // Apply temporary inline styles to match on-screen sizes and adjust spacing
   cardElement.style.display = 'flex';
   cardElement.style.flexDirection = 'column';
   cardElement.style.justifyContent = 'flex-start';
   cardElement.style.alignItems = 'center';
-  cardElement.style.gap = 'clamp(4px, 0.5vw, 6px)';
+  cardElement.style.gap = 'clamp(8px, 1vw, 10px)';
   cardElement.style.padding = 'clamp(10px, 1.5vw, 12px)';
+  cardElement.style.paddingTop = 'clamp(20px, 2.5vw, 24px)';
   cardElement.style.aspectRatio = '1/1';
   cardElement.style.width = 'clamp(600px, 60vw, 1200px)';
   cardElement.style.height = 'auto';
   cardElement.style.overflow = 'hidden';
 
   // Match non-print child element styles
-  cardElement.querySelector('.pnl-card-header').style.marginBottom = 'clamp(0.3rem, 0.6vw, 0.6rem)';
+  cardElement.querySelector('.pnl-card-header').style.marginBottom = 'clamp(0.5rem, 1vw, 1rem)';
   cardElement.querySelector('.pnl-card-header').style.padding = '0';
-  cardElement.querySelector('.pnl-card-token').style.margin = 'clamp(0.2rem, 0.4vw, 0.4rem) auto';
+  cardElement.querySelector('.pnl-card-token').style.margin = 'clamp(0.3rem, 0.6vw, 0.6rem) auto';
   cardElement.querySelector('.pnl-card-token').style.fontSize = 'clamp(3rem, 5.5vw, 8rem)';
-  cardElement.querySelector('.pnl-card-profit').style.margin = 'clamp(0.2rem, 0.4vw, 0.4rem) auto';
+  cardElement.querySelector('.pnl-card-profit').style.margin = 'clamp(0.3rem, 0.6vw, 0.6rem) auto';
   cardElement.querySelector('.pnl-card-profit').style.fontSize = 'clamp(2.5rem, 4.5vw, 6rem)';
-  cardElement.querySelector('.pnl-card-content').style.margin = '0';
-  cardElement.querySelector('.pnl-card-content').style.gap = 'clamp(0.2rem, 0.4vw, 0.4rem)';
-  cardElement.querySelector('.pnl-card-row').style.gap = 'clamp(0.8rem, 1.5vw, 2rem)';
+  cardElement.querySelector('.pnl-card-content').style.margin = 'clamp(0.3rem, 0.6vw, 0.6rem) 0';
+  cardElement.querySelector('.pnl-card-content').style.gap = 'clamp(0.4rem, 0.8vw, 0.8rem)';
+  cardElement.querySelector('.pnl-card-row').style.gap = 'clamp(1rem, 2.5vw, 4rem)';
   const labels = cardElement.querySelectorAll('.pnl-card-label');
   labels.forEach(label => {
     label.style.fontSize = 'clamp(2rem, 3.2vw, 4rem)';
@@ -2293,7 +2295,7 @@ function downloadPnLCard(cardId, tokenName) {
   const values = cardElement.querySelectorAll('.pnl-card-value');
   values.forEach(value => {
     value.style.fontSize = 'clamp(1.8rem, 2.8vw, 3.6rem)';
-    value.style.marginTop = 'clamp(0.2rem, 0.4vw, 0.4rem)';
+    value.style.marginTop = 'clamp(0.3rem, 0.6vw, 0.6rem)';
   });
 
   expandableSections.forEach(section => {
@@ -2305,7 +2307,7 @@ function downloadPnLCard(cardId, tokenName) {
   setTimeout(() => {
     html2canvas(cardElement, {
       backgroundColor: null,
-      scale: 2, // Keep reduced scale for better rendering
+      scale: 2,
       useCORS: true,
       logging: true,
       width: cardElement.offsetWidth,
